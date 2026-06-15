@@ -141,6 +141,13 @@ export default function DashboardPage() {
     state.mandala.cells.filter((c) => c.trim()).length;
   const wishlistCount = state.wishlist.length;
 
+  // 現在地（フェーズ）判定：探索（知る→導き出す）か、実践（動く）か。
+  // onboarding/field を埋めている段階＝探索、monthly/daily/done＝実践。
+  const phase: "explore" | "act" =
+    nextStep.kind === "onboarding" || nextStep.kind === "field"
+      ? "explore"
+      : "act";
+
   if (!loaded) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-32 text-center text-[var(--color-fg-faint)] text-sm tracking-widest">
@@ -197,6 +204,33 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* ===== 現在地 ＋ フローマップ（知る → 導き出す → 動く） ===== */}
+      <section className="py-8 hairline-bottom">
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
+              いま
+            </span>
+            <span
+              className={`text-[11px] tracking-[0.25em] px-3 py-1 border ${
+                phase === "explore"
+                  ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+                  : "border-[var(--color-ink)] text-[var(--color-ink)]"
+              }`}
+            >
+              {phase === "explore" ? "① 探索フェーズ" : "② 実践フェーズ"}
+            </span>
+            <span className="text-xs text-[var(--color-fg-mute)] hidden sm:inline">
+              {phase === "explore"
+                ? "自分を深掘りして、やるべきことを導き出す段階です。"
+                : "導き出した目標を、日々の行動で見失わない段階です。"}
+            </span>
+          </div>
+
+          <FlowMap phase={phase} />
+        </div>
+      </section>
+
       {/* ===== Next Step ===== */}
       <section className="py-10 hairline-bottom">
         <Link
@@ -227,12 +261,14 @@ export default function DashboardPage() {
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-12 md:col-span-3">
             <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-              01
+              全体像 ・ MAP
             </div>
             <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
               成功のピラミッド
             </h2>
             <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed">
+              上3層が「知る・導き出す」、下2層が「動く」。
+              <br />
               5つの階層が整うほど、毎日のやるべきことは澄み切ってゆく。
             </p>
             <Link
@@ -308,20 +344,50 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ===== 7 Fields ===== */}
+      {/* ===== ① 知る（探索の道具） ===== */}
+      <section className="py-16 hairline-bottom">
+        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+          ① 知る ・ EXPLORE
+        </div>
+        <h2 className="serif text-3xl text-[var(--color-ink)] mb-2">
+          探索の道具
+        </h2>
+        <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-10">
+          自分を深掘りするほど、やるべきことが見えてくる。
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-[var(--color-line)]">
+          <QuickItem
+            label="マンダラ"
+            value={mandalaFilled > 0 ? String(mandalaFilled) : "—"}
+            caption="MANDALA"
+            href="/mandala"
+          />
+          <QuickItem
+            label="100のリスト"
+            value={wishlistCount > 0 ? String(wishlistCount) : "—"}
+            caption={`/ 100 ・ LIST`}
+            href="/list-100"
+          />
+          <QuickItem label="100年史" value="—" caption="COMING SOON" disabled />
+          <QuickItem label="金の記録" value="—" caption="COMING SOON" disabled />
+          <QuickItem label="第II領域" value="—" caption="COMING SOON" disabled />
+        </div>
+      </section>
+
+      {/* ===== ② 導き出す（7 Fields） ===== */}
       <section className="py-16 hairline-bottom">
         <div className="grid grid-cols-12 gap-8 mb-4">
           <div className="col-span-12 md:col-span-3">
             <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-              02
+              ② 導き出す ・ DERIVE
             </div>
             <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
               七つの分野
             </h2>
             <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed">
-              人生は7つの方角から構成される。
+              探索から導き出された目標。
               <br />
-              偏れば澱み、整えば澄む。
+              人生は7つの方角から構成される。偏れば澱み、整えば澄む。
             </p>
             <Link
               href="/fields"
@@ -377,17 +443,22 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ===== Today + Monthly ===== */}
+      {/* ===== ③ 動く（Today + Monthly） ===== */}
       <section className="py-16 hairline-bottom">
+        <div className="mb-10">
+          <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-2">
+            ③ 動く ・ ACT
+          </div>
+          <p className="text-sm text-[var(--color-fg-mute)]">
+            導き出した目標を、今日この瞬間の行動へ。見失わない。
+          </p>
+        </div>
         <div className="grid grid-cols-12 gap-12">
 
           {/* Today */}
           <div className="col-span-12 lg:col-span-7">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-2">
-                  03
-                </div>
                 <h2 className="serif text-3xl text-[var(--color-ink)]">
                   本日の行
                 </h2>
@@ -472,9 +543,6 @@ export default function DashboardPage() {
           <div className="col-span-12 lg:col-span-5">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-2">
-                  04
-                </div>
                 <h2 className="serif text-3xl text-[var(--color-ink)]">
                   {ym.month}月の計画
                 </h2>
@@ -532,33 +600,6 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ===== Quick Access ===== */}
-      <section className="py-16 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          05
-        </div>
-        <h2 className="serif text-3xl text-[var(--color-ink)] mb-10">
-          そのほかの記録
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-[var(--color-line)]">
-          <QuickItem
-            label="マンダラ"
-            value={mandalaFilled > 0 ? String(mandalaFilled) : "—"}
-            caption="MANDALA"
-            href="/mandala"
-          />
-          <QuickItem
-            label="100のリスト"
-            value={wishlistCount > 0 ? String(wishlistCount) : "—"}
-            caption={`/ 100 ・ LIST`}
-            href="/list-100"
-          />
-          <QuickItem label="100年史" value="—" caption="COMING SOON" disabled />
-          <QuickItem label="金の記録" value="—" caption="COMING SOON" disabled />
-          <QuickItem label="第II領域" value="—" caption="COMING SOON" disabled />
-        </div>
-      </section>
-
       {/* ===== Quote ===== */}
       <section className="py-24 text-center">
         <div className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-loose tracking-wider">
@@ -580,6 +621,48 @@ export default function DashboardPage() {
         <span>© 2026 HOKUSHIN</span>
       </footer>
 
+    </div>
+  );
+}
+
+function FlowMap({ phase }: { phase: "explore" | "act" }) {
+  // 探索フェーズでは「知る」「導き出す」を強調、実践フェーズでは「動く」を強調
+  const steps: { no: string; ja: string; en: string; active: boolean }[] = [
+    { no: "①", ja: "知る", en: "EXPLORE", active: phase === "explore" },
+    { no: "②", ja: "導き出す", en: "DERIVE", active: phase === "explore" },
+    { no: "③", ja: "動く", en: "ACT", active: phase === "act" },
+  ];
+  return (
+    <div className="flex items-stretch gap-2 sm:gap-3">
+      {steps.map((s, i) => (
+        <div key={s.no} className="flex items-stretch gap-2 sm:gap-3 flex-1">
+          <div
+            className={`flex-1 px-3 py-3 border text-center transition ${
+              s.active
+                ? "border-[var(--color-ink)] bg-[var(--color-paper-soft)]"
+                : "border-[var(--color-line)] opacity-60"
+            }`}
+          >
+            <div
+              className={`serif text-base ${
+                s.active
+                  ? "text-[var(--color-ink)]"
+                  : "text-[var(--color-fg-mute)]"
+              }`}
+            >
+              <span className="text-[var(--color-gold)]">{s.no}</span> {s.ja}
+            </div>
+            <div className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] mt-1">
+              {s.en}
+            </div>
+          </div>
+          {i < steps.length - 1 && (
+            <div className="flex items-center text-[var(--color-fg-faint)] text-sm">
+              →
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

@@ -2,26 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { APP_MEANING_JA, APP_NAME, APP_NAME_JA } from "@/lib/constants";
 import { useAppState } from "@/lib/storage";
+
+type NavGroup = "home" | "know" | "derive" | "act";
 
 interface NavItem {
   href: string;
   label: string;
   labelJa: string;
+  group: NavGroup;
 }
 
+// 流れ順に並べる：ダッシュボード → ①知る → ②導き出す → ③動く
 const NAV: NavItem[] = [
-  { href: "/", label: "DASHBOARD", labelJa: "ダッシュボード" },
-  { href: "/mandala", label: "MANDALA", labelJa: "曼荼羅" },
-  { href: "/list-100", label: "LIST 100", labelJa: "百のリスト" },
-  { href: "/pyramid", label: "PYRAMID", labelJa: "ピラミッド" },
-  { href: "/fields", label: "GOALS", labelJa: "七つの分野" },
-  { href: "/daily", label: "DAILY", labelJa: "日々の実践" },
-  { href: "/journal", label: "JOURNAL", labelJa: "日誌" },
-  { href: "/monthly", label: "MONTHLY", labelJa: "月次" },
+  { href: "/", label: "DASHBOARD", labelJa: "ダッシュボード", group: "home" },
+  { href: "/pyramid", label: "PYRAMID", labelJa: "ピラミッド", group: "know" },
+  { href: "/mandala", label: "MANDALA", labelJa: "曼荼羅", group: "know" },
+  { href: "/list-100", label: "LIST 100", labelJa: "百のリスト", group: "know" },
+  { href: "/fields", label: "GOALS", labelJa: "七つの分野", group: "derive" },
+  { href: "/daily", label: "DAILY", labelJa: "日々の実践", group: "act" },
+  { href: "/monthly", label: "MONTHLY", labelJa: "月次", group: "act" },
+  { href: "/journal", label: "JOURNAL", labelJa: "日誌", group: "act" },
 ];
+
+const GROUP_LABEL: Record<NavGroup, string> = {
+  home: "",
+  know: "① 知る",
+  derive: "② 導き出す",
+  act: "③ 動く",
+};
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -65,20 +76,32 @@ export function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-xs tracking-[0.2em] text-[var(--color-fg-mute)]">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`nav-link ${
-                isActive(item.href)
-                  ? "active text-[var(--color-ink)] font-medium"
-                  : "hover:text-[var(--color-ink)]"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-6 text-xs tracking-[0.2em] text-[var(--color-fg-mute)]">
+          {NAV.map((item, i) => {
+            const prev = NAV[i - 1];
+            const showDivider =
+              !!prev && prev.group !== item.group && item.group !== "home";
+            return (
+              <Fragment key={item.href}>
+                {showDivider && (
+                  <span
+                    className="w-px h-3 bg-[var(--color-line)]"
+                    aria-hidden
+                  />
+                )}
+                <Link
+                  href={item.href}
+                  className={`nav-link ${
+                    isActive(item.href)
+                      ? "active text-[var(--color-ink)] font-medium"
+                      : "hover:text-[var(--color-ink)]"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              </Fragment>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -154,35 +177,46 @@ export function SiteHeader() {
             className="relative bg-white hairline-bottom max-h-[calc(100vh-4rem)] overflow-y-auto"
           >
             <ul className="max-w-7xl mx-auto px-6 py-2">
-              {NAV.map((item) => {
+              {NAV.map((item, i) => {
+                const prev = NAV[i - 1];
+                const showHeader =
+                  item.group !== "home" &&
+                  (!prev || prev.group !== item.group);
                 const active = isActive(item.href);
                 return (
-                  <li key={item.href} className="hairline-bottom last:border-b-0">
-                    <Link
-                      href={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-baseline justify-between gap-4 py-3.5"
-                    >
-                      <span
-                        className={`serif text-lg ${
-                          active
-                            ? "text-[var(--color-gold)]"
-                            : "text-[var(--color-ink)]"
-                        }`}
+                  <Fragment key={item.href}>
+                    {showHeader && (
+                      <li className="pt-4 pb-1 text-[10px] tracking-[0.35em] text-[var(--color-gold)]">
+                        {GROUP_LABEL[item.group]}
+                      </li>
+                    )}
+                    <li className="hairline-bottom">
+                      <Link
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-baseline justify-between gap-4 py-3.5"
                       >
-                        {item.labelJa}
-                      </span>
-                      <span
-                        className={`text-[10px] tracking-[0.3em] ${
-                          active
-                            ? "text-[var(--color-gold)]"
-                            : "text-[var(--color-fg-faint)]"
-                        }`}
-                      >
-                        {item.label}
-                      </span>
-                    </Link>
-                  </li>
+                        <span
+                          className={`serif text-lg ${
+                            active
+                              ? "text-[var(--color-gold)]"
+                              : "text-[var(--color-ink)]"
+                          }`}
+                        >
+                          {item.labelJa}
+                        </span>
+                        <span
+                          className={`text-[10px] tracking-[0.3em] ${
+                            active
+                              ? "text-[var(--color-gold)]"
+                              : "text-[var(--color-fg-faint)]"
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+                      </Link>
+                    </li>
+                  </Fragment>
                 );
               })}
             </ul>
