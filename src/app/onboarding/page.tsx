@@ -232,7 +232,6 @@ export default function OnboardingPage() {
 
           {step === "philosophy" && !coachOpen && (
             <PhilosophyOrVisionInput
-              isPremium={state.userPlan === "premium"}
               onCoachOpen={() => setCoachOpen(true)}
               onApply={handlePhilosophyApply}
               placeholder="あなたが人生で大切にしている価値観を、一段落で書く…"
@@ -294,7 +293,6 @@ export default function OnboardingPage() {
 
           {step === "vision" && !coachOpen && (
             <PhilosophyOrVisionInput
-              isPremium={state.userPlan === "premium"}
               onCoachOpen={() => setCoachOpen(true)}
               onApply={handleVisionApply}
               placeholder="5 年後に望んでいる景色を、一段落で書く…"
@@ -351,12 +349,10 @@ export default function OnboardingPage() {
 }
 
 function PhilosophyOrVisionInput({
-  isPremium,
   onCoachOpen,
   onApply,
   placeholder,
 }: {
-  isPremium: boolean;
   onCoachOpen: () => void;
   onApply: (text: string) => void;
   placeholder: string;
@@ -368,7 +364,7 @@ function PhilosophyOrVisionInput({
         onClick={onCoachOpen}
         className="text-xs tracking-[0.3em] border border-[var(--color-ink)] text-[var(--color-ink)] px-6 py-3 hover:bg-[var(--color-ink)] hover:text-white transition"
       >
-        {isPremium ? "★ コーチと話す" : "★ PREMIUM ・ コーチと話す"}
+        ★ コーチと一緒に見つける
       </button>
 
       <div className="flex items-center gap-4">

@@ -14,6 +14,17 @@ interface Message {
   content: string;
 }
 
+// 直近のコーチ発言から選択肢チップ（<options>a | b | c</options>）を取り出す
+function parseOptions(text: string): string[] {
+  const m = text.match(/<options>([\s\S]*?)<\/options>/);
+  if (!m) return [];
+  return m[1]
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
 interface CoachDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -25,8 +36,13 @@ export function CoachDrawer({ open, onClose, context, onApply }: CoachDrawerProp
   const { state, loaded } = useAppState();
   const isPremium = loaded && state.userPlan === "premium";
 
-  // If the user is on Free plan, show the premium gate instead of the coach.
-  if (open && loaded && !isPremium) {
+  // オンボーディングの導き出し（ピラミッド：人生理念・ビジョン等）は無料開放。
+  // 誰でも「答えていくうちに理念が立ち上がる」体験ができるようにする。
+  // 七つの分野・月次の継続コーチは有料。
+  const isFreeCoach = context.kind === "pyramid";
+
+  // Free プランで、かつ有料コーチを開いた場合のみゲートを出す。
+  if (open && loaded && !isPremium && !isFreeCoach) {
     return <PremiumGate open={open} onClose={onClose} feature="AI コーチ" />;
   }
 
@@ -196,6 +212,30 @@ function CoachDrawerInner({
             <MessageBubble key={i} role={m.role} content={m.content} />
           ))}
           {streaming && <MessageBubble role="assistant" content={streaming} streaming />}
+
+          {/* 選択肢チップ：直近のコーチ発言にあれば、タップで返信できる */}
+          {!busy &&
+            !streaming &&
+            messages.length > 0 &&
+            messages[messages.length - 1].role === "assistant" &&
+            (() => {
+              const opts = parseOptions(messages[messages.length - 1].content);
+              if (opts.length === 0) return null;
+              return (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {opts.map((opt, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => sendMessage(opt)}
+                      className="text-xs text-left border border-[var(--color-line)] text-[var(--color-ink)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)] transition"
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
           {error && error.includes("ANTHROPIC_API_KEY") ? (
             <ApiKeyMissingNotice onClose={onClose} />
           ) : error ? (
@@ -301,8 +341,11 @@ function MessageBubble({
   content: string;
   streaming?: boolean;
 }) {
-  // strip <draft>...</draft> from displayed text
-  const cleanContent = content.replace(/<draft>[\s\S]*?<\/draft>/g, "").trim();
+  // strip <draft>...</draft> and <options>...</options> from displayed text
+  const cleanContent = content
+    .replace(/<draft>[\s\S]*?<\/draft>/g, "")
+    .replace(/<options>[\s\S]*?<\/options>/g, "")
+    .trim();
 
   if (role === "assistant") {
     return (
