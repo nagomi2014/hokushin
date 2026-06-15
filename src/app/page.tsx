@@ -135,6 +135,12 @@ export default function DashboardPage() {
     [state, ym.year, ym.month],
   );
 
+  // 「そのほかの記録」用の充足数（実在ページのみ実値を出す）
+  const mandalaFilled =
+    (state.mandala.center.trim() ? 1 : 0) +
+    state.mandala.cells.filter((c) => c.trim()).length;
+  const wishlistCount = state.wishlist.length;
+
   if (!loaded) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-32 text-center text-[var(--color-fg-faint)] text-sm tracking-widest">
@@ -200,9 +206,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between gap-6">
             <div className="flex-1">
               <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-3">
-                {nextStep.kind === "done"
-                  ? "★ &nbsp; 整いました"
-                  : "★ &nbsp; 次の一手"}
+                ★&nbsp;&nbsp;{nextStep.kind === "done" ? "整いました" : "次の一手"}
               </div>
               <div className="serif text-2xl md:text-3xl text-white mb-2">
                 {nextStep.label}
@@ -537,8 +541,18 @@ export default function DashboardPage() {
           そのほかの記録
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-[var(--color-line)]">
-          <QuickItem label="マンダラ" value="—" caption="COMING SOON" disabled />
-          <QuickItem label="100のリスト" value="—" caption="COMING SOON" disabled />
+          <QuickItem
+            label="マンダラ"
+            value={mandalaFilled > 0 ? String(mandalaFilled) : "—"}
+            caption="MANDALA"
+            href="/mandala"
+          />
+          <QuickItem
+            label="100のリスト"
+            value={wishlistCount > 0 ? String(wishlistCount) : "—"}
+            caption={`/ 100 ・ LIST`}
+            href="/list-100"
+          />
           <QuickItem label="100年史" value="—" caption="COMING SOON" disabled />
           <QuickItem label="金の記録" value="—" caption="COMING SOON" disabled />
           <QuickItem label="第II領域" value="—" caption="COMING SOON" disabled />
@@ -574,21 +588,17 @@ function QuickItem({
   label,
   value,
   caption,
+  href,
   disabled = false,
 }: {
   label: string;
   value: string;
   caption: string;
+  href?: string;
   disabled?: boolean;
 }) {
-  return (
-    <div
-      className={`bg-white p-8 transition group ${
-        disabled
-          ? "opacity-60"
-          : "hover:bg-[var(--color-paper-soft)] cursor-pointer"
-      }`}
-    >
+  const inner = (
+    <>
       <div className="serif text-[var(--color-fg-faint)] text-sm mb-12">
         {label}
       </div>
@@ -598,6 +608,27 @@ function QuickItem({
       <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mt-2">
         {caption}
       </div>
+    </>
+  );
+
+  if (href && !disabled) {
+    return (
+      <Link
+        href={href}
+        className="block bg-white p-8 transition group hover:bg-[var(--color-paper-soft)] cursor-pointer"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={`bg-white p-8 transition group ${
+        disabled ? "opacity-60" : ""
+      }`}
+    >
+      {inner}
     </div>
   );
 }
