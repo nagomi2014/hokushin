@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
-import { CoachDrawer } from "@/components/CoachDrawer";
+import { GuidedDerivation } from "@/components/GuidedDerivation";
+import { fieldQuestions, synthesizeFieldGoal } from "@/lib/coach/guided";
 import type { AppState, DailyTask, FieldId } from "@/lib/types";
 
 export default function FieldsPage() {
@@ -80,8 +81,7 @@ export default function FieldsPage() {
                     onClick={() => setCoachFieldId(field.id)}
                     className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
                   >
-                    {state.userPlan === "premium" ? "★ " : "★ PREMIUM ・ "}
-                    コーチに相談する
+                    ★ 質問で目標を作る
                   </button>
                   <span className="w-px h-4 bg-[var(--color-line)]" />
                   <span className="text-[var(--color-fg-mute)] tracking-widest">
@@ -165,17 +165,48 @@ export default function FieldsPage() {
         </span>
       </div>
 
-      <CoachDrawer
-        open={coachFieldId !== null}
-        onClose={() => setCoachFieldId(null)}
-        context={{
-          kind: "field",
-          fieldId: (coachFieldId ?? 1) as FieldId,
-        }}
-        onApply={(draft) => {
-          if (coachFieldId !== null) setField(coachFieldId, { shortTerm: draft });
-        }}
-      />
+      {coachFieldId !== null && (
+        <>
+          <div
+            className="fixed inset-0 bg-[var(--color-ink)]/30 z-50"
+            onClick={() => setCoachFieldId(null)}
+            aria-hidden
+          />
+          <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
+            <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
+              <div>
+                <div className="text-[9px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+                  ★ &nbsp; 質問で目標を作る
+                </div>
+                <div className="serif text-base text-[var(--color-ink)]">
+                  {FIELDS.find((f) => f.id === coachFieldId)?.nameJa} の短期目標
+                </div>
+              </div>
+              <button
+                onClick={() => setCoachFieldId(null)}
+                className="text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] text-xl leading-none px-2"
+                aria-label="close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <GuidedDerivation
+                key={coachFieldId}
+                questions={fieldQuestions(coachFieldId)}
+                synthesize={synthesizeFieldGoal}
+                onApply={(draft) => {
+                  setField(coachFieldId, { shortTerm: draft });
+                  setCoachFieldId(null);
+                }}
+                onCancel={() => setCoachFieldId(null)}
+                doneLabel="この短期目標にする"
+                draftHeader="あなたの答えから、こんな目標が見えてきました"
+              />
+            </div>
+          </aside>
+        </>
+      )}
 
     </div>
   );

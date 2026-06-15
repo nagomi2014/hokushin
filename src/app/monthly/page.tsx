@@ -7,7 +7,8 @@ import {
   daysInMonth,
   useAppState,
 } from "@/lib/storage";
-import { CoachDrawer } from "@/components/CoachDrawer";
+import { GuidedDerivation } from "@/components/GuidedDerivation";
+import { MONTHLY_QUESTIONS, synthesizeMonthly } from "@/lib/coach/guided";
 import type { MonthlyPlan } from "@/lib/types";
 
 function emptyPlan(year: number, month: number): MonthlyPlan {
@@ -136,8 +137,7 @@ export default function MonthlyPage() {
           onClick={() => setCoachOpen(true)}
           className="mt-6 text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-gold)] hover:border-[var(--color-ink)] pb-0.5"
         >
-          {state.userPlan === "premium" ? "★ " : "★ PREMIUM ・ "}
-          コーチに今月の計画を相談する →
+          ★ 質問で今月の計画を作る →
         </button>
       </section>
 
@@ -230,12 +230,47 @@ export default function MonthlyPage() {
         </span>
       </div>
 
-      <CoachDrawer
-        open={coachOpen}
-        onClose={() => setCoachOpen(false)}
-        context={{ kind: "monthly" }}
-        onApply={(draft) => update("primaryGoal", draft)}
-      />
+      {coachOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-[var(--color-ink)]/30 z-50"
+            onClick={() => setCoachOpen(false)}
+            aria-hidden
+          />
+          <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
+            <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
+              <div>
+                <div className="text-[9px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+                  ★ &nbsp; 質問で今月の計画を作る
+                </div>
+                <div className="serif text-base text-[var(--color-ink)]">
+                  今月の最重要目標
+                </div>
+              </div>
+              <button
+                onClick={() => setCoachOpen(false)}
+                className="text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] text-xl leading-none px-2"
+                aria-label="close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <GuidedDerivation
+                questions={MONTHLY_QUESTIONS}
+                synthesize={synthesizeMonthly}
+                onApply={(draft) => {
+                  update("primaryGoal", draft);
+                  setCoachOpen(false);
+                }}
+                onCancel={() => setCoachOpen(false)}
+                doneLabel="今月の最重要目標にする"
+                draftHeader="あなたの答えから、今月の一手が見えてきました"
+              />
+            </div>
+          </aside>
+        </>
+      )}
 
     </div>
   );

@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { PYRAMID_TIERS, PYRAMID_WIDTHS } from "@/lib/constants";
 import { useAppState } from "@/lib/storage";
-import { CoachDrawer } from "@/components/CoachDrawer";
+import { GuidedDerivation } from "@/components/GuidedDerivation";
+import {
+  CREED_QUESTIONS,
+  mirroredValues,
+  synthesizeCreed,
+} from "@/lib/coach/guided";
 import type { PyramidLevel } from "@/lib/types";
 
 export default function PyramidPage() {
@@ -133,14 +138,17 @@ export default function PyramidPage() {
                     ) : (
                       <span />
                     )}
-                    <button
-                      type="button"
-                      onClick={() => setCoachLevel(tier.level)}
-                      className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
-                    >
-                      {state.userPlan === "premium" ? "★ " : "★ PREMIUM ・ "}
-                      コーチに相談する →
-                    </button>
+                    {isFoundation ? (
+                      <button
+                        type="button"
+                        onClick={() => setCoachLevel(1)}
+                        className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
+                      >
+                        ★ 質問で見つける →
+                      </button>
+                    ) : (
+                      <span />
+                    )}
                   </div>
                 </div>
               </div>
@@ -161,17 +169,48 @@ export default function PyramidPage() {
         </div>
       </section>
 
-      <CoachDrawer
-        open={coachLevel !== null}
-        onClose={() => setCoachLevel(null)}
-        context={{
-          kind: "pyramid",
-          level: (coachLevel ?? 1) as PyramidLevel,
-        }}
-        onApply={(draft) => {
-          if (coachLevel !== null) setPyramid(coachLevel, draft);
-        }}
-      />
+      {coachLevel === 1 && (
+        <>
+          <div
+            className="fixed inset-0 bg-[var(--color-ink)]/30 z-50"
+            onClick={() => setCoachLevel(null)}
+            aria-hidden
+          />
+          <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
+            <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
+              <div>
+                <div className="text-[9px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+                  ★ &nbsp; 質問で見つける
+                </div>
+                <div className="serif text-base text-[var(--color-ink)]">
+                  人生理念
+                </div>
+              </div>
+              <button
+                onClick={() => setCoachLevel(null)}
+                className="text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] text-xl leading-none px-2"
+                aria-label="close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <GuidedDerivation
+                questions={CREED_QUESTIONS}
+                synthesize={synthesizeCreed}
+                mirror={mirroredValues}
+                onApply={(draft) => {
+                  setPyramid(1, draft);
+                  setCoachLevel(null);
+                }}
+                onCancel={() => setCoachLevel(null)}
+                doneLabel="これを人生理念にする"
+                draftHeader="あなたの答えから、こんな理念が見えてきました"
+              />
+            </div>
+          </aside>
+        </>
+      )}
 
     </div>
   );

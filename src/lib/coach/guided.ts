@@ -7,6 +7,8 @@
 // 汎用SaaS：個人固有の文脈は埋め込まない。
 // ============================================================
 
+import type { FieldId } from "@/lib/types";
+
 export type ValueId =
   | "connection"
   | "growth"
@@ -199,4 +201,103 @@ export function mirroredValues(answers: GuidedAnswer[]): string[] {
   return tallyValues(answers)
     .slice(0, 3)
     .map((v) => VALUES[v].label);
+}
+
+// ============================================================
+// 七つの分野：短期目標の導き出し（台本式・$0）
+// ============================================================
+
+// 現状認識（全分野共通）
+const FIELD_CURRENT_Q: GuidedQuestion = {
+  id: "current",
+  prompt: "今、この分野はどんな感じですか？",
+  options: [
+    { label: "充実してる", values: [] },
+    { label: "まあまあ", values: [] },
+    { label: "物足りない", values: [] },
+    { label: "手つかず", values: [] },
+    { label: "モヤモヤしてる", values: [] },
+  ],
+  allowFree: true,
+};
+
+// 1年後の理想（分野ごと）
+const FIELD_IDEAL_OPTIONS: Record<FieldId, string[]> = {
+  1: ["疲れにくい体", "引き締まった体", "痛みのない体", "体力がついてる", "数値が改善してる"],
+  2: ["気の合う仲間が増える", "大切な人と深まる", "苦手な人と距離を取れてる", "新しい出会いがある", "感謝を伝え合えてる"],
+  3: ["一緒に笑う時間が増える", "旅行や外出ができてる", "家がもっと心地いい", "子の成長を見守れてる", "役割分担がうまくいってる"],
+  4: ["収入が上がってる", "やりがいを感じてる", "働く時間を減らせてる", "新しい挑戦をしてる", "仕組み化が進んでる"],
+  5: ["新しいスキルを習得", "資格を取ってる", "苦手を克服してる", "専門性が深まってる", "学ぶ習慣がついてる"],
+  6: ["貯蓄が増えてる", "固定費を減らせてる", "収入源が増えてる", "投資を始めてる", "家計が見える化できてる"],
+  7: ["没頭できる趣味がある", "定期的に楽しめてる", "新しい趣味に挑戦", "仲間と楽しめてる", "教養が深まってる"],
+};
+
+export function fieldQuestions(fieldId: FieldId): GuidedQuestion[] {
+  return [
+    FIELD_CURRENT_Q,
+    {
+      id: "ideal",
+      prompt: "1年後、この分野がどうなっていたら「いい感じ」ですか？",
+      hint: "ピンと来たものをタップでOK。自分の言葉でも。",
+      options: FIELD_IDEAL_OPTIONS[fieldId].map((label) => ({ label, values: [] })),
+      allowFree: true,
+    },
+  ];
+}
+
+export function synthesizeFieldGoal(answers: GuidedAnswer[]): string {
+  const ideal = answers.find((a) => a.questionId === "ideal")?.text.trim();
+  const current = answers.find((a) => a.questionId === "current")?.text.trim();
+  if (!ideal) {
+    return current
+      ? `今は「${current}」。まず、ここを少し前に進める。`
+      : "";
+  }
+  return `1年後、${ideal}状態を目指す。まずはそこへ向けて、今できることから動き出す。`;
+}
+
+// ============================================================
+// 月次：今月の最重要目標の導き出し（台本式・$0）
+// ============================================================
+
+const MONTHLY_FIELD_LABELS = [
+  "健康・体力",
+  "人間関係",
+  "家族・家庭",
+  "仕事・職業",
+  "能力開発",
+  "経済・蓄財",
+  "趣味・教養",
+];
+
+export const MONTHLY_QUESTIONS: GuidedQuestion[] = [
+  {
+    id: "focus",
+    prompt: "今月、いちばん『前に進めたい』のはどの分野ですか？",
+    hint: "一つに絞るのが大切。全部やろうとすると分散します。",
+    options: MONTHLY_FIELD_LABELS.map((label) => ({ label, values: [] })),
+    allowFree: true,
+  },
+  {
+    id: "action",
+    prompt: "今月、それについて何をしますか？",
+    options: [
+      { label: "毎日少しずつ続ける", values: [] },
+      { label: "大きく1つ片付ける", values: [] },
+      { label: "情報を集める・調べる", values: [] },
+      { label: "人に相談する", values: [] },
+      { label: "環境を整える", values: [] },
+      { label: "習慣を1つ変える", values: [] },
+    ],
+    allowFree: true,
+  },
+];
+
+export function synthesizeMonthly(answers: GuidedAnswer[]): string {
+  const focus = answers.find((a) => a.questionId === "focus")?.text.trim();
+  const action = answers.find((a) => a.questionId === "action")?.text.trim();
+  if (!focus) return action ? `今月は「${action}」に取り組む。` : "";
+  return action
+    ? `今月は『${focus}』に集中する。${action}。`
+    : `今月は『${focus}』に集中する。`;
 }

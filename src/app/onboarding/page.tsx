@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
+import {
+  CREED_QUESTIONS,
+  mirroredValues,
+  synthesizeCreed,
+} from "@/lib/coach/guided";
 import { useAppState } from "@/lib/storage";
 import { APP_NAME_JA } from "@/lib/constants";
 
@@ -339,7 +344,15 @@ function PhilosophyOrVisionInput({
   // 台本式（無料）の導き出しを開いている間は、それだけを表示
   if (guided && showGuided) {
     return (
-      <GuidedDerivation onApply={onApply} onCancel={() => setShowGuided(false)} />
+      <GuidedDerivation
+        questions={CREED_QUESTIONS}
+        synthesize={synthesizeCreed}
+        mirror={mirroredValues}
+        onApply={onApply}
+        onCancel={() => setShowGuided(false)}
+        doneLabel="これを人生理念にする"
+        draftHeader="あなたの答えから、こんな理念が見えてきました"
+      />
     );
   }
 
