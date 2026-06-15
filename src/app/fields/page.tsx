@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
 import { CoachDrawer } from "@/components/CoachDrawer";
-import type { DailyTask, FieldId } from "@/lib/types";
+import type { AppState, DailyTask, FieldId } from "@/lib/types";
 
 export default function FieldsPage() {
   const { state, loaded, setField } = useAppState();
   const [coachFieldId, setCoachFieldId] = useState<FieldId | null>(null);
+  const [materialOpen, setMaterialOpen] = useState(true);
   const today = todayString();
 
   if (!loaded) {
@@ -41,6 +42,12 @@ export default function FieldsPage() {
           へ落とし込んでいく。
         </p>
       </section>
+
+      <ExplorationMaterial
+        state={state}
+        open={materialOpen}
+        onToggle={() => setMaterialOpen((v) => !v)}
+      />
 
       <section className="py-8 space-y-16">
         {FIELDS.map((field) => {
@@ -171,6 +178,186 @@ export default function FieldsPage() {
       />
 
     </div>
+  );
+}
+
+// ① 知る（探索）の中身を、② 導き出す（七つの分野）の場に並べる蝶番パネル。
+function ExplorationMaterial({
+  state,
+  open,
+  onToggle,
+}: {
+  state: AppState;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const creed = state.pyramid[1]?.content?.trim() ?? "";
+  const vision = state.pyramid[2]?.content?.trim() ?? "";
+  const mandalaCenter = state.mandala.center.trim();
+  const mandalaCells = state.mandala.cells.filter((c) => c.trim());
+  const wishes = state.wishlist.filter((w) => w.text.trim());
+
+  const hasAny =
+    !!creed ||
+    !!vision ||
+    !!mandalaCenter ||
+    mandalaCells.length > 0 ||
+    wishes.length > 0;
+
+  return (
+    <section className="py-6 hairline-bottom">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between group"
+        aria-expanded={open}
+      >
+        <span className="flex items-baseline gap-3">
+          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+            ① 知る → ② 導き出す
+          </span>
+          <span className="serif text-lg text-[var(--color-ink)]">
+            探索の材料
+          </span>
+        </span>
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
+          {open ? "閉じる −" : "開く ＋"}
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-5">
+          <p className="text-xs text-[var(--color-fg-mute)] leading-relaxed mb-5">
+            あなたの深掘りを材料に、七つの分野の目標を導き出します。
+          </p>
+
+          {!hasAny ? (
+            <div className="hairline-top hairline-bottom py-8 text-center text-sm text-[var(--color-fg-faint)]">
+              まだ探索の材料がありません。
+              <span className="block mt-3 flex items-center justify-center gap-4 text-[10px] tracking-[0.25em]">
+                <Link href="/pyramid" className="text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5">
+                  ピラミッド →
+                </Link>
+                <Link href="/mandala" className="text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5">
+                  マンダラ →
+                </Link>
+                <Link href="/list-100" className="text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5">
+                  100のリスト →
+                </Link>
+              </span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[var(--color-line)]">
+              <MaterialCard title="人生理念" href="/pyramid" en="CREED">
+                {creed ? (
+                  <p className="serif text-sm text-[var(--color-ink)] leading-relaxed">
+                    {creed}
+                  </p>
+                ) : (
+                  <EmptyHint href="/pyramid" label="ピラミッドで書く" />
+                )}
+              </MaterialCard>
+
+              <MaterialCard title="人生のビジョン" href="/pyramid" en="VISION">
+                {vision ? (
+                  <p className="serif text-sm text-[var(--color-ink)] leading-relaxed">
+                    {vision}
+                  </p>
+                ) : (
+                  <EmptyHint href="/pyramid" label="ピラミッドで書く" />
+                )}
+              </MaterialCard>
+
+              <MaterialCard title="マンダラ" href="/mandala" en="MANDALA">
+                {mandalaCenter || mandalaCells.length > 0 ? (
+                  <div className="text-sm text-[var(--color-ink)]">
+                    {mandalaCenter && (
+                      <div className="serif mb-2 text-[var(--color-gold)]">
+                        {mandalaCenter}
+                      </div>
+                    )}
+                    {mandalaCells.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {mandalaCells.slice(0, 8).map((c, i) => (
+                          <span
+                            key={i}
+                            className="text-[11px] px-2 py-0.5 border border-[var(--color-line)] text-[var(--color-fg-mute)]"
+                          >
+                            {c}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <EmptyHint href="/mandala" label="マンダラを書く" />
+                )}
+              </MaterialCard>
+
+              <MaterialCard title="100のリスト" href="/list-100" en="LIST 100">
+                {wishes.length > 0 ? (
+                  <ul className="text-sm text-[var(--color-ink)] space-y-1">
+                    {wishes.slice(0, 5).map((w) => (
+                      <li key={w.id} className="flex items-baseline gap-2">
+                        <span className="text-[var(--color-gold)] text-[10px]">
+                          ・
+                        </span>
+                        <span className="truncate">{w.text}</span>
+                      </li>
+                    ))}
+                    {wishes.length > 5 && (
+                      <li className="text-[10px] text-[var(--color-fg-faint)] pl-4">
+                        …他 {wishes.length - 5} 件
+                      </li>
+                    )}
+                  </ul>
+                ) : (
+                  <EmptyHint href="/list-100" label="やりたいことを書く" />
+                )}
+              </MaterialCard>
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function MaterialCard({
+  title,
+  en,
+  href,
+  children,
+}: {
+  title: string;
+  en: string;
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="bg-white p-5">
+      <div className="flex items-baseline justify-between mb-3">
+        <span className="serif text-sm text-[var(--color-ink)]">{title}</span>
+        <Link
+          href={href}
+          className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+        >
+          {en} →
+        </Link>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function EmptyHint({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="text-[11px] text-[var(--color-fg-faint)] italic hover:text-[var(--color-ink)] transition"
+    >
+      {label} →
+    </Link>
   );
 }
 
