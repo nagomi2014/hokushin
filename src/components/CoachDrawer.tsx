@@ -36,13 +36,9 @@ export function CoachDrawer({ open, onClose, context, onApply }: CoachDrawerProp
   const { state, loaded } = useAppState();
   const isPremium = loaded && state.userPlan === "premium";
 
-  // オンボーディングの導き出し（ピラミッド：人生理念・ビジョン等）は無料開放。
-  // 誰でも「答えていくうちに理念が立ち上がる」体験ができるようにする。
-  // 七つの分野・月次の継続コーチは有料。
-  const isFreeCoach = context.kind === "pyramid";
-
-  // Free プランで、かつ有料コーチを開いた場合のみゲートを出す。
-  if (open && loaded && !isPremium && !isFreeCoach) {
+  // AIコーチ（Anthropic API・従量課金）は有料オプション。
+  // 無料ユーザーは「台本式・導き出し対話」（GuidedDerivation・API不要）で理念を導き出せる。
+  if (open && loaded && !isPremium) {
     return <PremiumGate open={open} onClose={onClose} feature="AI コーチ" />;
   }
 

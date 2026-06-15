@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CoachDrawer } from "@/components/CoachDrawer";
+import { GuidedDerivation } from "@/components/GuidedDerivation";
 import { useAppState } from "@/lib/storage";
 import { APP_NAME_JA } from "@/lib/constants";
 
@@ -20,7 +20,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { state, loaded, setPyramid } = useAppState();
   const [step, setStep] = useState<Step>("welcome");
-  const [coachOpen, setCoachOpen] = useState(false);
 
   if (!loaded) {
     return (
@@ -39,23 +38,19 @@ export default function OnboardingPage() {
 
   function moveToPhilosophy() {
     setStep("philosophy");
-    setCoachOpen(true);
   }
 
   function handlePhilosophyApply(draft: string) {
     setPyramid(1, draft);
-    setCoachOpen(false);
     setStep("philosophy_done");
   }
 
   function moveToVision() {
     setStep("vision");
-    setCoachOpen(true);
   }
 
   function handleVisionApply(draft: string) {
     setPyramid(2, draft);
-    setCoachOpen(false);
     setStep("vision_done");
   }
 
@@ -69,17 +64,6 @@ export default function OnboardingPage() {
     }
     router.push("/");
   }
-
-  // ----------------------------------------------------------
-  // Coach context (depends on step)
-  // ----------------------------------------------------------
-  const coachContext =
-    step === "philosophy" || step === "philosophy_done"
-      ? ({ kind: "pyramid", level: 1 } as const)
-      : ({ kind: "pyramid", level: 2 } as const);
-
-  const coachOnApply =
-    step === "philosophy" ? handlePhilosophyApply : handleVisionApply;
 
   // ----------------------------------------------------------
   // Render
@@ -202,7 +186,7 @@ export default function OnboardingPage() {
           </h2>
           <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-8 max-w-xl">
             ピラミッドのいちばん底にある、動かぬ核となる価値観です。
-            右のコーチが質問していきます。答えながら、自分の中の言葉を引き出してみてください。
+            易しい質問に答えていくうちに、自分でも気づかなかった「大事にしていること」が見えてきます。
           </p>
 
           {step === "philosophy_done" && state.pyramid[1]?.content && (
@@ -221,18 +205,18 @@ export default function OnboardingPage() {
                   次へ ・ ビジョンを描く →
                 </button>
                 <button
-                  onClick={() => setCoachOpen(true)}
+                  onClick={() => setStep("philosophy")}
                   className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
                 >
-                  ↻ もう一度コーチと話す
+                  ↻ もう一度やり直す
                 </button>
               </div>
             </div>
           )}
 
-          {step === "philosophy" && !coachOpen && (
+          {step === "philosophy" && (
             <PhilosophyOrVisionInput
-              onCoachOpen={() => setCoachOpen(true)}
+              guided
               onApply={handlePhilosophyApply}
               placeholder="あなたが人生で大切にしている価値観を、一段落で書く…"
             />
@@ -252,7 +236,7 @@ export default function OnboardingPage() {
           </h2>
           <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-8 max-w-xl">
             理念を踏まえて、5 年後の自分が望んでいる景色を描きます。
-            さきほど書いた人生理念を見つめながら、コーチと一緒に言葉にしていきましょう。
+            さきほど書いた人生理念を見つめながら、言葉にしていきましょう。
           </p>
 
           {state.pyramid[1]?.content && (
@@ -282,18 +266,17 @@ export default function OnboardingPage() {
                   次へ ・ 完了 →
                 </button>
                 <button
-                  onClick={() => setCoachOpen(true)}
+                  onClick={() => setStep("vision")}
                   className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
                 >
-                  ↻ もう一度コーチと話す
+                  ↻ もう一度書き直す
                 </button>
               </div>
             </div>
           )}
 
-          {step === "vision" && !coachOpen && (
+          {step === "vision" && (
             <PhilosophyOrVisionInput
-              onCoachOpen={() => setCoachOpen(true)}
               onApply={handleVisionApply}
               placeholder="5 年後に望んでいる景色を、一段落で書く…"
             />
@@ -337,40 +320,48 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* Coach drawer (used for step 1 & 2) */}
-      <CoachDrawer
-        open={coachOpen}
-        onClose={() => setCoachOpen(false)}
-        context={coachContext}
-        onApply={coachOnApply}
-      />
     </div>
   );
 }
 
 function PhilosophyOrVisionInput({
-  onCoachOpen,
+  guided = false,
   onApply,
   placeholder,
 }: {
-  onCoachOpen: () => void;
+  guided?: boolean;
   onApply: (text: string) => void;
   placeholder: string;
 }) {
   const [text, setText] = useState("");
+  const [showGuided, setShowGuided] = useState(false);
+
+  // 台本式（無料）の導き出しを開いている間は、それだけを表示
+  if (guided && showGuided) {
+    return (
+      <GuidedDerivation onApply={onApply} onCancel={() => setShowGuided(false)} />
+    );
+  }
+
   return (
     <div className="space-y-5">
-      <button
-        onClick={onCoachOpen}
-        className="text-xs tracking-[0.3em] border border-[var(--color-ink)] text-[var(--color-ink)] px-6 py-3 hover:bg-[var(--color-ink)] hover:text-white transition"
-      >
-        ★ コーチと一緒に見つける
-      </button>
+      {guided && (
+        <button
+          onClick={() => setShowGuided(true)}
+          className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+        >
+          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-sm tracking-[0.15em]">質問に答えて見つける</span>
+          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            7つの易しい質問に答えるだけ
+          </span>
+        </button>
+      )}
 
       <div className="flex items-center gap-4">
         <div className="flex-1 h-px bg-[var(--color-line)]" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-          または
+          {guided ? "または" : ""}
         </span>
         <div className="flex-1 h-px bg-[var(--color-line)]" />
       </div>
