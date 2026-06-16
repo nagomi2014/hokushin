@@ -14,6 +14,7 @@ import {
   todayString,
   useAppState,
 } from "@/lib/storage";
+import { useTools } from "@/lib/tools/useTools";
 import type { AppState, MonthlyPlan } from "@/lib/types";
 
 // ------------------------------------------------------------
@@ -140,6 +141,7 @@ export default function DashboardPage() {
     (state.mandala.center.trim() ? 1 : 0) +
     state.mandala.cells.filter((c) => c.trim()).length;
   const wishlistCount = state.wishlist.length;
+  const tools = useTools();
 
   // 現在地（フェーズ）判定：探索（知る→導き出す）か、実践（動く）か。
   // onboarding/field を埋めている段階＝探索、monthly/daily/done＝実践。
@@ -355,7 +357,7 @@ export default function DashboardPage() {
         <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-10">
           自分を深掘りするほど、やるべきことが見えてくる。
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-[var(--color-line)]">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-[var(--color-line)]">
           <QuickItem
             label="マンダラ"
             value={mandalaFilled > 0 ? String(mandalaFilled) : "—"}
@@ -368,9 +370,39 @@ export default function DashboardPage() {
             caption={`/ 100 ・ LIST`}
             href="/list-100"
           />
-          <QuickItem label="100年史" value="—" caption="COMING SOON" disabled />
-          <QuickItem label="金の記録" value="—" caption="COMING SOON" disabled />
-          <QuickItem label="第II領域" value="—" caption="COMING SOON" disabled />
+          <QuickItem
+            label="100年史"
+            value={tools.lifeEvents.length > 0 ? String(tools.lifeEvents.length) : "—"}
+            caption="LIFE HISTORY"
+            href="/history"
+          />
+        </div>
+      </section>
+
+      {/* ===== そのほかのツール（ととのえる） ===== */}
+      <section className="py-16 hairline-bottom">
+        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+          ととのえる ・ TOOLS
+        </div>
+        <h2 className="serif text-3xl text-[var(--color-ink)] mb-2">
+          お金と時間を整える
+        </h2>
+        <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-10">
+          経済の足場と、重要だが緊急でない時間を、見える化する。
+        </p>
+        <div className="grid grid-cols-2 gap-px bg-[var(--color-line)]">
+          <QuickItem
+            label="金の記録"
+            value={tools.moneyEntries.length > 0 ? String(tools.moneyEntries.length) : "—"}
+            caption="MONEY"
+            href="/money"
+          />
+          <QuickItem
+            label="第II領域"
+            value={tools.primeItems.length > 0 ? String(tools.primeItems.length) : "—"}
+            caption="QUADRANT II"
+            href="/prime"
+          />
         </div>
       </section>
 
