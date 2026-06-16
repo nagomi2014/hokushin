@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useTools } from "@/lib/tools/useTools";
+import { LifeHistoryGuide } from "@/components/LifeHistoryGuide";
 
 export default function HistoryPage() {
   const {
@@ -15,6 +16,7 @@ export default function HistoryPage() {
   const [age, setAge] = useState("");
   const [text, setText] = useState("");
   const [kind, setKind] = useState<"past" | "future">("past");
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const sorted = useMemo(
     () => [...lifeEvents].sort((a, b) => a.age - b.age),
@@ -52,9 +54,41 @@ export default function HistoryPage() {
         </p>
       </section>
 
+      {/* Guide（質問に沿って書く） */}
+      {guideOpen && (
+        <section className="py-8 hairline-bottom">
+          <LifeHistoryGuide
+            onAdd={addLifeEvent}
+            onDone={() => setGuideOpen(false)}
+            onCancel={() => setGuideOpen(false)}
+          />
+        </section>
+      )}
+
       {/* Add form */}
-      <section className="py-8 hairline-bottom">
-        <div className="flex flex-wrap items-end gap-3">
+      {!guideOpen && (
+        <section className="py-8 hairline-bottom space-y-5">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+          >
+            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
+            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+              生まれた時から順に、質問に答えるだけで年表ができる
+            </span>
+          </button>
+
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-[var(--color-line)]" />
+            <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              または自分で1件ずつ
+            </span>
+            <div className="flex-1 h-px bg-[var(--color-line)]" />
+          </div>
+
+          <div className="flex flex-wrap items-end gap-3">
           <div>
             <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
               年齢
@@ -104,8 +138,9 @@ export default function HistoryPage() {
           >
             ＋ 追加
           </button>
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* Timeline */}
       <section className="py-8">
