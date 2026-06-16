@@ -9,6 +9,7 @@ interface Stage {
   era: string; // 時期ラベル
   defaultAge: number;
   prompt: string;
+  placeholder: string; // 入力欄の例文（質問に合わせる）
   hint?: string;
   kind: "past" | "future";
 }
@@ -19,7 +20,8 @@ const STAGES: Stage[] = [
     era: "誕生",
     defaultAge: 0,
     prompt: "あなたは、いつ・どこで生まれましたか？",
-    hint: "生まれた年や場所、聞いている家族の話でもOK。",
+    placeholder: "例：1985年、千葉県館山市で生まれた",
+    hint: "生まれた年と場所を。聞いている家族の話でもOK。",
     kind: "past",
   },
   {
@@ -27,6 +29,7 @@ const STAGES: Stage[] = [
     era: "幼少期（〜6歳）",
     defaultAge: 4,
     prompt: "小さい頃の思い出はありますか？保育園や幼稚園、住んでいた場所など。",
+    placeholder: "例：◯◯保育園に通っていた／祖父母の家によく行った",
     hint: "覚えている出来事をひとつ。年齢は分かる範囲で。",
     kind: "past",
   },
@@ -35,6 +38,7 @@ const STAGES: Stage[] = [
     era: "小学校 低学年（6〜9歳）",
     defaultAge: 7,
     prompt: "小学校に入学した頃のこと。どこの小学校で、1〜3年生の思い出は？",
+    placeholder: "例：◯◯小学校に入学／スイミングを習い始めた",
     hint: "習い事・友達・引越し・転校など。学年ごとに思い出せたら、それぞれ追加を。",
     kind: "past",
   },
@@ -43,6 +47,7 @@ const STAGES: Stage[] = [
     era: "小学校 高学年（9〜12歳）",
     defaultAge: 11,
     prompt: "小学校の4〜6年生の頃。夢中だったこと、印象に残っている出来事は？",
+    placeholder: "例：少年野球のキャプテンだった／◯◯へ引越した",
     hint: "クラブ・行事・引越し・転校など。複数あれば追加してください。",
     kind: "past",
   },
@@ -51,6 +56,7 @@ const STAGES: Stage[] = [
     era: "中学校（12〜15歳）",
     defaultAge: 13,
     prompt: "中学生の頃。部活・受験・友人関係など、覚えていることは？",
+    placeholder: "例：◯◯部に入った／高校受験をがんばった",
     kind: "past",
   },
   {
@@ -58,6 +64,7 @@ const STAGES: Stage[] = [
     era: "高校（15〜18歳）",
     defaultAge: 16,
     prompt: "高校生の頃。進路・出会い・夢中になったことは？",
+    placeholder: "例：◯◯高校に進学／アルバイトを始めた",
     kind: "past",
   },
   {
@@ -65,6 +72,7 @@ const STAGES: Stage[] = [
     era: "卒業後（18〜22歳）",
     defaultAge: 20,
     prompt: "高校卒業後はどんな道に？大学・専門学校・就職など。",
+    placeholder: "例：◯◯専門学校へ／上京して就職した",
     kind: "past",
   },
   {
@@ -72,6 +80,7 @@ const STAGES: Stage[] = [
     era: "20代",
     defaultAge: 25,
     prompt: "20代の頃。仕事・恋愛・引越し・転機になった出来事は？",
+    placeholder: "例：転職した／結婚した／独立した",
     kind: "past",
   },
   {
@@ -79,6 +88,7 @@ const STAGES: Stage[] = [
     era: "30代",
     defaultAge: 35,
     prompt: "30代の頃。結婚・子ども・キャリア・大きな決断などは？",
+    placeholder: "例：子どもが生まれた／家を建てた",
     hint: "なければスキップでOK。",
     kind: "past",
   },
@@ -87,6 +97,7 @@ const STAGES: Stage[] = [
     era: "40代",
     defaultAge: 45,
     prompt: "40代の頃。今につながる出来事や、価値観が変わった経験は？",
+    placeholder: "例：新しい挑戦を始めた／健康を見直した",
     hint: "なければスキップでOK。",
     kind: "past",
   },
@@ -95,6 +106,7 @@ const STAGES: Stage[] = [
     era: "50代〜現在",
     defaultAge: 55,
     prompt: "50代から今まで。最近の節目や、印象に残っていることは？",
+    placeholder: "例：子どもが独立した／趣味を再開した",
     hint: "まだなら、スキップしてください。",
     kind: "past",
   },
@@ -103,6 +115,7 @@ const STAGES: Stage[] = [
     era: "これから（未来）",
     defaultAge: 60,
     prompt: "これから——何歳のときに、何を叶えたいですか？未来の願いを置きましょう。",
+    placeholder: "例：60歳までに◯◯を実現する",
     hint: "いくつでも。年齢は「叶えたい歳」を入れてください。",
     kind: "future",
   },
@@ -221,7 +234,7 @@ export function LifeHistoryGuide({
             rows={2}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="覚えていることを書く…"
+            placeholder={stage.placeholder}
             className="w-full border border-[var(--color-line)] px-3 py-2 text-sm text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-none"
           />
         </div>
