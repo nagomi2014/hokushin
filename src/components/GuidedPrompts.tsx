@@ -9,6 +9,8 @@ export interface PromptStep {
   prompt: string;
   placeholder: string;
   hint?: string;
+  // 入力を完成形に整える（例：「ハワイ」→「ハワイへ行く」）。
+  format?: (text: string) => string;
 }
 
 interface GuidedPromptsProps {
@@ -40,8 +42,9 @@ export function GuidedPrompts({
   }
 
   function record(advance: boolean) {
-    if (text.trim()) {
-      onAdd(text.trim());
+    const t = text.trim();
+    if (t) {
+      onAdd(step.format ? step.format(t) : t);
       setAddedHere((c) => c + 1);
       setText("");
     }

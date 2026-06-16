@@ -3,21 +3,16 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAppState } from "@/lib/storage";
+import { useTools } from "@/lib/tools/useTools";
 import { MandalaGuide } from "@/components/MandalaGuide";
 
-const CELL_HINTS = [
-  "派生1",
-  "派生2",
-  "派生3",
-  "派生4",
-  "派生5",
-  "派生6",
-  "派生7",
-  "派生8",
-];
+// 3×3ブロック内の「中心以外の8マス」の位置（4＝中心は除外）
+const SURROUND = [0, 1, 2, 3, 5, 6, 7, 8];
+const sIdx = (pos: number) => SURROUND.indexOf(pos);
 
 export default function MandalaPage() {
   const { state, loaded, setMandalaCenter, setMandalaCell } = useAppState();
+  const { mandalaSub, setMandalaSub, addMandalaSub } = useTools();
   const [guideOpen, setGuideOpen] = useState(false);
 
   if (!loaded) {
@@ -29,8 +24,6 @@ export default function MandalaPage() {
   }
 
   const m = state.mandala;
-  const filledCount =
-    (m.center.trim() ? 1 : 0) + m.cells.filter((c) => c.trim()).length;
 
   return (
     <div className="max-w-5xl mx-auto px-6 lg:px-10">
@@ -57,6 +50,7 @@ export default function MandalaPage() {
             currentCenter={m.center}
             onSetCenter={setMandalaCenter}
             onSetCell={setMandalaCell}
+            onAddSub={addMandalaSub}
             onDone={() => setGuideOpen(false)}
             onCancel={() => setGuideOpen(false)}
           />
@@ -77,28 +71,80 @@ export default function MandalaPage() {
         </section>
       )}
 
-      {/* Mandala grid */}
+      {/* Mandalart 9×9 grid */}
       <section className="py-12 hairline-bottom">
-        <div className="max-w-2xl mx-auto">
-          <div className="grid grid-cols-3 gap-px bg-[var(--color-line)]">
-            {/* Row 1 */}
-            <MandalaCell value={m.cells[0]} onChange={(v) => setMandalaCell(0, v)} hint={CELL_HINTS[0]} />
-            <MandalaCell value={m.cells[1]} onChange={(v) => setMandalaCell(1, v)} hint={CELL_HINTS[1]} />
-            <MandalaCell value={m.cells[2]} onChange={(v) => setMandalaCell(2, v)} hint={CELL_HINTS[2]} />
-            {/* Row 2 */}
-            <MandalaCell value={m.cells[3]} onChange={(v) => setMandalaCell(3, v)} hint={CELL_HINTS[3]} />
-            <MandalaCenter value={m.center} onChange={setMandalaCenter} />
-            <MandalaCell value={m.cells[4]} onChange={(v) => setMandalaCell(4, v)} hint={CELL_HINTS[4]} />
-            {/* Row 3 */}
-            <MandalaCell value={m.cells[5]} onChange={(v) => setMandalaCell(5, v)} hint={CELL_HINTS[5]} />
-            <MandalaCell value={m.cells[6]} onChange={(v) => setMandalaCell(6, v)} hint={CELL_HINTS[6]} />
-            <MandalaCell value={m.cells[7]} onChange={(v) => setMandalaCell(7, v)} hint={CELL_HINTS[7]} />
-          </div>
+        <div className="overflow-x-auto -mx-6 px-6 lg:mx-0 lg:px-0">
+          <div className="grid grid-cols-9 gap-px bg-[var(--color-line)] min-w-[680px]">
+            {Array.from({ length: 81 }).map((_, idx) => {
+              const r = Math.floor(idx / 9);
+              const c = idx % 9;
+              const block = Math.floor(r / 3) * 3 + (Math.floor(c / 3) % 3);
+              const pos = (r % 3) * 3 + (c % 3);
+              const blockBorder: React.CSSProperties = {
+                borderRight:
+                  c % 3 === 2 && c !== 8
+                    ? "2px solid var(--color-ink)"
+                    : undefined,
+                borderBottom:
+                  r % 3 === 2 && r !== 8
+                    ? "2px solid var(--color-ink)"
+                    : undefined,
+              };
 
-          <div className="mt-5 flex items-center justify-between text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-            <span>FILLED &nbsp; {filledCount} / 9</span>
-            <span>AUTO-SAVED · LOCAL</span>
+              if (block === 4) {
+                // 中央ブロック：メインテーマ＋8観点
+                if (pos === 4) {
+                  return (
+                    <Cell
+                      key={idx}
+                      variant="theme"
+                      value={m.center}
+                      onChange={setMandalaCenter}
+                      style={blockBorder}
+                    />
+                  );
+                }
+                const a = sIdx(pos);
+                return (
+                  <Cell
+                    key={idx}
+                    variant="aspect"
+                    value={m.cells[a] ?? ""}
+                    onChange={(v) => setMandalaCell(a, v)}
+                    style={blockBorder}
+                  />
+                );
+              }
+
+              // 外周ブロック：その観点の派生8項目（中心は観点のミラー）
+              const a = sIdx(block);
+              if (pos === 4) {
+                return (
+                  <Cell
+                    key={idx}
+                    variant="aspectMirror"
+                    value={m.cells[a] ?? ""}
+                    style={blockBorder}
+                  />
+                );
+              }
+              const s = sIdx(pos);
+              return (
+                <Cell
+                  key={idx}
+                  variant="sub"
+                  value={mandalaSub[a]?.[s] ?? ""}
+                  onChange={(v) => setMandalaSub(a, s, v)}
+                  style={blockBorder}
+                />
+              );
+            })}
           </div>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+          <span>中央テーマ＋8観点＋64派生 ＝ 81マス</span>
+          <span>SAVED · THIS DEVICE</span>
         </div>
       </section>
 
@@ -108,10 +154,10 @@ export default function MandalaPage() {
           書き方のヒント
         </div>
         <ul className="text-sm text-[var(--color-fg-mute)] leading-relaxed space-y-2 max-w-2xl">
-          <li>― 完璧を目指さなくてOK。思いついた言葉から書き始める。</li>
-          <li>― 中央には「あなたが人生で大切にしたいこと」を一つ。例：自由、健康、家族、創造、貢献。</li>
-          <li>― まわりの 8 マスは、中央から連想されるキーワード。動詞でも名詞でも、抽象でも具体でも。</li>
-          <li>― 書いた言葉は、次に <Link href="/fields" className="text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5">七つの分野</Link> で目標を立てる時の材料になる。</li>
+          <li>― 真ん中の<span className="text-[var(--color-gold)]">紺のマス</span>に「人生で大切にしたいこと」を一つ。</li>
+          <li>― そのまわりの<span className="text-[var(--color-gold)]">金のマス</span>が、中央から派生する8つの観点。</li>
+          <li>― 外側の8ブロックは、それぞれの観点をさらに8つに展開する場所。</li>
+          <li>― 「質問に沿って書く」を使えば、順番に質問されるので白紙で迷いません。</li>
         </ul>
       </section>
 
@@ -133,47 +179,60 @@ export default function MandalaPage() {
   );
 }
 
-function MandalaCenter({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="bg-[var(--color-ink)] aspect-square flex flex-col">
-      <div className="px-3 pt-3 pb-1 text-[9px] tracking-[0.3em] text-[var(--color-gold)]">
-        ★ &nbsp; 中心
-      </div>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="自分が人生で大切にしたいこと"
-        className="flex-1 bg-transparent text-white serif text-base md:text-lg leading-snug p-3 pt-1 focus:outline-none resize-none placeholder:text-white/30"
-      />
-    </div>
-  );
-}
+type CellVariant = "theme" | "aspect" | "aspectMirror" | "sub";
 
-function MandalaCell({
+function Cell({
+  variant,
   value,
   onChange,
-  hint,
+  style,
 }: {
+  variant: CellVariant;
   value: string;
-  onChange: (v: string) => void;
-  hint: string;
+  onChange?: (v: string) => void;
+  style?: React.CSSProperties;
 }) {
-  return (
-    <div className="bg-white aspect-square flex flex-col group hover:bg-[var(--color-paper-soft)] transition">
-      <div className="px-2.5 pt-2 pb-0.5 text-[9px] tracking-[0.25em] text-[var(--color-fg-faint)]">
-        {hint}
+  const base =
+    "aspect-square flex items-center justify-center text-center leading-tight";
+
+  if (variant === "theme") {
+    return (
+      <div className="bg-[var(--color-ink)]" style={style}>
+        <input
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder="中央テーマ"
+          className={`${base} w-full h-full bg-transparent text-white serif text-[11px] md:text-xs px-1 focus:outline-none placeholder:text-white/40`}
+        />
       </div>
-      <textarea
+    );
+  }
+
+  if (variant === "aspectMirror") {
+    // 外周ブロックの中心＝観点のミラー（編集は中央ブロックで）
+    return (
+      <div
+        className={`${base} bg-[var(--color-paper-soft)] text-[var(--color-gold)] serif text-[11px] md:text-xs px-1`}
+        style={style}
+        title="観点（中央で編集）"
+      >
+        {value || "—"}
+      </div>
+    );
+  }
+
+  const tint =
+    variant === "aspect"
+      ? "bg-[var(--color-paper-soft)] text-[var(--color-gold)] serif"
+      : "bg-white text-[var(--color-ink)]";
+
+  return (
+    <div className={tint} style={style}>
+      <input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange?.(e.target.value)}
         placeholder="—"
-        className="flex-1 bg-transparent text-[var(--color-ink)] text-sm leading-snug px-2.5 pb-2.5 focus:outline-none resize-none placeholder:text-[var(--color-fg-faint)]"
+        className={`${base} w-full h-full bg-transparent text-[11px] md:text-xs px-1 focus:outline-none placeholder:text-[var(--color-fg-faint)]`}
       />
     </div>
   );

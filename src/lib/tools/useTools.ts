@@ -41,10 +41,21 @@ export interface ToolsData {
   lifeEvents: LifeEvent[];
   moneyEntries: MoneyEntry[];
   primeItems: PrimeItem[];
+  // マンダラート派生：8観点 × 8項目（フル9×9の外周ブロック）
+  mandalaSub: string[][];
+}
+
+function emptyMandalaSub(): string[][] {
+  return Array.from({ length: 8 }, () => Array.from({ length: 8 }, () => ""));
 }
 
 function emptyTools(): ToolsData {
-  return { lifeEvents: [], moneyEntries: [], primeItems: [] };
+  return {
+    lifeEvents: [],
+    moneyEntries: [],
+    primeItems: [],
+    mandalaSub: emptyMandalaSub(),
+  };
 }
 
 function loadTools(): ToolsData {
@@ -53,10 +64,15 @@ function loadTools(): ToolsData {
     const raw = window.localStorage.getItem(KEY);
     if (!raw) return emptyTools();
     const parsed = JSON.parse(raw) as Partial<ToolsData>;
+    const sub = Array.isArray(parsed.mandalaSub) ? parsed.mandalaSub : [];
+    const mandalaSub = emptyMandalaSub().map((row, i) =>
+      row.map((_, j) => String(sub[i]?.[j] ?? "")),
+    );
     return {
       lifeEvents: parsed.lifeEvents ?? [],
       moneyEntries: parsed.moneyEntries ?? [],
       primeItems: parsed.primeItems ?? [],
+      mandalaSub,
     };
   } catch {
     return emptyTools();
@@ -87,6 +103,9 @@ export interface UseToolsResult extends ToolsData {
   addPrimeItem: (text: string) => void;
   togglePrimeItem: (id: string) => void;
   removePrimeItem: (id: string) => void;
+  // マンダラート派生
+  setMandalaSub: (aspect: number, sub: number, text: string) => void;
+  addMandalaSub: (aspect: number, text: string) => void; // 空いている枠へ
 }
 
 export function useTools(): UseToolsResult {
@@ -165,5 +184,25 @@ export function useTools(): UseToolsResult {
         ...prev,
         primeItems: prev.primeItems.filter((p) => p.id !== id),
       })),
+
+    setMandalaSub: (aspect, sub, text) =>
+      mutate((prev) => {
+        if (aspect < 0 || aspect > 7 || sub < 0 || sub > 7) return prev;
+        const grid = prev.mandalaSub.map((r) => [...r]);
+        grid[aspect][sub] = text;
+        return { ...prev, mandalaSub: grid };
+      }),
+    addMandalaSub: (aspect, text) => {
+      const t = text.trim();
+      if (!t) return;
+      mutate((prev) => {
+        if (aspect < 0 || aspect > 7) return prev;
+        const grid = prev.mandalaSub.map((r) => [...r]);
+        const slot = grid[aspect].findIndex((c) => !c.trim());
+        if (slot === -1) return prev; // 8枠が埋まっている
+        grid[aspect][slot] = t;
+        return { ...prev, mandalaSub: grid };
+      });
+    },
   };
 }

@@ -5,17 +5,22 @@ import { useState } from "react";
 import { useAppState } from "@/lib/storage";
 import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
 
+// すでに文（動詞などで終わる）なら触らず、単語なら語尾を足して完成形にする。
+const isPhrase = (t: string) => /[るうくぐすつぬぶむいたない]$/.test(t);
+const fin = (suffix: string) => (t: string) =>
+  !suffix || isPhrase(t) ? t : `${t}${suffix}`;
+
 const WISHLIST_PROMPTS: PromptStep[] = [
-  { prompt: "行ってみたい場所は？", placeholder: "例：ハワイ／京都の紅葉を見に行く", hint: "思いつくだけ、いくつでも。" },
-  { prompt: "やってみたい趣味・挑戦は？", placeholder: "例：サーフィン／フルマラソンを完走する", hint: "うまくできなくてもOK。" },
-  { prompt: "会いたい人・深めたい関係は？", placeholder: "例：恩師に会う／家族で旅行する" },
-  { prompt: "手に入れたいもの・スキルは？", placeholder: "例：英語を話せるように／一眼カメラ" },
-  { prompt: "体験してみたいことは？", placeholder: "例：オーロラを見る／無人島に泊まる" },
-  { prompt: "学んでみたいことは？", placeholder: "例：プログラミング／歴史／楽器" },
-  { prompt: "健康・体について叶えたいことは？", placeholder: "例：毎朝走る／体脂肪を落とす" },
+  { prompt: "行ってみたい場所は？", placeholder: "例：ハワイ → ハワイへ行く", hint: "場所の名前だけでもOK。「〜へ行く」に整えます。", format: fin("へ行く") },
+  { prompt: "やってみたい趣味・挑戦は？", placeholder: "例：サーフィン → サーフィンをやってみる", format: fin("をやってみる") },
+  { prompt: "会いたい人・深めたい関係は？", placeholder: "例：恩師 → 恩師に会う", format: fin("に会う") },
+  { prompt: "手に入れたいもの・スキルは？", placeholder: "例：一眼カメラ → 一眼カメラを手に入れる", format: fin("を手に入れる") },
+  { prompt: "体験してみたいことは？", placeholder: "例：オーロラ → オーロラを体験する", format: fin("を体験する") },
+  { prompt: "学んでみたいことは？", placeholder: "例：プログラミング → プログラミングを学ぶ", format: fin("を学ぶ") },
+  { prompt: "健康・体について叶えたいことは？", placeholder: "例：毎朝走る／体脂肪を落とす", hint: "文のままでOK。" },
   { prompt: "仕事・お金で叶えたいことは？", placeholder: "例：独立する／月◯万円稼ぐ" },
-  { prompt: "誰かにしてあげたいことは？", placeholder: "例：親孝行する／誰かを応援する" },
-  { prompt: "やめたい・手放したいことは？", placeholder: "例：夜更かし／無駄遣いをやめる" },
+  { prompt: "誰かにしてあげたいことは？", placeholder: "例：親孝行 → 親孝行をする", format: fin("をする") },
+  { prompt: "やめたい・手放したいことは？", placeholder: "例：夜更かし → 夜更かしをやめる", format: fin("をやめる") },
 ];
 
 export default function List100Page() {
