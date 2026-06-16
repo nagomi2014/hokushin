@@ -204,6 +204,105 @@ export function mirroredValues(answers: GuidedAnswer[]): string[] {
 }
 
 // ============================================================
+// 人生のビジョン：5年後の景色の導き出し（台本式・$0）
+// ============================================================
+
+export const VISION_QUESTIONS: GuidedQuestion[] = [
+  {
+    id: "place",
+    prompt: "5年後、どんな場所で暮らしていたいですか？",
+    hint: "ピンと来たものをタップでOK。自分の言葉でも。",
+    options: [
+      { label: "今と同じ場所", values: [] },
+      { label: "もっと自然の近く", values: [] },
+      { label: "便利な街なか", values: [] },
+      { label: "海や山の近く", values: [] },
+      { label: "別の土地・海外", values: [] },
+      { label: "まだ決めてない", values: [] },
+    ],
+    allowFree: true,
+  },
+  {
+    id: "people",
+    prompt: "5年後、誰と過ごす時間がいちばん多いといいですか？",
+    options: [
+      { label: "家族", values: [] },
+      { label: "パートナー", values: [] },
+      { label: "気の合う仲間", values: [] },
+      { label: "一人の時間も大切に", values: [] },
+      { label: "新しく出会う人たち", values: [] },
+    ],
+    allowFree: true,
+  },
+  {
+    id: "work",
+    prompt: "5年後、どんな働き方をしていたいですか？",
+    options: [
+      { label: "好きな仕事に集中している", values: [] },
+      { label: "時間に縛られず自由に", values: [] },
+      { label: "安定した収入で安心して", values: [] },
+      { label: "新しい挑戦の真っ最中", values: [] },
+      { label: "人を育てる・支える側で", values: [] },
+    ],
+    allowFree: true,
+  },
+  {
+    id: "morning",
+    prompt: "5年後の朝、どんな気分で目覚めていたいですか？",
+    options: [
+      { label: "わくわくしている", values: [] },
+      { label: "穏やかで満たされている", values: [] },
+      { label: "達成感がある", values: [] },
+      { label: "自由を感じている", values: [] },
+      { label: "誰かと一緒で安心している", values: [] },
+    ],
+    allowFree: true,
+  },
+  {
+    id: "achievement",
+    prompt: "5年後、「これができていたら最高」と思うことは？",
+    options: [
+      { label: "健康な体", values: [] },
+      { label: "大切な人との時間", values: [] },
+      { label: "経済的な余裕", values: [] },
+      { label: "やりたい仕事の実現", values: [] },
+      { label: "新しいスキル・趣味", values: [] },
+      { label: "誰かの役に立つこと", values: [] },
+    ],
+    allowFree: true,
+  },
+];
+
+export function synthesizeVision(answers: GuidedAnswer[]): string {
+  const get = (id: string) =>
+    answers.find((a) => a.questionId === id)?.text.trim();
+  const place = get("place");
+  const people = get("people");
+  const work = get("work");
+  const morning = get("morning");
+  const achievement = get("achievement");
+
+  const parts: string[] = [];
+
+  // 場所＋人
+  if (place && place !== "まだ決めてない" && people) {
+    parts.push(`5年後、私は${place}で、${people}と過ごす時間を大切にしている。`);
+  } else if (people) {
+    parts.push(`5年後、私は${people}と過ごす時間を大切にしている。`);
+  } else if (place && place !== "まだ決めてない") {
+    parts.push(`5年後、私は${place}で暮らしている。`);
+  } else {
+    parts.push("5年後の私は、こんな景色の中にいる。");
+  }
+
+  if (work) parts.push(`${work}。`);
+  if (morning) parts.push(`毎朝、${morning}。`);
+  if (achievement) parts.push(`そして「${achievement}」を手にしていたら、最高だ。`);
+
+  return parts.join("");
+}
+
+// ============================================================
 // 七つの分野：短期目標の導き出し（台本式・$0）
 // ============================================================
 

@@ -6,8 +6,12 @@ import { useState } from "react";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
 import {
   CREED_QUESTIONS,
+  VISION_QUESTIONS,
   mirroredValues,
   synthesizeCreed,
+  synthesizeVision,
+  type GuidedAnswer,
+  type GuidedQuestion,
 } from "@/lib/coach/guided";
 import { useAppState } from "@/lib/storage";
 import { APP_NAME_JA } from "@/lib/constants";
@@ -221,7 +225,14 @@ export default function OnboardingPage() {
 
           {step === "philosophy" && (
             <PhilosophyOrVisionInput
-              guided
+              guidedConfig={{
+                questions: CREED_QUESTIONS,
+                synthesize: synthesizeCreed,
+                mirror: mirroredValues,
+                doneLabel: "これを人生理念にする",
+                draftHeader: "あなたの答えから、こんな理念が見えてきました",
+                ctaSub: "7つの易しい質問に答えるだけ",
+              }}
               onApply={handlePhilosophyApply}
               placeholder="あなたが人生で大切にしている価値観を、一段落で書く…"
             />
@@ -282,6 +293,13 @@ export default function OnboardingPage() {
 
           {step === "vision" && (
             <PhilosophyOrVisionInput
+              guidedConfig={{
+                questions: VISION_QUESTIONS,
+                synthesize: synthesizeVision,
+                doneLabel: "これを人生のビジョンにする",
+                draftHeader: "あなたの答えから、こんなビジョンが見えてきました",
+                ctaSub: "5つの質問で5年後を描く",
+              }}
               onApply={handleVisionApply}
               placeholder="5 年後に望んでいる景色を、一段落で書く…"
             />
@@ -329,12 +347,21 @@ export default function OnboardingPage() {
   );
 }
 
+interface GuidedConfig {
+  questions: GuidedQuestion[];
+  synthesize: (a: GuidedAnswer[]) => string;
+  mirror?: (a: GuidedAnswer[]) => string[];
+  doneLabel: string;
+  draftHeader: string;
+  ctaSub: string;
+}
+
 function PhilosophyOrVisionInput({
-  guided = false,
+  guidedConfig,
   onApply,
   placeholder,
 }: {
-  guided?: boolean;
+  guidedConfig?: GuidedConfig;
   onApply: (text: string) => void;
   placeholder: string;
 }) {
@@ -342,23 +369,23 @@ function PhilosophyOrVisionInput({
   const [showGuided, setShowGuided] = useState(false);
 
   // 台本式（無料）の導き出しを開いている間は、それだけを表示
-  if (guided && showGuided) {
+  if (guidedConfig && showGuided) {
     return (
       <GuidedDerivation
-        questions={CREED_QUESTIONS}
-        synthesize={synthesizeCreed}
-        mirror={mirroredValues}
+        questions={guidedConfig.questions}
+        synthesize={guidedConfig.synthesize}
+        mirror={guidedConfig.mirror}
         onApply={onApply}
         onCancel={() => setShowGuided(false)}
-        doneLabel="これを人生理念にする"
-        draftHeader="あなたの答えから、こんな理念が見えてきました"
+        doneLabel={guidedConfig.doneLabel}
+        draftHeader={guidedConfig.draftHeader}
       />
     );
   }
 
   return (
     <div className="space-y-5">
-      {guided && (
+      {guidedConfig && (
         <button
           onClick={() => setShowGuided(true)}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
@@ -366,7 +393,7 @@ function PhilosophyOrVisionInput({
           <span className="text-[var(--color-gold)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">質問に答えて見つける</span>
           <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
-            7つの易しい質問に答えるだけ
+            {guidedConfig.ctaSub}
           </span>
         </button>
       )}
@@ -374,7 +401,7 @@ function PhilosophyOrVisionInput({
       <div className="flex items-center gap-4">
         <div className="flex-1 h-px bg-[var(--color-line)]" />
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-          {guided ? "または" : ""}
+          {guidedConfig ? "または" : ""}
         </span>
         <div className="flex-1 h-px bg-[var(--color-line)]" />
       </div>
