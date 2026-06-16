@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useAppState } from "@/lib/storage";
+import { MandalaGuide } from "@/components/MandalaGuide";
 
 const CELL_HINTS = [
   "派生1",
@@ -16,6 +18,7 @@ const CELL_HINTS = [
 
 export default function MandalaPage() {
   const { state, loaded, setMandalaCenter, setMandalaCell } = useAppState();
+  const [guideOpen, setGuideOpen] = useState(false);
 
   if (!loaded) {
     return (
@@ -46,6 +49,33 @@ export default function MandalaPage() {
           ここで集めた言葉が、目標を立てる時の <span className="text-[var(--color-ink)]">材料</span> になります。
         </p>
       </section>
+
+      {/* Guide（質問に沿って書く） */}
+      {guideOpen ? (
+        <section className="py-8 hairline-bottom max-w-2xl mx-auto">
+          <MandalaGuide
+            currentCenter={m.center}
+            onSetCenter={setMandalaCenter}
+            onSetCell={setMandalaCell}
+            onDone={() => setGuideOpen(false)}
+            onCancel={() => setGuideOpen(false)}
+          />
+        </section>
+      ) : (
+        <section className="py-8 hairline-bottom max-w-2xl mx-auto">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+          >
+            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
+            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+              中央のテーマ → 8つの観点、を質問に答えて埋める
+            </span>
+          </button>
+        </section>
+      )}
 
       {/* Mandala grid */}
       <section className="py-12 hairline-bottom">

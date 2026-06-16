@@ -3,6 +3,20 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAppState } from "@/lib/storage";
+import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
+
+const WISHLIST_PROMPTS: PromptStep[] = [
+  { prompt: "行ってみたい場所は？", placeholder: "例：ハワイ／京都の紅葉を見に行く", hint: "思いつくだけ、いくつでも。" },
+  { prompt: "やってみたい趣味・挑戦は？", placeholder: "例：サーフィン／フルマラソンを完走する", hint: "うまくできなくてもOK。" },
+  { prompt: "会いたい人・深めたい関係は？", placeholder: "例：恩師に会う／家族で旅行する" },
+  { prompt: "手に入れたいもの・スキルは？", placeholder: "例：英語を話せるように／一眼カメラ" },
+  { prompt: "体験してみたいことは？", placeholder: "例：オーロラを見る／無人島に泊まる" },
+  { prompt: "学んでみたいことは？", placeholder: "例：プログラミング／歴史／楽器" },
+  { prompt: "健康・体について叶えたいことは？", placeholder: "例：毎朝走る／体脂肪を落とす" },
+  { prompt: "仕事・お金で叶えたいことは？", placeholder: "例：独立する／月◯万円稼ぐ" },
+  { prompt: "誰かにしてあげたいことは？", placeholder: "例：親孝行する／誰かを応援する" },
+  { prompt: "やめたい・手放したいことは？", placeholder: "例：夜更かし／無駄遣いをやめる" },
+];
 
 export default function List100Page() {
   const {
@@ -15,6 +29,7 @@ export default function List100Page() {
   } = useAppState();
 
   const [newText, setNewText] = useState("");
+  const [guideOpen, setGuideOpen] = useState(false);
 
   if (!loaded) {
     return (
@@ -85,6 +100,33 @@ export default function List100Page() {
           </div>
         )}
       </section>
+
+      {/* Guide（質問に沿って書き出す） */}
+      {guideOpen ? (
+        <section className="py-6 hairline-bottom">
+          <GuidedPrompts
+            steps={WISHLIST_PROMPTS}
+            onAdd={addWishlistItem}
+            onDone={() => setGuideOpen(false)}
+            onCancel={() => setGuideOpen(false)}
+            doneLabel="完了する"
+          />
+        </section>
+      ) : (
+        <section className="py-6 hairline-bottom">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+          >
+            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-sm tracking-[0.15em]">質問に沿って書き出す</span>
+            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+              テーマごとの質問に答えるだけで、どんどん埋まっていく
+            </span>
+          </button>
+        </section>
+      )}
 
       {/* Add form */}
       <section className="py-6 hairline-bottom">
