@@ -3,12 +3,20 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useTools, type MoneyEntry } from "@/lib/tools/useTools";
+import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
 
 const KINDS: { id: MoneyEntry["kind"]; label: string }[] = [
   { id: "income", label: "収入" },
   { id: "expense", label: "支出" },
   { id: "asset", label: "資産" },
   { id: "goal", label: "目標" },
+];
+
+const MONEY_PROMPTS: PromptStep[] = [
+  { prompt: "いま持っている貯蓄・資産は？", placeholder: "例：普通預金／投資信託／持ち家", hint: "種類ごとに、いくつでも。", meta: "asset" },
+  { prompt: "収入源は？", placeholder: "例：給与／副業／配当", meta: "income" },
+  { prompt: "毎月の固定費で気になるものは？", placeholder: "例：家賃／サブスク／保険", meta: "expense" },
+  { prompt: "お金で叶えたい目標は？", placeholder: "例：1年で100万円貯める／固定費を月1万円減らす", meta: "goal" },
 ];
 
 function ym(): string {
@@ -23,6 +31,7 @@ export default function MoneyPage() {
   const [amount, setAmount] = useState("");
   const [kind, setKind] = useState<MoneyEntry["kind"]>("asset");
   const [note, setNote] = useState("");
+  const [guideOpen, setGuideOpen] = useState(false);
 
   function add() {
     if (!label.trim()) return;
@@ -61,6 +70,41 @@ export default function MoneyPage() {
           経済の足場を整える。
         </p>
       </section>
+
+      {/* Guide */}
+      {guideOpen ? (
+        <section className="py-8 hairline-bottom">
+          <GuidedPrompts
+            steps={MONEY_PROMPTS}
+            onAdd={(text, step) =>
+              addMoneyEntry({
+                label: text,
+                amount: null,
+                kind: (step.meta as MoneyEntry["kind"]) ?? "asset",
+                note: "",
+                date: ym(),
+              })
+            }
+            onDone={() => setGuideOpen(false)}
+            onCancel={() => setGuideOpen(false)}
+            doneLabel="完了する"
+          />
+        </section>
+      ) : (
+        <section className="py-8 hairline-bottom">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+          >
+            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
+            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+              資産・収入・固定費・目標を、質問に答えて記録
+            </span>
+          </button>
+        </section>
+      )}
 
       {/* Add form */}
       <section className="py-8 hairline-bottom space-y-3">

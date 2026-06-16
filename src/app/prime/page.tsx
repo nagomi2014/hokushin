@@ -3,11 +3,21 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useTools } from "@/lib/tools/useTools";
+import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
+
+const PRIME_PROMPTS: PromptStep[] = [
+  { prompt: "健康・体のために、後回しにしがちだけど大事なことは？", placeholder: "例：運動を習慣にする／定期健診を受ける", hint: "いくつでも。" },
+  { prompt: "家族・大切な人との関係で、時間をかけたいことは？", placeholder: "例：週に一度ゆっくり話す／一緒に出かける" },
+  { prompt: "学び・成長で、いつかやりたいことは？", placeholder: "例：資格の勉強／読書を習慣にする" },
+  { prompt: "仕事の“準備・仕組み化”で、緊急じゃないけど効くことは？", placeholder: "例：マニュアルを作る／自動化を進める" },
+  { prompt: "心・休息のために、整えたいことは？", placeholder: "例：睡眠を整える／趣味の時間をとる" },
+];
 
 export default function PrimePage() {
   const { loaded, primeItems, addPrimeItem, togglePrimeItem, removePrimeItem } =
     useTools();
   const [text, setText] = useState("");
+  const [guideOpen, setGuideOpen] = useState(false);
 
   function add() {
     if (!text.trim()) return;
@@ -69,6 +79,33 @@ export default function PrimePage() {
           </div>
         </div>
       </section>
+
+      {/* Guide */}
+      {guideOpen ? (
+        <section className="py-8 hairline-bottom">
+          <GuidedPrompts
+            steps={PRIME_PROMPTS}
+            onAdd={(t) => addPrimeItem(t)}
+            onDone={() => setGuideOpen(false)}
+            onCancel={() => setGuideOpen(false)}
+            doneLabel="完了する"
+          />
+        </section>
+      ) : (
+        <section className="py-8 hairline-bottom">
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+          >
+            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
+            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+              分野ごとの質問に答えて、大事だけど後回しになることを集める
+            </span>
+          </button>
+        </section>
+      )}
 
       {/* Add */}
       <section className="py-8 hairline-bottom">

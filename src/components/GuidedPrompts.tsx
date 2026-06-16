@@ -11,11 +11,13 @@ export interface PromptStep {
   hint?: string;
   // 入力を完成形に整える（例：「ハワイ」→「ハワイへ行く」）。
   format?: (text: string) => string;
+  // 任意の付帯情報（例：金の記録の種別 income/expense/asset/goal）。
+  meta?: string;
 }
 
 interface GuidedPromptsProps {
   steps: PromptStep[];
-  onAdd: (text: string) => void;
+  onAdd: (text: string, step: PromptStep) => void;
   onDone: () => void;
   onCancel: () => void;
   doneLabel?: string;
@@ -44,7 +46,7 @@ export function GuidedPrompts({
   function record(advance: boolean) {
     const t = text.trim();
     if (t) {
-      onAdd(step.format ? step.format(t) : t);
+      onAdd(step.format ? step.format(t) : t, step);
       setAddedHere((c) => c + 1);
       setText("");
     }
