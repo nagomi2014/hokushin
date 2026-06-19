@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
-import { GuidedDerivation } from "@/components/GuidedDerivation";
-import { fieldQuestions, synthesizeFieldGoal } from "@/lib/coach/guided";
+import { FieldHorizonGuide } from "@/components/FieldHorizonGuide";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import type { AppState, DailyTask, FieldId } from "@/lib/types";
 
@@ -83,30 +82,20 @@ export default function FieldsPage() {
         </section>
 
         <section className="py-8">
-          <GuidedDerivation
+          <FieldHorizonGuide
             key={field.id}
-            questions={fieldQuestions(field.id)}
-            synthesize={synthesizeFieldGoal}
-            onApply={(draft) => {
-              setField(field.id, { shortTerm: draft });
-              advanceSeq();
+            fieldId={field.id}
+            fieldName={field.nameJa}
+            current={{
+              longTerm: state.fields[field.id]?.longTerm ?? "",
+              midTerm: state.fields[field.id]?.midTerm ?? "",
+              shortTerm: state.fields[field.id]?.shortTerm ?? "",
             }}
+            onSet={(k, v) => setField(field.id, { [k]: v })}
+            onDone={advanceSeq}
             onCancel={() => setSeqIndex(null)}
-            doneLabel="この目標にする"
-            draftHeader="あなたの答えから、こんな目標が見えてきました"
             progressKey={`field-${field.id}`}
           />
-          <div className="mt-6 hairline-top pt-4 text-right">
-            <button
-              type="button"
-              onClick={advanceSeq}
-              className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
-            >
-              {seqIndex >= FIELDS.length - 1
-                ? "この分野はスキップして完了 →"
-                : "この分野はスキップ → 次へ"}
-            </button>
-          </div>
         </section>
       </div>
     );
@@ -285,7 +274,7 @@ export default function FieldsPage() {
                   ★ &nbsp; 質問で目標を作る
                 </div>
                 <div className="serif text-base text-[var(--color-ink)]">
-                  {FIELDS.find((f) => f.id === coachFieldId)?.nameJa} の短期目標
+                  {FIELDS.find((f) => f.id === coachFieldId)?.nameJa} の目標
                 </div>
               </div>
               <button
@@ -297,17 +286,20 @@ export default function FieldsPage() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
-              <GuidedDerivation
+              <FieldHorizonGuide
                 key={coachFieldId}
-                questions={fieldQuestions(coachFieldId)}
-                synthesize={synthesizeFieldGoal}
-                onApply={(draft) => {
-                  setField(coachFieldId, { shortTerm: draft });
-                  setCoachFieldId(null);
+                fieldId={coachFieldId}
+                fieldName={
+                  FIELDS.find((f) => f.id === coachFieldId)?.nameJa ?? ""
+                }
+                current={{
+                  longTerm: state.fields[coachFieldId]?.longTerm ?? "",
+                  midTerm: state.fields[coachFieldId]?.midTerm ?? "",
+                  shortTerm: state.fields[coachFieldId]?.shortTerm ?? "",
                 }}
+                onSet={(k, v) => setField(coachFieldId, { [k]: v })}
+                onDone={() => setCoachFieldId(null)}
                 onCancel={() => setCoachFieldId(null)}
-                doneLabel="この短期目標にする"
-                draftHeader="あなたの答えから、こんな目標が見えてきました"
                 progressKey={`field-${coachFieldId}`}
               />
             </div>

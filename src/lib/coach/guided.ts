@@ -331,6 +331,10 @@ const FIELD_IDEAL_OPTIONS: Record<FieldId, string[]> = {
   7: ["没頭できる趣味がある", "定期的に楽しめてる", "新しい趣味に挑戦", "仲間と楽しめてる", "教養が深まってる"],
 };
 
+export function fieldIdealOptions(fieldId: FieldId): string[] {
+  return FIELD_IDEAL_OPTIONS[fieldId];
+}
+
 export function fieldQuestions(fieldId: FieldId): GuidedQuestion[] {
   return [
     FIELD_CURRENT_Q,
