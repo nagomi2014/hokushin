@@ -6,18 +6,108 @@ import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
 import { fieldQuestions, synthesizeFieldGoal } from "@/lib/coach/guided";
+import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import type { AppState, DailyTask, FieldId } from "@/lib/types";
+
+const SEQ_KEY = "fields-seq";
 
 export default function FieldsPage() {
   const { state, loaded, setField } = useAppState();
   const [coachFieldId, setCoachFieldId] = useState<FieldId | null>(null);
-  const [materialOpen, setMaterialOpen] = useState(true);
+  const [materialOpen, setMaterialOpen] = useState(false);
+  // 一分野ずつ質問していく順番モード（null=通常表示、0〜6=その分野）
+  const [seqIndex, setSeqIndex] = useState<number | null>(null);
   const today = todayString();
+
+  function startSeq() {
+    const saved = Math.min(readGuide(SEQ_KEY, 0), FIELDS.length - 1);
+    setSeqIndex(saved);
+  }
+  function advanceSeq() {
+    if (seqIndex === null) return;
+    if (seqIndex >= FIELDS.length - 1) {
+      clearGuide(SEQ_KEY);
+      setSeqIndex(null);
+    } else {
+      const n = seqIndex + 1;
+      setSeqIndex(n);
+      writeGuide(SEQ_KEY, n);
+    }
+  }
 
   if (!loaded) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-32 text-center text-[var(--color-fg-faint)] text-sm tracking-widest">
         LOADING…
+      </div>
+    );
+  }
+
+  // ===== 順番モード（一分野ずつ質問）=====
+  if (seqIndex !== null) {
+    const field = FIELDS[seqIndex];
+    return (
+      <div className="max-w-3xl mx-auto px-6 lg:px-10">
+        <section className="pt-20 pb-8 hairline-bottom">
+          <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-5">
+            <span>
+              分野 {seqIndex + 1} / {FIELDS.length}
+            </span>
+            <div className="flex-1 h-px bg-[var(--color-line)] relative">
+              <div
+                className="absolute inset-y-0 left-0 bg-[var(--color-ink)]"
+                style={{
+                  width: `${((seqIndex + 1) / FIELDS.length) * 100}%`,
+                  top: -1,
+                  height: 3,
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setSeqIndex(null)}
+              className="text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
+            >
+              閉じる
+            </button>
+          </div>
+          <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+            {field.nameEn}
+          </div>
+          <h1 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.1] mb-3">
+            {field.nameJa}
+          </h1>
+          <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed">
+            この分野の「1年後の目標」を、質問に答えて立てます。
+          </p>
+        </section>
+
+        <section className="py-8">
+          <GuidedDerivation
+            key={field.id}
+            questions={fieldQuestions(field.id)}
+            synthesize={synthesizeFieldGoal}
+            onApply={(draft) => {
+              setField(field.id, { shortTerm: draft });
+              advanceSeq();
+            }}
+            onCancel={() => setSeqIndex(null)}
+            doneLabel="この目標にする"
+            draftHeader="あなたの答えから、こんな目標が見えてきました"
+            progressKey={`field-${field.id}`}
+          />
+          <div className="mt-6 hairline-top pt-4 text-right">
+            <button
+              type="button"
+              onClick={advanceSeq}
+              className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
+            >
+              {seqIndex >= FIELDS.length - 1
+                ? "この分野はスキップして完了 →"
+                : "この分野はスキップ → 次へ"}
+            </button>
+          </div>
+        </section>
       </div>
     );
   }
@@ -42,6 +132,22 @@ export default function FieldsPage() {
           <span className="text-[var(--color-ink)]">今日のタスク</span>
           へ落とし込んでいく。
         </p>
+      </section>
+
+      <section className="py-8 hairline-bottom">
+        <button
+          type="button"
+          onClick={startSeq}
+          className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
+        >
+          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-sm tracking-[0.15em]">
+            質問に沿って、七つの分野を順に立てる
+          </span>
+          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            一つの分野ずつ、質問に答えるだけ。途中で閉じても続きから
+          </span>
+        </button>
       </section>
 
       <ExplorationMaterial
