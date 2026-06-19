@@ -15,6 +15,7 @@ interface Horizon {
   label: string;
   prompt: (fieldName: string) => string;
   placeholder: string;
+  hint?: string;
   useIdealChips?: boolean;
 }
 
@@ -23,20 +24,23 @@ const HORIZONS: Horizon[] = [
     key: "longTerm",
     label: "長期（5年以上）",
     prompt: (f) => `${f}で、5年後より先、最終的にどうなっていたい？`,
-    placeholder: "例：〜になっている",
+    placeholder: "例：いつまでも自分の足で歩ける体でいる",
+    hint: "大きな方向でOK。下のボタンから選んでも、自分の言葉でも。",
     useIdealChips: true,
   },
   {
     key: "midTerm",
     label: "中期（1〜5年）",
-    prompt: () => "そこへ向けて、1〜5年でどこまで進めたい？",
-    placeholder: "例：〜まで進める",
+    prompt: () => "では、その途中——3年後くらいには、どうなっていたい？",
+    placeholder: "例：週3回の運動が習慣になっている",
+    hint: "長期と「今」のあいだの“通過点”を、ひとつ。",
   },
   {
     key: "shortTerm",
     label: "短期（1年以内）",
     prompt: () => "では、この1年で何をする？",
-    placeholder: "例：まず〜から始める",
+    placeholder: "例：まず毎朝10分のウォーキングから始める",
+    hint: "小さく、確実にできることから。",
   },
 ];
 
@@ -126,6 +130,11 @@ export function FieldHorizonGuide({
         <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
           {h.prompt(fieldName)}
         </div>
+        {h.hint && (
+          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+            {h.hint}
+          </div>
+        )}
       </div>
 
       {/* chips（長期のみ・タップで入力欄に入る） */}
