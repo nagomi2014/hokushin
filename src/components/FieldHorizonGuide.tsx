@@ -13,41 +13,53 @@ type HorizonKey = "longTerm" | "midTerm" | "shortTerm";
 interface Horizon {
   key: HorizonKey;
   label: string;
-  prompt: (fieldName: string) => string;
+  prompt: string;
   placeholder: string;
   hint?: string;
   useIdealChips?: boolean;
 }
 
-const HORIZONS: Horizon[] = [
-  {
-    key: "longTerm",
-    label: "長期（5年以上）",
-    prompt: (f) => `${f}で、5年後より先、最終的にどうなっていたい？`,
-    placeholder: "例：いつまでも自分の足で歩ける体でいる",
-    hint: "大きな方向でOK。下のボタンから選んでも、自分の言葉でも。",
-    useIdealChips: true,
-  },
-  {
-    key: "midTerm",
-    label: "中期（1〜5年）",
-    prompt: () => "では、その途中——3年後くらいには、どうなっていたい？",
-    placeholder: "例：週3回の運動が習慣になっている",
-    hint: "長期と「今」のあいだの“通過点”を、ひとつ。",
-  },
-  {
-    key: "shortTerm",
-    label: "短期（1年以内）",
-    prompt: () => "では、この1年で何をする？",
-    placeholder: "例：まず毎朝10分のウォーキングから始める",
-    hint: "小さく、確実にできることから。",
-  },
-];
+// 毎年末〆。短期＝今年末、中期＝mid年後の年末、長期＝long年後の年末。
+function buildHorizons(
+  fieldName: string,
+  baseYear: number,
+  midYears: number,
+  longYears: number,
+): Horizon[] {
+  const midY = baseYear + midYears;
+  const longY = baseYear + longYears;
+  return [
+    {
+      key: "longTerm",
+      label: `長期 ・ ${longY}年末（${longYears}年後）`,
+      prompt: `${fieldName}で、${longYears}年後（${longY}年末）には、どうなっていたい？`,
+      placeholder: "例：いつまでも自分の足で歩ける体でいる",
+      hint: "大きな方向でOK。下のボタンから選んでも、自分の言葉でも。",
+      useIdealChips: true,
+    },
+    {
+      key: "midTerm",
+      label: `中期 ・ ${midY}年末（${midYears}年後）`,
+      prompt: `では、その途中——${midYears}年後（${midY}年末）には、どうなっていたい？`,
+      placeholder: "例：週3回の運動が習慣になっている",
+      hint: "長期と「今」のあいだの“通過点”を、ひとつ。",
+    },
+    {
+      key: "shortTerm",
+      label: `短期 ・ ${baseYear}年末（今年）`,
+      prompt: `では、今年（${baseYear}年12月31日）までに何をする？`,
+      placeholder: "例：まず毎朝10分のウォーキングから始める",
+      hint: "小さく、確実にできることから。",
+    },
+  ];
+}
 
 interface FieldHorizonGuideProps {
   fieldId: FieldId;
   fieldName: string;
   current: { longTerm: string; midTerm: string; shortTerm: string };
+  midYears: number;
+  longYears: number;
   onSet: (key: HorizonKey, value: string) => void;
   onDone: () => void;
   onCancel: () => void;
@@ -58,23 +70,27 @@ export function FieldHorizonGuide({
   fieldId,
   fieldName,
   current,
+  midYears,
+  longYears,
   onSet,
   onDone,
   onCancel,
   progressKey,
 }: FieldHorizonGuideProps) {
+  const baseYear = new Date().getFullYear();
+  const horizons = buildHorizons(fieldName, baseYear, midYears, longYears);
   const key = progressKey ? `${progressKey}-horizon` : undefined;
-  const initStep = key ? Math.min(readGuide(key, 0), HORIZONS.length - 1) : 0;
+  const initStep = key ? Math.min(readGuide(key, 0), horizons.length - 1) : 0;
 
   const [step, setStep] = useState(initStep);
-  const h = HORIZONS[step];
+  const h = horizons[step];
   const [text, setText] = useState(current[h.key] ?? "");
-  const isLast = step >= HORIZONS.length - 1;
+  const isLast = step >= horizons.length - 1;
   const chips = h.useIdealChips ? fieldIdealOptions(fieldId) : [];
 
   function go(i: number) {
     setStep(i);
-    setText(current[HORIZONS[i].key] ?? "");
+    setText(current[horizons[i].key] ?? "");
     if (key) writeGuide(key, i);
   }
 
@@ -93,13 +109,13 @@ export function FieldHorizonGuide({
       {/* progress */}
       <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
-          {step + 1} / {HORIZONS.length}
+          {step + 1} / {horizons.length}
         </span>
         <div className="flex-1 h-px bg-[var(--color-line)] relative">
           <div
             className="absolute inset-y-0 left-0 bg-[var(--color-ink)]"
             style={{
-              width: `${((step + 1) / HORIZONS.length) * 100}%`,
+              width: `${((step + 1) / horizons.length) * 100}%`,
               top: -1,
               height: 3,
             }}
@@ -128,7 +144,7 @@ export function FieldHorizonGuide({
           {h.label}
         </div>
         <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
-          {h.prompt(fieldName)}
+          {h.prompt}
         </div>
         {h.hint && (
           <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">

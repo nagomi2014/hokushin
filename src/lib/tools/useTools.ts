@@ -37,12 +37,19 @@ export interface PrimeItem {
   done: boolean;
 }
 
+// 目標の区切り（毎年末〆）。短期＝今年末、中期＝mid年後、長期＝long年後。
+export interface HorizonSpan {
+  mid: number;
+  long: number;
+}
+
 export interface ToolsData {
   lifeEvents: LifeEvent[];
   moneyEntries: MoneyEntry[];
   primeItems: PrimeItem[];
   // マンダラート派生：8観点 × 8項目（フル9×9の外周ブロック）
   mandalaSub: string[][];
+  horizonSpan: HorizonSpan;
 }
 
 function emptyMandalaSub(): string[][] {
@@ -55,6 +62,7 @@ function emptyTools(): ToolsData {
     moneyEntries: [],
     primeItems: [],
     mandalaSub: emptyMandalaSub(),
+    horizonSpan: { mid: 3, long: 10 },
   };
 }
 
@@ -68,11 +76,17 @@ function loadTools(): ToolsData {
     const mandalaSub = emptyMandalaSub().map((row, i) =>
       row.map((_, j) => String(sub[i]?.[j] ?? "")),
     );
+    const hs = parsed.horizonSpan;
+    const horizonSpan: HorizonSpan = {
+      mid: typeof hs?.mid === "number" ? hs.mid : 3,
+      long: typeof hs?.long === "number" ? hs.long : 10,
+    };
     return {
       lifeEvents: parsed.lifeEvents ?? [],
       moneyEntries: parsed.moneyEntries ?? [],
       primeItems: parsed.primeItems ?? [],
       mandalaSub,
+      horizonSpan,
     };
   } catch {
     return emptyTools();
@@ -106,6 +120,8 @@ export interface UseToolsResult extends ToolsData {
   // マンダラート派生
   setMandalaSub: (aspect: number, sub: number, text: string) => void;
   addMandalaSub: (aspect: number, text: string) => void; // 空いている枠へ
+  // 目標の区切り
+  setHorizonSpan: (patch: Partial<HorizonSpan>) => void;
 }
 
 export function useTools(): UseToolsResult {
@@ -204,5 +220,15 @@ export function useTools(): UseToolsResult {
         return { ...prev, mandalaSub: grid };
       });
     },
+
+    setHorizonSpan: (patch) =>
+      mutate((prev) => {
+        const mid = Math.max(1, Math.min(9, patch.mid ?? prev.horizonSpan.mid));
+        const long = Math.max(
+          mid + 1,
+          Math.min(50, patch.long ?? prev.horizonSpan.long),
+        );
+        return { ...prev, horizonSpan: { mid, long } };
+      }),
   };
 }

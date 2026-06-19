@@ -6,12 +6,14 @@ import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
 import { FieldHorizonGuide } from "@/components/FieldHorizonGuide";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
+import { useTools } from "@/lib/tools/useTools";
 import type { AppState, DailyTask, FieldId } from "@/lib/types";
 
 const SEQ_KEY = "fields-seq";
 
 export default function FieldsPage() {
   const { state, loaded, setField } = useAppState();
+  const { horizonSpan, setHorizonSpan } = useTools();
   const [coachFieldId, setCoachFieldId] = useState<FieldId | null>(null);
   const [materialOpen, setMaterialOpen] = useState(false);
   // 一分野ずつ質問していく順番モード（null=通常表示、0〜6=その分野）
@@ -91,6 +93,8 @@ export default function FieldsPage() {
               midTerm: state.fields[field.id]?.midTerm ?? "",
               shortTerm: state.fields[field.id]?.shortTerm ?? "",
             }}
+            midYears={horizonSpan.mid}
+            longYears={horizonSpan.long}
             onSet={(k, v) => setField(field.id, { [k]: v })}
             onDone={advanceSeq}
             onCancel={() => setSeqIndex(null)}
@@ -112,14 +116,14 @@ export default function FieldsPage() {
           七つの分野
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
-          <span className="text-[var(--color-ink)]">長期（5年以上）</span>
+          <span className="text-[var(--color-ink)]">長期</span>
           <span className="text-[var(--color-gold)] mx-2">→</span>
-          <span className="text-[var(--color-ink)]">中期（1〜5年）</span>
+          <span className="text-[var(--color-ink)]">中期</span>
           <span className="text-[var(--color-gold)] mx-2">→</span>
-          <span className="text-[var(--color-ink)]">短期（1年以内）</span>
+          <span className="text-[var(--color-ink)]">短期（今年末）</span>
           <span className="text-[var(--color-gold)] mx-2">→</span>
           <span className="text-[var(--color-ink)]">今日のタスク</span>
-          へ落とし込んでいく。
+          へ、年ごとに降ろしていく。
         </p>
       </section>
 
@@ -137,6 +141,45 @@ export default function FieldsPage() {
             一つの分野ずつ、質問に答えるだけ。途中で閉じても続きから
           </span>
         </button>
+      </section>
+
+      {/* 目標の区切り設定（毎年 12/31 〆） */}
+      <section className="py-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-3">
+          目標の区切り（毎年 12 / 31 〆）
+        </div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-[var(--color-ink)]">
+          <span>
+            短期 ＝ 今年末
+            <span className="text-[var(--color-fg-faint)] ml-1">
+              （{new Date().getFullYear()}）
+            </span>
+          </span>
+          <span className="text-[var(--color-line)]">/</span>
+          <span className="flex items-center gap-2">
+            中期 ＝
+            <Stepper
+              value={horizonSpan.mid}
+              onChange={(n) => setHorizonSpan({ mid: n })}
+            />
+            年後
+            <span className="text-[var(--color-fg-faint)]">
+              （{new Date().getFullYear() + horizonSpan.mid}）
+            </span>
+          </span>
+          <span className="text-[var(--color-line)]">/</span>
+          <span className="flex items-center gap-2">
+            長期 ＝
+            <Stepper
+              value={horizonSpan.long}
+              onChange={(n) => setHorizonSpan({ long: n })}
+            />
+            年後
+            <span className="text-[var(--color-fg-faint)]">
+              （{new Date().getFullYear() + horizonSpan.long}）
+            </span>
+          </span>
+        </div>
       </section>
 
       <ExplorationMaterial
@@ -297,6 +340,8 @@ export default function FieldsPage() {
                   midTerm: state.fields[coachFieldId]?.midTerm ?? "",
                   shortTerm: state.fields[coachFieldId]?.shortTerm ?? "",
                 }}
+                midYears={horizonSpan.mid}
+                longYears={horizonSpan.long}
                 onSet={(k, v) => setField(coachFieldId, { [k]: v })}
                 onDone={() => setCoachFieldId(null)}
                 onCancel={() => setCoachFieldId(null)}
@@ -488,6 +533,38 @@ function EmptyHint({ href, label }: { href: string; label: string }) {
     >
       {label} →
     </Link>
+  );
+}
+
+function Stepper({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <span className="inline-flex items-center border border-[var(--color-line)]">
+      <button
+        type="button"
+        onClick={() => onChange(value - 1)}
+        className="px-2 py-0.5 text-[var(--color-fg-mute)] hover:bg-[var(--color-paper-soft)] hover:text-[var(--color-ink)] transition"
+        aria-label="減らす"
+      >
+        −
+      </button>
+      <span className="px-2 serif text-sm text-[var(--color-ink)] min-w-[1.5rem] text-center">
+        {value}
+      </span>
+      <button
+        type="button"
+        onClick={() => onChange(value + 1)}
+        className="px-2 py-0.5 text-[var(--color-fg-mute)] hover:bg-[var(--color-paper-soft)] hover:text-[var(--color-ink)] transition"
+        aria-label="増やす"
+      >
+        ＋
+      </button>
+    </span>
   );
 }
 
