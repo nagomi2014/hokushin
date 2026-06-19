@@ -18,7 +18,6 @@ import { APP_NAME_JA } from "@/lib/constants";
 
 type Step =
   | "welcome"
-  | "self_discovery"
   | "philosophy"
   | "philosophy_done"
   | "vision"
@@ -42,10 +41,6 @@ export default function OnboardingPage() {
   // Step navigation helpers
   // ----------------------------------------------------------
   function start() {
-    setStep("self_discovery");
-  }
-
-  function moveToPhilosophy() {
     setStep("philosophy");
   }
 
@@ -99,9 +94,9 @@ export default function OnboardingPage() {
             あなたの北辰（人生の北極星）を、ここから一緒に見つけていきます。
           </p>
           <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed max-w-md mx-auto mb-12">
-            まず、自分を知るところから。
+            むずかしいことは聞きません。
             <br />
-            その上で、人生理念とビジョンをコーチと一緒に書き上げます。
+            やさしい質問に答えていくと、人生理念とビジョンが見えてきます。
           </p>
           <button
             onClick={start}
@@ -111,7 +106,7 @@ export default function OnboardingPage() {
             はじめる
           </button>
           <div className="mt-10 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-            所要時間：5〜10 分
+            所要時間：約 5 分
           </div>
           <button
             onClick={skipOnboarding}
@@ -122,71 +117,10 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* Self-Discovery */}
-      {step === "self_discovery" && (
-        <div className="w-full py-16">
-          <StepProgress current={1} total={3} />
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mt-12 mb-4">
-            ★ &nbsp; SELF&nbsp;DISCOVERY
-          </div>
-          <h2 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.15] mb-3">
-            まず、自分を知る
-          </h2>
-          <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-10 max-w-xl">
-            目標を立てる前に、自分の中にあるキーワードを書き出します。
-            <br />
-            ここで集めた言葉が、このあと書く<span className="text-[var(--color-ink)]">人生理念</span>と
-            <span className="text-[var(--color-ink)]">ビジョン</span>の材料になります。
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-            <SelfDiscoveryCard
-              href="/mandala"
-              title="マンダラチャート"
-              caption="中央に「大切にしたいこと」、まわりに 8 つの派生キーワード"
-              done={
-                !!state.mandala.center.trim() ||
-                state.mandala.cells.some((c) => c.trim())
-              }
-            />
-            <SelfDiscoveryCard
-              href="/list-100"
-              title="100 のリスト"
-              caption="人生でやりたいことを、思いつくまま 100 個書き出す"
-              done={state.wishlist.length > 0}
-              meta={
-                state.wishlist.length > 0
-                  ? `${state.wishlist.length} / 100`
-                  : undefined
-              }
-            />
-          </div>
-
-          <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-6 leading-relaxed">
-            両方やっても、片方だけでもOK。あとで戻って書き足すこともできます。
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={moveToPhilosophy}
-              className="bg-[var(--color-ink)] text-white px-8 py-3 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
-            >
-              次へ ・ 人生理念を書く →
-            </button>
-            <button
-              onClick={() => setStep("welcome")}
-              className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
-            >
-              ← 戻る
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Philosophy in progress / done */}
       {(step === "philosophy" || step === "philosophy_done") && (
         <div className="w-full py-16">
-          <StepProgress current={2} total={3} />
+          <StepProgress current={1} total={2} />
           <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mt-12 mb-4">
             ★ &nbsp; FOUNDATION
           </div>
@@ -244,7 +178,7 @@ export default function OnboardingPage() {
       {/* Vision in progress / done */}
       {(step === "vision" || step === "vision_done") && (
         <div className="w-full py-16">
-          <StepProgress current={3} total={3} />
+          <StepProgress current={2} total={2} />
           <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mt-12 mb-4">
             ★ &nbsp; VISION
           </div>
@@ -342,6 +276,25 @@ export default function OnboardingPage() {
               ダッシュボードへ
             </Link>
           </div>
+
+          <div className="mt-14 pt-8 hairline-top max-w-md mx-auto">
+            <div className="text-[10px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-4">
+              もっと自分を深掘りするなら（あとでもOK）
+            </div>
+            <div className="flex items-center justify-center gap-5 text-xs tracking-[0.2em]">
+              <Link href="/mandala" className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition">
+                マンダラ
+              </Link>
+              <span className="text-[var(--color-line)]">/</span>
+              <Link href="/list-100" className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition">
+                100のリスト
+              </Link>
+              <span className="text-[var(--color-line)]">/</span>
+              <Link href="/history" className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition">
+                100年史
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 
@@ -435,51 +388,6 @@ function PhilosophyOrVisionInput({
   );
 }
 
-function SelfDiscoveryCard({
-  href,
-  title,
-  caption,
-  done,
-  meta,
-}: {
-  href: string;
-  title: string;
-  caption: string;
-  done: boolean;
-  meta?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      target="_blank"
-      className="group block border border-[var(--color-line)] p-6 hover:border-[var(--color-ink)] transition"
-    >
-      <div className="flex items-start justify-between mb-3 gap-3">
-        <span className="serif text-lg text-[var(--color-ink)]">{title}</span>
-        {done ? (
-          <span className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] whitespace-nowrap">
-            ✓ 書いた
-          </span>
-        ) : (
-          <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] whitespace-nowrap">
-            未着手
-          </span>
-        )}
-      </div>
-      <p className="text-xs text-[var(--color-fg-mute)] leading-relaxed mb-4">
-        {caption}
-      </p>
-      <div className="flex items-center justify-between text-[10px] tracking-[0.3em]">
-        <span className="text-[var(--color-fg-faint)]">
-          {meta || (done ? "書いた一覧を見る" : "新しいタブで開く")}
-        </span>
-        <span className="text-[var(--color-gold)] group-hover:translate-x-1 transition">
-          →
-        </span>
-      </div>
-    </Link>
-  );
-}
 
 function StepProgress({ current, total }: { current: number; total: number }) {
   return (
