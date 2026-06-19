@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 
 // 汎用：プロンプトを順にたどって、各回でいくつでも項目を足していく台本ウォーカー。
 // 100のリストなど「複数追加」する導き出しに使う（AI不要・$0）。
@@ -21,6 +22,7 @@ interface GuidedPromptsProps {
   onDone: () => void;
   onCancel: () => void;
   doneLabel?: string;
+  progressKey?: string; // 指定すると途中保存・再開できる
 }
 
 export function GuidedPrompts({
@@ -29,8 +31,13 @@ export function GuidedPrompts({
   onDone,
   onCancel,
   doneLabel = "完了",
+  progressKey,
 }: GuidedPromptsProps) {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() =>
+    progressKey
+      ? Math.min(readGuide(progressKey, 0), Math.max(0, steps.length - 1))
+      : 0,
+  );
   const [text, setText] = useState("");
   const [addedHere, setAddedHere] = useState(0);
 
@@ -41,6 +48,12 @@ export function GuidedPrompts({
     setIndex(i);
     setText("");
     setAddedHere(0);
+    if (progressKey) writeGuide(progressKey, i);
+  }
+
+  function finish() {
+    if (progressKey) clearGuide(progressKey);
+    onDone();
   }
 
   function record(advance: boolean) {
@@ -51,13 +64,13 @@ export function GuidedPrompts({
       setText("");
     }
     if (advance) {
-      if (isLast) onDone();
+      if (isLast) finish();
       else go(index + 1);
     }
   }
 
   function skip() {
-    if (isLast) onDone();
+    if (isLast) finish();
     else go(index + 1);
   }
 

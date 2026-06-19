@@ -89,6 +89,7 @@ export default function PrimePage() {
             onDone={() => setGuideOpen(false)}
             onCancel={() => setGuideOpen(false)}
             doneLabel="完了する"
+            progressKey="prime"
           />
         </section>
       ) : (

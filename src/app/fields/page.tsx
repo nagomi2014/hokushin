@@ -202,6 +202,7 @@ export default function FieldsPage() {
                 onCancel={() => setCoachFieldId(null)}
                 doneLabel="この短期目標にする"
                 draftHeader="あなたの答えから、こんな目標が見えてきました"
+                progressKey={`field-${coachFieldId}`}
               />
             </div>
           </aside>

@@ -232,6 +232,7 @@ export default function OnboardingPage() {
                 doneLabel: "これを人生理念にする",
                 draftHeader: "あなたの答えから、こんな理念が見えてきました",
                 ctaSub: "7つの易しい質問に答えるだけ",
+                progressKey: "creed",
               }}
               onApply={handlePhilosophyApply}
               placeholder="あなたが人生で大切にしている価値観を、一段落で書く…"
@@ -299,6 +300,7 @@ export default function OnboardingPage() {
                 doneLabel: "これを人生のビジョンにする",
                 draftHeader: "あなたの答えから、こんなビジョンが見えてきました",
                 ctaSub: "5つの質問で5年後を描く",
+                progressKey: "vision",
               }}
               onApply={handleVisionApply}
               placeholder="5 年後に望んでいる景色を、一段落で書く…"
@@ -354,6 +356,7 @@ interface GuidedConfig {
   doneLabel: string;
   draftHeader: string;
   ctaSub: string;
+  progressKey: string;
 }
 
 function PhilosophyOrVisionInput({
@@ -379,6 +382,7 @@ function PhilosophyOrVisionInput({
         onCancel={() => setShowGuided(false)}
         doneLabel={guidedConfig.doneLabel}
         draftHeader={guidedConfig.draftHeader}
+        progressKey={guidedConfig.progressKey}
       />
     );
   }

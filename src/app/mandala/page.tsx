@@ -48,6 +48,7 @@ export default function MandalaPage() {
         <section className="py-8 hairline-bottom max-w-2xl mx-auto">
           <MandalaGuide
             currentCenter={m.center}
+            currentCells={m.cells}
             onSetCenter={setMandalaCenter}
             onSetCell={setMandalaCell}
             onAddSub={addMandalaSub}

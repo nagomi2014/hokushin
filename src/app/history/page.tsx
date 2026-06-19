@@ -61,6 +61,7 @@ export default function HistoryPage() {
             onAdd={addLifeEvent}
             onDone={() => setGuideOpen(false)}
             onCancel={() => setGuideOpen(false)}
+            progressKey="history"
           />
         </section>
       )}

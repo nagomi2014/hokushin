@@ -206,6 +206,7 @@ export default function PyramidPage() {
                 onCancel={() => setCoachLevel(null)}
                 doneLabel="これを人生理念にする"
                 draftHeader="あなたの答えから、こんな理念が見えてきました"
+                progressKey="creed"
               />
             </div>
           </aside>

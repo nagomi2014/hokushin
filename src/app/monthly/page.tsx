@@ -266,6 +266,7 @@ export default function MonthlyPage() {
                 onCancel={() => setCoachOpen(false)}
                 doneLabel="今月の最重要目標にする"
                 draftHeader="あなたの答えから、今月の一手が見えてきました"
+                progressKey="monthly"
               />
             </div>
           </aside>

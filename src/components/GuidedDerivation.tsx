@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { GuidedAnswer, GuidedQuestion } from "@/lib/coach/guided";
+import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 
 interface GuidedDerivationProps {
   questions: GuidedQuestion[];
@@ -12,6 +13,13 @@ interface GuidedDerivationProps {
   draftHeader?: string; // ドラフト見出し
   // 価値ミラーリング（理念のみ）。なければ表示しない。
   mirror?: (answers: GuidedAnswer[]) => string[];
+  progressKey?: string; // 指定すると途中保存・再開できる
+}
+
+interface SavedDerivation {
+  answers: GuidedAnswer[];
+  index: number;
+  phase: "asking" | "draft";
 }
 
 /**
@@ -27,12 +35,22 @@ export function GuidedDerivation({
   doneLabel = "これで決定する",
   draftHeader = "あなたの答えから、こんな形が見えてきました",
   mirror,
+  progressKey,
 }: GuidedDerivationProps) {
-  const [answers, setAnswers] = useState<GuidedAnswer[]>([]);
-  const [index, setIndex] = useState(0);
+  const [saved] = useState<SavedDerivation | null>(() =>
+    progressKey ? readGuide<SavedDerivation | null>(progressKey, null) : null,
+  );
+  const [answers, setAnswers] = useState<GuidedAnswer[]>(saved?.answers ?? []);
+  const [index, setIndex] = useState(
+    Math.min(saved?.index ?? 0, Math.max(0, questions.length - 1)),
+  );
   const [freeText, setFreeText] = useState("");
-  const [phase, setPhase] = useState<"asking" | "draft">("asking");
-  const [draft, setDraft] = useState("");
+  const [phase, setPhase] = useState<"asking" | "draft">(
+    saved?.phase ?? "asking",
+  );
+  const [draft, setDraft] = useState(
+    saved?.phase === "draft" ? synthesize(saved.answers) : "",
+  );
 
   const q = questions[index];
   const isLast = index >= questions.length - 1;
@@ -40,6 +58,10 @@ export function GuidedDerivation({
     () => (mirror ? mirror(answers) : []),
     [answers, mirror],
   );
+
+  function persist(a: GuidedAnswer[], i: number, p: "asking" | "draft") {
+    if (progressKey) writeGuide(progressKey, { answers: a, index: i, phase: p });
+  }
 
   function record(text: string, values: GuidedAnswer["values"]) {
     const next = [
@@ -50,8 +72,10 @@ export function GuidedDerivation({
     setFreeText("");
     if (isLast) {
       finish(next);
+      persist(next, index, "draft");
     } else {
       setIndex((i) => i + 1);
+      persist(next, index + 1, "asking");
     }
   }
 
@@ -64,6 +88,7 @@ export function GuidedDerivation({
     if (index > 0) {
       setIndex((i) => i - 1);
       setFreeText("");
+      persist(answers, index - 1, "asking");
     }
   }
 
@@ -97,7 +122,11 @@ export function GuidedDerivation({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => draft.trim() && onApply(draft.trim())}
+            onClick={() => {
+              if (!draft.trim()) return;
+              if (progressKey) clearGuide(progressKey);
+              onApply(draft.trim());
+            }}
             disabled={!draft.trim()}
             className="bg-[var(--color-ink)] text-white px-6 py-2.5 text-xs tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition disabled:opacity-30 disabled:cursor-not-allowed"
           >
@@ -106,8 +135,10 @@ export function GuidedDerivation({
           <button
             type="button"
             onClick={() => {
+              setAnswers([]);
               setPhase("asking");
               setIndex(0);
+              if (progressKey) clearGuide(progressKey);
             }}
             className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
           >
@@ -213,10 +244,13 @@ export function GuidedDerivation({
         {answers.length >= 3 && (
           <button
             type="button"
-            onClick={() => finish(answers)}
+            onClick={() => {
+              finish(answers);
+              persist(answers, index, "draft");
+            }}
             className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
           >
-            もう十分 ・ 理念を作る →
+            もう十分 ・ つくる →
           </button>
         )}
       </div>

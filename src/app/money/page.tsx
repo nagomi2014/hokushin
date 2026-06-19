@@ -88,6 +88,7 @@ export default function MoneyPage() {
             onDone={() => setGuideOpen(false)}
             onCancel={() => setGuideOpen(false)}
             doneLabel="完了する"
+            progressKey="money"
           />
         </section>
       ) : (

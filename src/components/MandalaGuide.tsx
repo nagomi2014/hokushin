@@ -29,6 +29,7 @@ const CELL_AREAS = [
 
 interface MandalaGuideProps {
   currentCenter: string;
+  currentCells: string[];
   onSetCenter: (text: string) => void;
   onSetCell: (index: number, text: string) => void;
   onAddSub: (aspectIndex: number, text: string) => void;
@@ -36,21 +37,30 @@ interface MandalaGuideProps {
   onCancel: () => void;
 }
 
+type Phase = "main" | "bridge" | "sub";
+
 export function MandalaGuide({
   currentCenter,
+  currentCells,
   onSetCenter,
   onSetCell,
   onAddSub,
   onDone,
   onCancel,
 }: MandalaGuideProps) {
-  type Phase = "main" | "bridge" | "sub";
-  const [phase, setPhase] = useState<Phase>("main");
+  const initCells = Array.from({ length: 8 }, (_, i) => currentCells[i] ?? "");
+  // 既に書いた分はスキップして、未入力の最初から再開する
+  const firstEmpty = initCells.findIndex((c) => !c.trim());
+  const initPhase: Phase =
+    currentCenter.trim() && firstEmpty === -1 ? "bridge" : "main";
+  const initStep = !currentCenter.trim() ? 0 : firstEmpty === -1 ? 0 : firstEmpty + 1;
+
+  const [phase, setPhase] = useState<Phase>(initPhase);
   // main: 0=中央, 1〜8=観点
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(initStep);
   const [text, setText] = useState("");
   const [center, setCenter] = useState(currentCenter);
-  const [cells, setCells] = useState<string[]>(Array(8).fill(""));
+  const [cells, setCells] = useState<string[]>(initCells);
   // sub
   const [queue, setQueue] = useState<number[]>([]);
   const [qPos, setQPos] = useState(0);

@@ -115,6 +115,7 @@ export default function List100Page() {
             onDone={() => setGuideOpen(false)}
             onCancel={() => setGuideOpen(false)}
             doneLabel="完了する"
+            progressKey="wishlist"
           />
         </section>
       ) : (

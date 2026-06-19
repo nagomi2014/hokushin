@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 
 // 人生を時系列でたどるインタビュー台本（$0・LLM不要）。
 // 各ステージで「年齢＋出来事」を1つずつ記録し、年表が埋まっていく。
@@ -125,15 +126,20 @@ interface LifeHistoryGuideProps {
   onAdd: (age: number, text: string, kind: "past" | "future") => void;
   onDone: () => void;
   onCancel: () => void;
+  progressKey?: string;
 }
 
 export function LifeHistoryGuide({
   onAdd,
   onDone,
   onCancel,
+  progressKey,
 }: LifeHistoryGuideProps) {
-  const [index, setIndex] = useState(0);
-  const [age, setAge] = useState(String(STAGES[0].defaultAge));
+  const initIndex = progressKey
+    ? Math.min(readGuide(progressKey, 0), STAGES.length - 1)
+    : 0;
+  const [index, setIndex] = useState(initIndex);
+  const [age, setAge] = useState(String(STAGES[initIndex].defaultAge));
   const [text, setText] = useState("");
   const [addedHere, setAddedHere] = useState(0);
 
@@ -145,6 +151,12 @@ export function LifeHistoryGuide({
     setAge(String(STAGES[i].defaultAge));
     setText("");
     setAddedHere(0);
+    if (progressKey) writeGuide(progressKey, i);
+  }
+
+  function finish() {
+    if (progressKey) clearGuide(progressKey);
+    onDone();
   }
 
   function record(advance: boolean) {
@@ -155,13 +167,13 @@ export function LifeHistoryGuide({
       setText("");
     }
     if (advance) {
-      if (isLast) onDone();
+      if (isLast) finish();
       else goToStage(index + 1);
     }
   }
 
   function skip() {
-    if (isLast) onDone();
+    if (isLast) finish();
     else goToStage(index + 1);
   }
 
