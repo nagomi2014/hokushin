@@ -45,6 +45,7 @@ export function GuidedDerivation({
     Math.min(saved?.index ?? 0, Math.max(0, questions.length - 1)),
   );
   const [freeText, setFreeText] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
   const [phase, setPhase] = useState<"asking" | "draft">(
     saved?.phase ?? "asking",
   );
@@ -63,20 +64,46 @@ export function GuidedDerivation({
     if (progressKey) writeGuide(progressKey, { answers: a, index: i, phase: p });
   }
 
-  function record(text: string, values: GuidedAnswer["values"]) {
-    const next = [
-      ...answers.filter((a) => a.questionId !== q.id),
-      { questionId: q.id, text, values },
-    ];
-    setAnswers(next);
+  function toggle(label: string) {
+    setSelected((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
+    );
+  }
+
+  function advance(nextAnswers: GuidedAnswer[]) {
+    setSelected([]);
     setFreeText("");
     if (isLast) {
-      finish(next);
-      persist(next, index, "draft");
+      finish(nextAnswers);
+      persist(nextAnswers, index, "draft");
     } else {
       setIndex((i) => i + 1);
-      persist(next, index + 1, "asking");
+      persist(nextAnswers, index + 1, "asking");
     }
+  }
+
+  // 選んだチップ（複数可）＋自由記述を1つの回答にまとめて次へ。
+  function commit() {
+    const labels = [...selected];
+    const ft = freeText.trim();
+    if (ft) labels.push(ft);
+    if (labels.length === 0) {
+      advance(answers); // 何も選ばなければスキップ
+      return;
+    }
+    const values = [
+      ...new Set(
+        q.options
+          .filter((o) => selected.includes(o.label))
+          .flatMap((o) => o.values),
+      ),
+    ];
+    const next = [
+      ...answers.filter((a) => a.questionId !== q.id),
+      { questionId: q.id, text: labels.join("、"), values },
+    ];
+    setAnswers(next);
+    advance(next);
   }
 
   function finish(finalAnswers: GuidedAnswer[]) {
@@ -88,6 +115,7 @@ export function GuidedDerivation({
     if (index > 0) {
       setIndex((i) => i - 1);
       setFreeText("");
+      setSelected([]);
       persist(answers, index - 1, "asking");
     }
   }
@@ -188,18 +216,31 @@ export function GuidedDerivation({
         <div className="text-[11px] text-[var(--color-fg-faint)]">{q.hint}</div>
       )}
 
-      {/* 選択肢チップ */}
-      <div className="flex flex-wrap gap-2">
-        {q.options.map((opt) => (
-          <button
-            key={opt.label}
-            type="button"
-            onClick={() => record(opt.label, opt.values)}
-            className="text-xs text-left border border-[var(--color-line)] text-[var(--color-ink)] px-3 py-2 hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)] transition"
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* 選択肢チップ（複数選択OK・トグル） */}
+      <div>
+        <div className="flex flex-wrap gap-2">
+          {q.options.map((opt) => {
+            const on = selected.includes(opt.label);
+            return (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => toggle(opt.label)}
+                className={`text-xs text-left border px-3 py-2 transition ${
+                  on
+                    ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
+                    : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
+                }`}
+              >
+                {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          ピンと来たものを複数選んでOK（裏で大事な価値を見つけます）
+        </div>
       </div>
 
       {/* 自由記述 */}
@@ -208,32 +249,35 @@ export function GuidedDerivation({
           <div className="flex items-center gap-3 mb-2">
             <div className="flex-1 h-px bg-[var(--color-line)]" />
             <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-              または自分の言葉で
+              自分の言葉も足せます
             </span>
             <div className="flex-1 h-px bg-[var(--color-line)]" />
           </div>
-          <div className="flex items-end gap-2">
-            <textarea
-              rows={2}
-              value={freeText}
-              onChange={(e) => setFreeText(e.target.value)}
-              placeholder="自由に書く…"
-              className="flex-1 border border-[var(--color-line)] px-3 py-2 text-sm text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-none"
-            />
-            <button
-              type="button"
-              onClick={() => freeText.trim() && record(freeText.trim(), [])}
-              disabled={!freeText.trim()}
-              className="text-xs tracking-[0.25em] border border-[var(--color-ink)] text-[var(--color-ink)] px-3 py-2 hover:bg-[var(--color-ink)] hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              答える →
-            </button>
-          </div>
+          <textarea
+            rows={2}
+            value={freeText}
+            onChange={(e) => setFreeText(e.target.value)}
+            placeholder="自由に書く…（任意）"
+            className="w-full border border-[var(--color-line)] px-3 py-2 text-sm text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-none"
+          />
         </div>
       )}
 
+      {/* 次へ */}
+      <button
+        type="button"
+        onClick={commit}
+        className="w-full bg-[var(--color-ink)] text-white py-2.5 text-xs tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
+      >
+        {selected.length > 0 || freeText.trim()
+          ? isLast
+            ? `次へ ・ つくる →`
+            : `次へ →（${selected.length + (freeText.trim() ? 1 : 0)}つ選択）`
+          : "選ばずに次へ →"}
+      </button>
+
       {/* フッター操作 */}
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex items-center justify-between pt-1">
         <button
           type="button"
           onClick={index > 0 ? back : onCancel}
