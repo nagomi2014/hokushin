@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 
 // 人生を時系列でたどるインタビュー台本（$0・LLM不要）。
@@ -135,13 +135,23 @@ export function LifeHistoryGuide({
   onCancel,
   progressKey,
 }: LifeHistoryGuideProps) {
-  const initIndex = progressKey
-    ? Math.min(readGuide(progressKey, 0), STAGES.length - 1)
-    : 0;
-  const [index, setIndex] = useState(initIndex);
-  const [age, setAge] = useState(String(STAGES[initIndex].defaultAge));
+  const [index, setIndex] = useState(0);
+  const [age, setAge] = useState(String(STAGES[0].defaultAge));
   const [text, setText] = useState("");
   const [addedHere, setAddedHere] = useState(0);
+
+  // マウント後に、保存済みの時期を復元する。
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current || !progressKey) return;
+    restored.current = true;
+    const saved = Math.min(readGuide(progressKey, 0), STAGES.length - 1);
+    if (saved > 0) {
+      setIndex(saved);
+      setAge(String(STAGES[saved].defaultAge));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progressKey]);
 
   const stage = STAGES[index];
   const isLast = index >= STAGES.length - 1;

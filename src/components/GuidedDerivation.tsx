@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { GuidedAnswer, GuidedQuestion } from "@/lib/coach/guided";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 
@@ -37,21 +37,29 @@ export function GuidedDerivation({
   mirror,
   progressKey,
 }: GuidedDerivationProps) {
-  const [saved] = useState<SavedDerivation | null>(() =>
-    progressKey ? readGuide<SavedDerivation | null>(progressKey, null) : null,
-  );
-  const [answers, setAnswers] = useState<GuidedAnswer[]>(saved?.answers ?? []);
-  const [index, setIndex] = useState(
-    Math.min(saved?.index ?? 0, Math.max(0, questions.length - 1)),
-  );
+  const [answers, setAnswers] = useState<GuidedAnswer[]>([]);
+  const [index, setIndex] = useState(0);
   const [freeText, setFreeText] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
-  const [phase, setPhase] = useState<"asking" | "draft">(
-    saved?.phase ?? "asking",
-  );
-  const [draft, setDraft] = useState(
-    saved?.phase === "draft" ? synthesize(saved.answers) : "",
-  );
+  const [phase, setPhase] = useState<"asking" | "draft">("asking");
+  const [draft, setDraft] = useState("");
+
+  // マウント後に、保存済みの途中経過を復元する（localStorage 復元の定石）。
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current || !progressKey) return;
+    restored.current = true;
+    const saved = readGuide<SavedDerivation | null>(progressKey, null);
+    if (saved && Array.isArray(saved.answers) && saved.answers.length > 0) {
+      setAnswers(saved.answers);
+      setIndex(Math.min(saved.index ?? 0, Math.max(0, questions.length - 1)));
+      if (saved.phase === "draft") {
+        setPhase("draft");
+        setDraft(synthesize(saved.answers));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progressKey]);
 
   const q = questions[index];
   const isLast = index >= questions.length - 1;

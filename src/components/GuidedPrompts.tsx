@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 
 // 汎用：プロンプトを順にたどって、各回でいくつでも項目を足していく台本ウォーカー。
@@ -33,13 +33,19 @@ export function GuidedPrompts({
   doneLabel = "完了",
   progressKey,
 }: GuidedPromptsProps) {
-  const [index, setIndex] = useState(() =>
-    progressKey
-      ? Math.min(readGuide(progressKey, 0), Math.max(0, steps.length - 1))
-      : 0,
-  );
+  const [index, setIndex] = useState(0);
   const [text, setText] = useState("");
   const [addedHere, setAddedHere] = useState(0);
+
+  // マウント後に、保存済みの進行位置を復元する。
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current || !progressKey) return;
+    restored.current = true;
+    const saved = readGuide(progressKey, 0);
+    if (saved > 0) setIndex(Math.min(saved, Math.max(0, steps.length - 1)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progressKey]);
 
   const step = steps[index];
   const isLast = index >= steps.length - 1;

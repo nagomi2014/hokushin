@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
 import { FieldHorizonGuide } from "@/components/FieldHorizonGuide";
@@ -24,6 +24,11 @@ export default function FieldsPage() {
     const saved = Math.min(readGuide(SEQ_KEY, 0), FIELDS.length - 1);
     setSeqIndex(saved);
   }
+
+  // 順番モードの現在分野を、変わるたびに保存（閉じても続きから）。
+  useEffect(() => {
+    if (seqIndex !== null) writeGuide(SEQ_KEY, seqIndex);
+  }, [seqIndex]);
   function advanceSeq() {
     if (seqIndex === null) return;
     if (seqIndex >= FIELDS.length - 1) {

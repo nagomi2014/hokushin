@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fieldIdealOptions } from "@/lib/coach/guided";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import type { FieldId } from "@/lib/types";
@@ -80,13 +80,25 @@ export function FieldHorizonGuide({
   const baseYear = new Date().getFullYear();
   const horizons = buildHorizons(fieldName, baseYear, midYears, longYears);
   const key = progressKey ? `${progressKey}-horizon` : undefined;
-  const initStep = key ? Math.min(readGuide(key, 0), horizons.length - 1) : 0;
 
-  const [step, setStep] = useState(initStep);
+  const [step, setStep] = useState(0);
   const h = horizons[step];
   const [text, setText] = useState(current[h.key] ?? "");
   const isLast = step >= horizons.length - 1;
   const chips = h.useIdealChips ? fieldIdealOptions(fieldId) : [];
+
+  // マウント後に、保存済みの地平（長期/中期/短期）を復元する。
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current || !key) return;
+    restored.current = true;
+    const saved = Math.min(readGuide(key, 0), horizons.length - 1);
+    if (saved > 0) {
+      setStep(saved);
+      setText(current[horizons[saved].key] ?? "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   function go(i: number) {
     setStep(i);
