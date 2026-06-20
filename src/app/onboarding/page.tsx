@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
 import {
   CREED_QUESTIONS,
@@ -28,6 +28,19 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { state, loaded, setPyramid } = useAppState();
   const [step, setStep] = useState<Step>("welcome");
+
+  // 再訪時：理念が済んでいればビジョンから、両方済みなら完了から再開する。
+  const resumed = useRef(false);
+  useEffect(() => {
+    if (!loaded || resumed.current) return;
+    resumed.current = true;
+    const p1 = state.pyramid[1]?.content?.trim();
+    const p2 = state.pyramid[2]?.content?.trim();
+    if (p1 && p2) setStep("complete");
+    else if (p1) setStep("vision");
+    // どちらも未入力なら welcome のまま
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
 
   if (!loaded) {
     return (
