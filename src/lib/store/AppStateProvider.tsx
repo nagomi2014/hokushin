@@ -149,6 +149,25 @@ function rowToReport(r: Record<string, unknown>): DailyReport {
   };
 }
 
+// 何か中身が入っているか（クラウド空判定・ローカル復元の判断に使う）
+function hasContent(s: AppState): boolean {
+  return (
+    Object.values(s.pyramid).some((p) => p.content.trim() !== "") ||
+    Object.values(s.fields).some(
+      (f) =>
+        f.shortTerm.trim() !== "" ||
+        f.midTerm.trim() !== "" ||
+        f.longTerm.trim() !== "",
+    ) ||
+    s.dailyTasks.length > 0 ||
+    s.monthlyPlans.some((m) => m.primaryGoal.trim() !== "") ||
+    s.wishlist.length > 0 ||
+    s.mandala.center.trim() !== "" ||
+    s.mandala.cells.some((c) => c.trim() !== "") ||
+    s.dailyReports.length > 0
+  );
+}
+
 function normalizeCells(cells: unknown): string[] {
   const arr = Array.isArray(cells) ? cells.map((c) => String(c ?? "")) : [];
   while (arr.length < 8) arr.push("");
@@ -270,7 +289,15 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         try {
           const cloud = await loadCloud(supabase, userId);
           if (!active) return;
-          setState(cloud);
+          const local = loadState();
+          // クラウドが空（書き込み失敗等）でローカルに中身があれば、ローカルを採用して
+          // クラウドへ復旧プッシュする。これでデータ消失を防ぐ。
+          if (!hasContent(cloud) && hasContent(local)) {
+            setState(local);
+            void pushFullState(supabase, userId, local);
+          } else {
+            setState(cloud);
+          }
         } catch (e) {
           console.error("[hokushin] cloud load failed", e);
           if (!active) return;
@@ -308,16 +335,16 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabaseEnabled]);
 
-  // -- 永続化ヘルパ：ローカルなら localStorage、クラウドなら cloudFn --
+  // -- 永続化ヘルパ：常にローカルへ保存（クラウド失敗時の保険）＋クラウド時はcloudFnも --
   const persist = useCallback((next: AppState, cloudFn?: () => void) => {
+    // ログイン中でも、まずローカルへ必ずバックアップする（書き込み失敗・通信断でも消えない）
+    saveState(next);
     if (modeRef.current === "cloud") {
       try {
         cloudFn?.();
       } catch (e) {
         console.error("[hokushin] cloud write failed", e);
       }
-    } else {
-      saveState(next);
     }
   }, []);
 
