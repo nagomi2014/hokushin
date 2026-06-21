@@ -77,9 +77,15 @@ export function loadState(): AppState {
   }
 }
 
-export function saveState(state: AppState): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+export function saveState(state: AppState): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch {
+    // localStorage が使えない（プライベートモード・容量・無効化など）
+    return false;
+  }
 }
 
 // ============================================================
@@ -113,6 +119,8 @@ export interface AppStateApi {
   ) => void;
   // Plan
   setUserPlan: (plan: UserPlan) => void;
+  // 明示的に「ここまで保存」する（端末＋クラウド）。結果メッセージを返す。
+  saveNow: () => Promise<{ ok: boolean; message: string }>;
 }
 
 // useAppState は Provider 実装を再エクスポート（既存ページの import を維持）

@@ -260,6 +260,8 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const userIdRef = useRef<string | null>(null);
   const modeRef = useRef<StoreMode>("local");
   modeRef.current = mode;
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   // -- 初期化：セッション判定 → ローカル or クラウド読み込み --
   useEffect(() => {
@@ -740,6 +742,41 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     // onAuthStateChange が local モードへ戻す
   }, []);
 
+  // 明示的に「ここまで保存」：端末（localStorage）＋クラウドへ即保存し、結果を返す。
+  const saveNow = useCallback(async (): Promise<{
+    ok: boolean;
+    message: string;
+  }> => {
+    const localOk = saveState(stateRef.current);
+    const supabase = supabaseRef.current;
+    const u = userIdRef.current;
+    if (modeRef.current === "cloud" && supabase && u) {
+      try {
+        const { error } = await pushFullState(supabase, u, stateRef.current);
+        if (!error) return { ok: true, message: "保存しました（この端末＋クラウド）" };
+        return {
+          ok: localOk,
+          message: localOk
+            ? "この端末に保存しました（クラウドは後で再同期します）"
+            : `保存に失敗しました：${error}`,
+        };
+      } catch {
+        return {
+          ok: localOk,
+          message: localOk
+            ? "この端末に保存しました（クラウド接続なし）"
+            : "保存に失敗しました",
+        };
+      }
+    }
+    return {
+      ok: localOk,
+      message: localOk
+        ? "この端末に保存しました"
+        : "保存できませんでした。ブラウザの設定（プライベートモード等）をご確認ください",
+    };
+  }, []);
+
   const syncLocalToCloud = useCallback(async (): Promise<{
     ok: boolean;
     message: string;
@@ -779,6 +816,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     removeWishlistItem,
     saveDailyReport,
     setUserPlan,
+    saveNow,
     // meta
     mode,
     authReady,
@@ -803,8 +841,8 @@ async function pushFullState(
   supabase: SupabaseClient | null,
   userId: string,
   s: AppState,
-): Promise<void> {
-  if (!supabase) return;
+): Promise<{ error: string | null }> {
+  if (!supabase) return { error: "no client" };
 
   const pyramidRows = Object.values(s.pyramid).map((p) => ({
     user_id: userId,
@@ -833,7 +871,7 @@ async function pushFullState(
     updated_at: r.updatedAt,
   }));
 
-  await Promise.all([
+  const results = await Promise.all([
     supabase
       .from("pyramid_entries")
       .upsert(pyramidRows, { onConflict: "user_id,level" }),
@@ -842,12 +880,12 @@ async function pushFullState(
       .upsert(fieldRows, { onConflict: "user_id,field_id" }),
     taskRows.length
       ? supabase.from("daily_tasks").upsert(taskRows, { onConflict: "id" })
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     monthlyRows.length
       ? supabase
           .from("monthly_plans")
           .upsert(monthlyRows, { onConflict: "user_id,year,month" })
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     supabase.from("mandala_charts").upsert(
       {
         user_id: userId,
@@ -859,14 +897,21 @@ async function pushFullState(
     ),
     wishRows.length
       ? supabase.from("wishlist_items").upsert(wishRows, { onConflict: "id" })
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     reportRows.length
       ? supabase
           .from("daily_reports")
           .upsert(reportRows, { onConflict: "user_id,date" })
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     supabase.from("profiles").update({ plan: s.userPlan }).eq("id", userId),
   ]);
+
+  const firstErr = results.find(
+    (r) => r && typeof r === "object" && "error" in r && r.error,
+  ) as { error: { message?: string } } | undefined;
+  return {
+    error: firstErr?.error ? firstErr.error.message ?? "保存エラー" : null,
+  };
 }
 
 // ------------------------------------------------------------
