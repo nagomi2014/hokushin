@@ -45,6 +45,14 @@ export interface HorizonSpan {
   long: number;
 }
 
+// 今月の目標：選んだ分野ごとに、その月の目標を複数書ける。
+export interface MonthGoal {
+  id: string;
+  ym: string; // "2026-06"
+  fieldId: number;
+  text: string;
+}
+
 export interface ToolsData {
   lifeEvents: LifeEvent[];
   moneyEntries: MoneyEntry[];
@@ -54,6 +62,10 @@ export interface ToolsData {
   horizonSpan: HorizonSpan;
   // 取り組む分野（七つの分野のうち、自分が選んだものだけ）。空＝未選択。
   selectedFields: number[];
+  // 月の分野別目標
+  monthGoals: MonthGoal[];
+  // 月ごとの最重要目標（ym -> monthGoalのid）
+  primaryMonthGoal: Record<string, string>;
 }
 
 function emptyMandalaSub(): string[][] {
@@ -68,6 +80,8 @@ function emptyTools(): ToolsData {
     mandalaSub: emptyMandalaSub(),
     horizonSpan: { mid: 3, long: 10 },
     selectedFields: [],
+    monthGoals: [],
+    primaryMonthGoal: {},
   };
 }
 
@@ -89,6 +103,16 @@ function loadTools(): ToolsData {
     const selectedFields = Array.isArray(parsed.selectedFields)
       ? parsed.selectedFields.filter((n) => typeof n === "number")
       : [];
+    const monthGoals = Array.isArray(parsed.monthGoals)
+      ? parsed.monthGoals.filter(
+          (g): g is MonthGoal =>
+            !!g && typeof g.id === "string" && typeof g.ym === "string",
+        )
+      : [];
+    const primaryMonthGoal =
+      parsed.primaryMonthGoal && typeof parsed.primaryMonthGoal === "object"
+        ? (parsed.primaryMonthGoal as Record<string, string>)
+        : {};
     return {
       lifeEvents: parsed.lifeEvents ?? [],
       moneyEntries: parsed.moneyEntries ?? [],
@@ -96,6 +120,8 @@ function loadTools(): ToolsData {
       mandalaSub,
       horizonSpan,
       selectedFields,
+      monthGoals,
+      primaryMonthGoal,
     };
   } catch {
     return emptyTools();
@@ -135,6 +161,11 @@ export interface UseToolsResult extends ToolsData {
   // 取り組む分野の選択
   setSelectedFields: (ids: number[]) => void;
   toggleSelectedField: (id: number) => void;
+  // 月の分野別目標
+  addMonthGoal: (ym: string, fieldId: number) => void;
+  setMonthGoalText: (id: string, text: string) => void;
+  removeMonthGoal: (id: string) => void;
+  setPrimaryMonthGoal: (ym: string, goalId: string) => void;
 }
 
 export function useTools(): UseToolsResult {
@@ -271,6 +302,41 @@ export function useTools(): UseToolsResult {
           ? prev.selectedFields.filter((n) => n !== id)
           : [...prev.selectedFields, id];
         return { ...prev, selectedFields: next.sort((a, b) => a - b) };
+      }),
+
+    addMonthGoal: (ym, fieldId) =>
+      mutate((prev) => ({
+        ...prev,
+        monthGoals: [
+          ...prev.monthGoals,
+          { id: uid("mg"), ym, fieldId, text: "" },
+        ],
+      })),
+    setMonthGoalText: (id, text) =>
+      mutate((prev) => ({
+        ...prev,
+        monthGoals: prev.monthGoals.map((g) =>
+          g.id === id ? { ...g, text } : g,
+        ),
+      })),
+    removeMonthGoal: (id) =>
+      mutate((prev) => {
+        const primaryMonthGoal = { ...prev.primaryMonthGoal };
+        for (const k of Object.keys(primaryMonthGoal)) {
+          if (primaryMonthGoal[k] === id) delete primaryMonthGoal[k];
+        }
+        return {
+          ...prev,
+          monthGoals: prev.monthGoals.filter((g) => g.id !== id),
+          primaryMonthGoal,
+        };
+      }),
+    setPrimaryMonthGoal: (ym, goalId) =>
+      mutate((prev) => {
+        const primaryMonthGoal = { ...prev.primaryMonthGoal };
+        if (primaryMonthGoal[ym] === goalId) delete primaryMonthGoal[ym];
+        else primaryMonthGoal[ym] = goalId;
+        return { ...prev, primaryMonthGoal };
       }),
   };
 }

@@ -7,12 +7,10 @@ import {
   daysInMonth,
   useAppState,
 } from "@/lib/storage";
-import { GuidedDerivation } from "@/components/GuidedDerivation";
-import { buildMonthlyQuestions, synthesizeMonthly } from "@/lib/coach/guided";
 import { FIELD_MAP } from "@/lib/constants";
 import { useTools } from "@/lib/tools/useTools";
-import { activeFieldIds, fieldHasState } from "@/lib/fields";
-import type { FieldId, MonthlyPlan } from "@/lib/types";
+import { activeFieldIds } from "@/lib/fields";
+import type { MonthlyPlan } from "@/lib/types";
 
 function emptyPlan(year: number, month: number): MonthlyPlan {
   return {
@@ -31,9 +29,20 @@ function emptyPlan(year: number, month: number): MonthlyPlan {
 
 export default function MonthlyPage() {
   const { state, loaded, upsertMonthlyPlan } = useAppState();
+  const {
+    selectedFields,
+    monthGoals,
+    primaryMonthGoal,
+    addMonthGoal,
+    setMonthGoalText,
+    removeMonthGoal,
+    setPrimaryMonthGoal,
+  } = useTools();
+
   const initial = currentYearMonth();
   const [ym, setYm] = useState(initial);
-  const [coachOpen, setCoachOpen] = useState(false);
+
+  const ymKey = `${ym.year}-${String(ym.month).padStart(2, "0")}`;
 
   const existing = state.monthlyPlans.find(
     (p) => p.year === ym.year && p.month === ym.month,
@@ -52,29 +61,16 @@ export default function MonthlyPage() {
 
   const totalDays = useMemo(() => daysInMonth(ym.year, ym.month), [ym]);
 
-  const { selectedFields } = useTools();
-
-  // 取り組む分野に絞って、今月の問いを組み立てる（紐づけ）
-  const activeFieldGoals = useMemo(() => {
-    const rec: Partial<
-      Record<FieldId, { shortTerm: string; midTerm: string; longTerm: string }>
-    > = {};
-    for (const id of activeFieldIds(selectedFields, state.fields)) {
-      rec[id] = state.fields[id];
-    }
-    return rec;
-  }, [selectedFields, state.fields]);
-  const monthlyQuestions = useMemo(
-    () => buildMonthlyQuestions(activeFieldGoals),
-    [activeFieldGoals],
-  );
-  const fieldsWithStates = useMemo(
-    () =>
-      activeFieldIds(selectedFields, state.fields)
-        .map((id) => FIELD_MAP[id])
-        .filter((f) => fieldHasState(state.fields[f.id])),
+  // 取り組む分野
+  const monthFieldIds = useMemo(
+    () => activeFieldIds(selectedFields, state.fields),
     [selectedFields, state.fields],
   );
+
+  // 今月の最重要目標（idと本文）
+  const primaryId = primaryMonthGoal[ymKey];
+  const primaryText =
+    monthGoals.find((g) => g.id === primaryId)?.text.trim() ?? "";
 
   // 先月（前月）の振り返り
   const prevYm =
@@ -96,12 +92,16 @@ export default function MonthlyPage() {
     upsertMonthlyPlan(next);
   }
 
-  function setGoalFromField(fieldId: FieldId) {
-    const g = state.fields[fieldId];
-    const target = (g.shortTerm || g.midTerm || g.longTerm).trim();
-    if (!target) return;
-    update("primaryGoal", `${FIELD_MAP[fieldId].nameJaShort}「${target}」に近づく`);
-  }
+  // 最重要目標（★で選んだもの）を、クラウド同期の primaryGoal にも反映する。
+  // この月で新モデル（今月の目標）を使い始めた場合のみ反映し、過去データは触らない。
+  const usesMonthGoals = monthGoals.some((g) => g.ym === ymKey);
+  useEffect(() => {
+    if (!loaded || !usesMonthGoals) return;
+    if (primaryText !== (plan.primaryGoal ?? "").trim()) {
+      update("primaryGoal", primaryText);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primaryText, loaded, usesMonthGoals, plan.primaryGoal]);
 
   function shiftMonth(delta: number) {
     let m = ym.month + delta;
@@ -159,7 +159,7 @@ export default function MonthlyPage() {
           </div>
         </div>
         <p className="text-[var(--color-fg-mute)] text-sm mt-4 tracking-wider">
-          選んだ目標から、今月この一手をどこに置くか。
+          選んだ分野ごとに、今月の目標を立てる。その中から最重要をひとつ。
         </p>
       </section>
 
@@ -186,88 +186,118 @@ export default function MonthlyPage() {
         )}
       </Section>
 
-      {/* Primary goal（選んだ分野の長期・中期・短期から作る） */}
-      <Section number="01" title="今月の最重要目標" caption="THIS MONTH'S GOAL">
-        {fieldsWithStates.length > 0 && (
-          <div className="mb-5">
-            <div className="flex items-baseline justify-between mb-3">
-              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-                選んだ目標から決める
-              </div>
-              <button
-                type="button"
-                onClick={() => setCoachOpen(true)}
-                className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-gold)] hover:border-[var(--color-ink)] pb-0.5"
-              >
-                ★ 質問で決める →
-              </button>
+      {/* 今月の最重要目標（★で選ばれたもの） */}
+      <Section number="01" title="今月の最重要目標" caption="MOST IMPORTANT">
+        {primaryText ? (
+          <div className="bg-[var(--color-ink)] text-white px-5 py-4">
+            <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)] mb-1">
+              ★ THIS MONTH
             </div>
-            <div className="space-y-px bg-[var(--color-line)] border border-[var(--color-line)]">
-              {fieldsWithStates.map((f) => {
-                const g = state.fields[f.id];
-                return (
-                  <div key={f.id} className="bg-white px-4 py-3">
-                    <div className="flex items-baseline justify-between gap-3 mb-1.5">
-                      <span className="serif text-sm text-[var(--color-ink)]">
-                        {f.nameJa}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setGoalFromField(f.id)}
-                        className="text-[10px] tracking-[0.2em] text-[var(--color-ink)] border border-[var(--color-line)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)] transition whitespace-nowrap"
-                      >
-                        今月これを進める →
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] leading-relaxed">
-                      {g.longTerm.trim() && (
-                        <span>
-                          <span className="text-[var(--color-fg-faint)] tracking-[0.15em] mr-1">
-                            長期
-                          </span>
-                          <span className="text-[var(--color-fg-mute)]">
-                            {g.longTerm.trim()}
-                          </span>
-                        </span>
-                      )}
-                      {g.midTerm.trim() && (
-                        <span>
-                          <span className="text-[var(--color-fg-faint)] tracking-[0.15em] mr-1">
-                            中期
-                          </span>
-                          <span className="text-[var(--color-fg-mute)]">
-                            {g.midTerm.trim()}
-                          </span>
-                        </span>
-                      )}
-                      {g.shortTerm.trim() && (
-                        <span>
-                          <span className="text-[var(--color-gold)] tracking-[0.15em] mr-1">
-                            短期
-                          </span>
-                          <span className="text-[var(--color-ink)]">
-                            {g.shortTerm.trim()}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <div className="serif text-xl leading-relaxed">{primaryText}</div>
           </div>
+        ) : (
+          <p className="text-[12px] text-[var(--color-fg-faint)] italic">
+            下の「今月の目標」を書いて、その中のひとつを ★ で「最重要」に選んでください。
+          </p>
         )}
-        <textarea
-          value={plan.primaryGoal}
-          onChange={(e) => update("primaryGoal", e.target.value)}
-          rows={2}
-          placeholder="今月、いちばん大切な一手は…（上のボタンから引き込んで、整えてもOK）"
-          className="w-full border border-[var(--color-line)] px-4 py-3 serif text-xl text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
-        />
       </Section>
 
-      {/* Reflection（今月を振り返る・月末に書く） */}
-      <Section number="02" title="今月の振り返り" caption="REFLECTION">
+      {/* 今月の目標（分野ごとに複数） */}
+      <Section number="02" title="今月の目標" caption="THIS MONTH'S GOALS">
+        <p className="text-[11px] text-[var(--color-fg-faint)] mb-6 leading-relaxed">
+          選んだ分野ごとに、今月の目標を書きます（いくつでも）。
+          いちばん大切なものを ★ で選ぶと、上の「最重要目標」になります。
+        </p>
+
+        {monthFieldIds.length === 0 ? (
+          <div className="py-10 text-center text-sm text-[var(--color-fg-faint)]">
+            取り組む分野がまだありません。
+            <Link
+              href="/fields"
+              className="ml-2 border-b border-[var(--color-line)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+            >
+              目標設定で分野を選ぶ →
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {monthFieldIds.map((fid) => {
+              const f = FIELD_MAP[fid];
+              const goals = monthGoals.filter(
+                (g) => g.ym === ymKey && g.fieldId === fid,
+              );
+              const shortTerm = state.fields[fid]?.shortTerm?.trim() ?? "";
+              return (
+                <div key={fid}>
+                  <div className="flex items-baseline gap-3 mb-3 hairline-bottom pb-2">
+                    <span className="serif text-lg text-[var(--color-ink)]">
+                      {f.nameJa}
+                    </span>
+                    {shortTerm && (
+                      <span className="text-[10px] text-[var(--color-fg-faint)]">
+                        <span className="tracking-[0.15em] mr-1">短期目標</span>
+                        {shortTerm}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {goals.map((g) => {
+                      const isPrimary = primaryId === g.id;
+                      return (
+                        <div key={g.id} className="flex items-center gap-2 group">
+                          <button
+                            type="button"
+                            onClick={() => setPrimaryMonthGoal(ymKey, g.id)}
+                            className={`text-base leading-none ${
+                              isPrimary
+                                ? "text-[var(--color-gold)]"
+                                : "text-[var(--color-line)] hover:text-[var(--color-gold)]"
+                            } transition`}
+                            aria-label="最重要に選ぶ"
+                            title="最重要に選ぶ"
+                          >
+                            {isPrimary ? "★" : "☆"}
+                          </button>
+                          <input
+                            type="text"
+                            value={g.text}
+                            onChange={(e) => setMonthGoalText(g.id, e.target.value)}
+                            placeholder="今月の目標を書く…"
+                            className={`flex-1 border-b px-2 py-2 text-sm text-[var(--color-ink)] focus:outline-none transition ${
+                              isPrimary
+                                ? "border-[var(--color-gold)]"
+                                : "border-[var(--color-line)] focus:border-[var(--color-ink)]"
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeMonthGoal(g.id)}
+                            className="opacity-0 group-hover:opacity-100 text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition text-xs"
+                            aria-label="削除"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() => addMonthGoal(ymKey, fid)}
+                      className="mt-1 text-[11px] tracking-[0.2em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
+                    >
+                      ＋ {f.nameJaShort}の目標を追加
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Section>
+
+      {/* 今月の振り返り（月末に書く） */}
+      <Section number="03" title="今月の振り返り" caption="REFLECTION">
         <p className="text-[11px] text-[var(--color-fg-faint)] mb-3">
           月末に、この月を振り返って書きます。来月の「先月の振り返り」として、ここに見えるようになります。
         </p>
@@ -291,70 +321,6 @@ export default function MonthlyPage() {
           {totalDays} DAYS · AUTO-SAVED
         </span>
       </div>
-
-      {coachOpen && (
-        <>
-          <div
-            className="fixed inset-0 bg-[var(--color-ink)]/30 z-50"
-            onClick={() => setCoachOpen(false)}
-            aria-hidden
-          />
-          <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
-            <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
-              <div>
-                <div className="text-[9px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
-                  ★ &nbsp; 質問で今月の計画を作る
-                </div>
-                <div className="serif text-base text-[var(--color-ink)]">
-                  今月の最重要目標
-                </div>
-              </div>
-              <button
-                onClick={() => setCoachOpen(false)}
-                className="text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] text-xl leading-none px-2"
-                aria-label="close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 py-5">
-              {fieldsWithStates.length > 0 && (
-                <div className="mb-5 bg-[var(--color-paper-soft)] border-l-2 border-[var(--color-gold)] px-4 py-3">
-                  <div className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
-                    目標・目指す状態
-                  </div>
-                  <div className="space-y-1">
-                    {fieldsWithStates.map((f) => {
-                      const g = state.fields[f.id];
-                      const goal = (g.shortTerm || g.midTerm || g.longTerm).trim();
-                      return (
-                        <div key={f.id} className="flex items-baseline gap-2 text-[11px]">
-                          <span className="text-[var(--color-gold)] tracking-[0.15em] w-12 shrink-0">
-                            {f.nameJaShort}
-                          </span>
-                          <span className="text-[var(--color-ink)]">{goal}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              <GuidedDerivation
-                questions={monthlyQuestions}
-                synthesize={synthesizeMonthly}
-                onApply={(draft) => {
-                  update("primaryGoal", draft);
-                  setCoachOpen(false);
-                }}
-                onCancel={() => setCoachOpen(false)}
-                doneLabel="今月の最重要目標にする"
-                draftHeader="あなたの答えから、今月の一手が見えてきました"
-                progressKey="monthly"
-              />
-            </div>
-          </aside>
-        </>
-      )}
 
     </div>
   );
