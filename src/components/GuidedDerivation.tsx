@@ -43,23 +43,42 @@ export function GuidedDerivation({
   const [selected, setSelected] = useState<string[]>([]);
   const [phase, setPhase] = useState<"asking" | "draft">("asking");
   const [draft, setDraft] = useState("");
+  // 前回の途中経過があれば、「途中から/最初から」を選んでもらう
+  const [pendingResume, setPendingResume] = useState<SavedDerivation | null>(
+    null,
+  );
 
-  // マウント後に、保存済みの途中経過を復元する（localStorage 復元の定石）。
-  const restored = useRef(false);
+  const checked = useRef(false);
   useEffect(() => {
-    if (restored.current || !progressKey) return;
-    restored.current = true;
+    if (checked.current || !progressKey) return;
+    checked.current = true;
     const saved = readGuide<SavedDerivation | null>(progressKey, null);
     if (saved && Array.isArray(saved.answers) && saved.answers.length > 0) {
-      setAnswers(saved.answers);
-      setIndex(Math.min(saved.index ?? 0, Math.max(0, questions.length - 1)));
-      if (saved.phase === "draft") {
-        setPhase("draft");
-        setDraft(synthesize(saved.answers));
-      }
+      setPendingResume(saved);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progressKey]);
+
+  function doResume() {
+    if (!pendingResume) return;
+    setAnswers(pendingResume.answers);
+    setIndex(
+      Math.min(pendingResume.index ?? 0, Math.max(0, questions.length - 1)),
+    );
+    if (pendingResume.phase === "draft") {
+      setPhase("draft");
+      setDraft(synthesize(pendingResume.answers));
+    }
+    setPendingResume(null);
+  }
+  function doRestart() {
+    if (progressKey) clearGuide(progressKey);
+    setAnswers([]);
+    setIndex(0);
+    setPhase("asking");
+    setDraft("");
+    setPendingResume(null);
+  }
 
   const q = questions[index];
   const isLast = index >= questions.length - 1;
@@ -126,6 +145,38 @@ export function GuidedDerivation({
       setSelected([]);
       persist(answers, index - 1, "asking");
     }
+  }
+
+  // ---- 前回の続きがあれば、再開/最初からを選ぶ ----
+  if (pendingResume) {
+    return (
+      <div className="space-y-5">
+        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+          ★ &nbsp; 前回の続きがあります
+        </div>
+        <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
+          {pendingResume.answers.length} 問まで答えた状態が保存されています。
+          <br />
+          どうしますか？
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={doResume}
+            className="bg-[var(--color-ink)] text-white px-6 py-2.5 text-xs tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
+          >
+            途中から再開する →
+          </button>
+          <button
+            type="button"
+            onClick={doRestart}
+            className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
+          >
+            最初からやり直す
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // ---- ドラフト確認フェーズ ----
