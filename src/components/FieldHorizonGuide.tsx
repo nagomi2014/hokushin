@@ -97,6 +97,24 @@ export function FieldHorizonGuide({
     else go(step + 1);
   }
 
+  // チップは複数選択（入力欄に足す／再タップで外す）
+  const selectedChips = new Set(
+    text
+      .split(/[、,]/)
+      .map((s) => s.trim())
+      .filter(Boolean),
+  );
+  function toggleChip(c: string) {
+    setText((prev) => {
+      const parts = prev
+        .split(/[、,]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (parts.includes(c)) return parts.filter((p) => p !== c).join("、");
+      return [...parts, c].join("、");
+    });
+  }
+
   return (
     <div className="space-y-5">
       {/* progress */}
@@ -148,17 +166,30 @@ export function FieldHorizonGuide({
 
       {/* chips（長期のみ・タップで入力欄に入る） */}
       {chips.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {chips.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setText(c)}
-              className="text-xs border border-[var(--color-line)] text-[var(--color-ink)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)] transition"
-            >
-              {c}
-            </button>
-          ))}
+        <div>
+          <div className="flex flex-wrap gap-2">
+            {chips.map((c) => {
+              const on = selectedChips.has(c);
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => toggleChip(c)}
+                  className={`text-xs border px-3 py-1.5 transition ${
+                    on
+                      ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
+                      : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
+                  }`}
+                >
+                  {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+            複数選んでOK（下の欄で自由に書き換えもできます）
+          </div>
         </div>
       )}
 
