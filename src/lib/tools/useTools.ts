@@ -35,6 +35,7 @@ export interface PrimeItem {
   id: string;
   text: string;
   done: boolean;
+  fieldId?: number; // どの分野の状態に近づくための一手か（任意）
 }
 
 // 目標の区切り（毎年末〆）。短期＝今年末、中期＝mid年後、長期＝long年後。
@@ -114,7 +115,7 @@ export interface UseToolsResult extends ToolsData {
   addMoneyEntry: (entry: Omit<MoneyEntry, "id">) => void;
   removeMoneyEntry: (id: string) => void;
   // 第II領域
-  addPrimeItem: (text: string) => void;
+  addPrimeItem: (text: string, fieldId?: number) => void;
   togglePrimeItem: (id: string) => void;
   removePrimeItem: (id: string) => void;
   // マンダラート派生
@@ -180,12 +181,15 @@ export function useTools(): UseToolsResult {
         moneyEntries: prev.moneyEntries.filter((e) => e.id !== id),
       })),
 
-    addPrimeItem: (text) => {
+    addPrimeItem: (text, fieldId) => {
       const t = text.trim();
       if (!t) return;
       mutate((prev) => ({
         ...prev,
-        primeItems: [...prev.primeItems, { id: uid("pi"), text: t, done: false }],
+        primeItems: [
+          ...prev.primeItems,
+          { id: uid("pi"), text: t, done: false, ...(fieldId ? { fieldId } : {}) },
+        ],
       }));
     },
     togglePrimeItem: (id) =>

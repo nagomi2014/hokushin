@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTools } from "@/lib/tools/useTools";
+import { useAppState } from "@/lib/storage";
 import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
+import { FIELDS, FIELD_MAP } from "@/lib/constants";
+import type { FieldId } from "@/lib/types";
 
-const PRIME_PROMPTS: PromptStep[] = [
+// 分野が未設定のときのフォールバック（汎用の問い）
+const GENERIC_PROMPTS: PromptStep[] = [
   { prompt: "健康・体のために、後回しにしがちだけど大事なことは？", placeholder: "例：運動を習慣にする／定期健診を受ける", hint: "いくつでも。" },
   { prompt: "家族・大切な人との関係で、時間をかけたいことは？", placeholder: "例：週に一度ゆっくり話す／一緒に出かける" },
   { prompt: "学び・成長で、いつかやりたいことは？", placeholder: "例：資格の勉強／読書を習慣にする" },
@@ -14,10 +18,45 @@ const PRIME_PROMPTS: PromptStep[] = [
 ];
 
 export default function PrimePage() {
-  const { loaded, primeItems, addPrimeItem, togglePrimeItem, removePrimeItem } =
-    useTools();
+  const {
+    loaded: toolsLoaded,
+    primeItems,
+    addPrimeItem,
+    togglePrimeItem,
+    removePrimeItem,
+  } = useTools();
+  const { state, loaded: stateLoaded } = useAppState();
   const [text, setText] = useState("");
   const [guideOpen, setGuideOpen] = useState(false);
+
+  // 状態が一つでも入っている分野
+  const fieldsWithStates = useMemo(
+    () =>
+      FIELDS.filter((f) => {
+        const g = state.fields[f.id];
+        return (g.longTerm || g.midTerm || g.shortTerm || "").trim();
+      }),
+    [state.fields],
+  );
+
+  // 分野ごとに「その状態に近づくための一手」を引き出す質問を組み立てる
+  const steps: PromptStep[] = useMemo(() => {
+    if (fieldsWithStates.length === 0) return GENERIC_PROMPTS;
+    return fieldsWithStates.map((f) => {
+      const g = state.fields[f.id];
+      const context: { label: string; text: string }[] = [];
+      if (g.longTerm.trim()) context.push({ label: "長期", text: g.longTerm.trim() });
+      if (g.midTerm.trim()) context.push({ label: "中期", text: g.midTerm.trim() });
+      if (g.shortTerm.trim()) context.push({ label: "短期", text: g.shortTerm.trim() });
+      return {
+        prompt: `「${f.nameJa}」で目指す状態に近づくために——\n重要だけど、つい後回しにしていることは？`,
+        placeholder: "例：週1回まとまった時間をとる／環境を先に整える",
+        hint: "“緊急じゃないけど効く一手”を。いくつでもOK。",
+        meta: String(f.id),
+        context,
+      };
+    });
+  }, [fieldsWithStates, state.fields]);
 
   function add() {
     if (!text.trim()) return;
@@ -26,6 +65,7 @@ export default function PrimePage() {
   }
 
   const done = primeItems.filter((p) => p.done).length;
+  const loaded = toolsLoaded && stateLoaded;
 
   if (!loaded) {
     return (
@@ -46,7 +86,7 @@ export default function PrimePage() {
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
           「重要だけど、緊急ではない」こと。ここに時間を使えるかで、人生は変わる。
-          急かされないからこそ後回しになりがちな一手を、ここに集めておく。
+          七つの分野で描いた“ありたい状態”に近づく一手を、ここに集めておく。
         </p>
       </section>
 
@@ -80,12 +120,45 @@ export default function PrimePage() {
         </div>
       </section>
 
+      {/* 分野の状態の参照（紐づけの土台） */}
+      {fieldsWithStates.length > 0 && (
+        <section className="py-8 hairline-bottom">
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="serif text-lg text-[var(--color-ink)]">
+              七つの分野・目指す状態
+            </h2>
+            <Link
+              href="/fields"
+              className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+            >
+              分野を編集 →
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {fieldsWithStates.map((f) => {
+              const g = state.fields[f.id];
+              const goal = (g.shortTerm || g.midTerm || g.longTerm).trim();
+              return (
+                <div key={f.id} className="flex items-baseline gap-3 text-[12px]">
+                  <span className="text-[var(--color-gold)] tracking-[0.2em] w-16 shrink-0">
+                    {f.nameJaShort}
+                  </span>
+                  <span className="text-[var(--color-ink)]">{goal}</span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Guide */}
       {guideOpen ? (
         <section className="py-8 hairline-bottom">
           <GuidedPrompts
-            steps={PRIME_PROMPTS}
-            onAdd={(t) => addPrimeItem(t)}
+            steps={steps}
+            onAdd={(t, step) =>
+              addPrimeItem(t, step.meta ? Number(step.meta) : undefined)
+            }
             onDone={() => setGuideOpen(false)}
             onCancel={() => setGuideOpen(false)}
             doneLabel="完了する"
@@ -100,9 +173,15 @@ export default function PrimePage() {
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
             <span className="text-[var(--color-gold)] mr-2">★</span>
-            <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
+            <span className="text-sm tracking-[0.15em]">
+              {fieldsWithStates.length > 0
+                ? "分野の状態から、一手を引き出す"
+                : "質問に沿って書く"}
+            </span>
             <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
-              分野ごとの質問に答えて、大事だけど後回しになることを集める
+              {fieldsWithStates.length > 0
+                ? "各分野の“ありたい状態”を見ながら、近づくための一手を集める"
+                : "分野ごとの質問に答えて、大事だけど後回しになることを集める"}
             </span>
           </button>
         </section>
@@ -139,38 +218,51 @@ export default function PrimePage() {
         ) : (
           <>
             <div className="hairline-top">
-              {primeItems.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-4 py-4 hairline-bottom group"
-                >
-                  <button
-                    type="button"
-                    onClick={() => togglePrimeItem(p.id)}
-                    className={`check-box ${p.done ? "checked" : ""}`}
-                    aria-label="toggle"
+              {primeItems.map((p) => {
+                const fm =
+                  p.fieldId && FIELD_MAP[p.fieldId as FieldId]
+                    ? FIELD_MAP[p.fieldId as FieldId]
+                    : null;
+                return (
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-4 py-4 hairline-bottom group"
                   >
-                    {p.done && <span className="text-[10px]">✓</span>}
-                  </button>
-                  <span
-                    className={`text-sm flex-1 ${
-                      p.done
-                        ? "line-through text-[var(--color-fg-faint)]"
-                        : "text-[var(--color-ink)]"
-                    }`}
-                  >
-                    {p.text}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removePrimeItem(p.id)}
-                    className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
-                    aria-label="削除"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+                    <button
+                      type="button"
+                      onClick={() => togglePrimeItem(p.id)}
+                      className={`check-box ${p.done ? "checked" : ""}`}
+                      aria-label="toggle"
+                    >
+                      {p.done && <span className="text-[10px]">✓</span>}
+                    </button>
+                    <div className="flex-1">
+                      {fm && (
+                        <span className="text-[9px] tracking-[0.2em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 mr-2 align-middle">
+                          {fm.nameJaShort}
+                        </span>
+                      )}
+                      <span
+                        className={`text-sm align-middle ${
+                          p.done
+                            ? "line-through text-[var(--color-fg-faint)]"
+                            : "text-[var(--color-ink)]"
+                        }`}
+                      >
+                        {p.text}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removePrimeItem(p.id)}
+                      className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
+                      aria-label="削除"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
             </div>
             <div className="mt-5 text-xs text-[var(--color-fg-mute)] tracking-widest">
               DONE &nbsp; {done} / {primeItems.length}

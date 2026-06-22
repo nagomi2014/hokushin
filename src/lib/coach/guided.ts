@@ -400,7 +400,48 @@ export function synthesizeMonthly(answers: GuidedAnswer[]): string {
   const focus = answers.find((a) => a.questionId === "focus")?.text.trim();
   const action = answers.find((a) => a.questionId === "action")?.text.trim();
   if (!focus) return action ? `今月は「${action}」に取り組む。` : "";
+  // 「分野名：目指す状態」の形なら、分野と状態を分けて文にする
+  const sep = focus.indexOf("：");
+  if (sep > 0) {
+    const field = focus.slice(0, sep).trim();
+    const stateText = focus.slice(sep + 1).trim();
+    const head = `今月は『${field}』に集中する。「${stateText}」に近づくため、`;
+    return action ? `${head}${action}。` : `${head}まずは一歩を踏み出す。`;
+  }
   return action
     ? `今月は『${focus}』に集中する。${action}。`
     : `今月は『${focus}』に集中する。`;
+}
+
+// 分野の状態（短期/中期/長期）から、今月の「どの分野を前に進めるか」の選択肢を作る。
+// 状態が一つも無ければ、分野名だけの汎用選択肢にフォールバックする。
+export function buildMonthlyQuestions(
+  fieldGoals: Record<FieldId, { shortTerm: string; midTerm: string; longTerm: string }>,
+): GuidedQuestion[] {
+  const labeled: GuidedOption[] = [];
+  for (let i = 1 as FieldId; i <= 7; i = (i + 1) as FieldId) {
+    const g = fieldGoals[i];
+    if (!g) continue;
+    const state = (g.shortTerm || g.midTerm || g.longTerm || "").trim();
+    if (!state) continue;
+    labeled.push({ label: `${MONTHLY_FIELD_LABELS[i - 1]}：${state}`, values: [] });
+  }
+  const focusOptions =
+    labeled.length > 0
+      ? labeled
+      : MONTHLY_FIELD_LABELS.map((label) => ({ label, values: [] as ValueId[] }));
+
+  return [
+    {
+      id: "focus",
+      prompt:
+        labeled.length > 0
+          ? "今月、いちばん『前に進めたい』分野は？\n——どの“ありたい状態”に一歩近づきますか？"
+          : "今月、いちばん『前に進めたい』のはどの分野ですか？",
+      hint: "一つに絞るのが大切。全部やろうとすると分散します。",
+      options: focusOptions,
+      allowFree: true,
+    },
+    MONTHLY_QUESTIONS[1],
+  ];
 }

@@ -8,7 +8,8 @@ import {
   useAppState,
 } from "@/lib/storage";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
-import { MONTHLY_QUESTIONS, synthesizeMonthly } from "@/lib/coach/guided";
+import { buildMonthlyQuestions, synthesizeMonthly } from "@/lib/coach/guided";
+import { FIELDS } from "@/lib/constants";
 import type { MonthlyPlan } from "@/lib/types";
 
 function emptyPlan(year: number, month: number): MonthlyPlan {
@@ -48,6 +49,20 @@ export default function MonthlyPage() {
   }, [state.monthlyPlans, ym.year, ym.month]);
 
   const totalDays = useMemo(() => daysInMonth(ym.year, ym.month), [ym]);
+
+  // 分野の“ありたい状態”から今月の問いを組み立てる（紐づけ）
+  const monthlyQuestions = useMemo(
+    () => buildMonthlyQuestions(state.fields),
+    [state.fields],
+  );
+  const fieldsWithStates = useMemo(
+    () =>
+      FIELDS.filter((f) => {
+        const g = state.fields[f.id];
+        return (g.shortTerm || g.midTerm || g.longTerm || "").trim();
+      }),
+    [state.fields],
+  );
 
   function update<K extends keyof MonthlyPlan>(key: K, value: MonthlyPlan[K]) {
     const next: MonthlyPlan = {
@@ -256,8 +271,29 @@ export default function MonthlyPage() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5">
+              {fieldsWithStates.length > 0 && (
+                <div className="mb-5 bg-[var(--color-paper-soft)] border-l-2 border-[var(--color-gold)] px-4 py-3">
+                  <div className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+                    七つの分野・目指す状態
+                  </div>
+                  <div className="space-y-1">
+                    {fieldsWithStates.map((f) => {
+                      const g = state.fields[f.id];
+                      const goal = (g.shortTerm || g.midTerm || g.longTerm).trim();
+                      return (
+                        <div key={f.id} className="flex items-baseline gap-2 text-[11px]">
+                          <span className="text-[var(--color-gold)] tracking-[0.15em] w-12 shrink-0">
+                            {f.nameJaShort}
+                          </span>
+                          <span className="text-[var(--color-ink)]">{goal}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <GuidedDerivation
-                questions={MONTHLY_QUESTIONS}
+                questions={monthlyQuestions}
                 synthesize={synthesizeMonthly}
                 onApply={(draft) => {
                   update("primaryGoal", draft);

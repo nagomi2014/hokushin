@@ -13,8 +13,10 @@ export interface PromptStep {
   hint?: string;
   // 入力を完成形に整える（例：「ハワイ」→「ハワイへ行く」）。
   format?: (text: string) => string;
-  // 任意の付帯情報（例：金の記録の種別 income/expense/asset/goal）。
+  // 任意の付帯情報（例：金の記録の種別 income/expense/asset/goal／分野ID）。
   meta?: string;
+  // 質問の上に出す“文脈”（例：その分野の目指す状態）。
+  context?: { label: string; text: string }[];
 }
 
 interface GuidedPromptsProps {
@@ -124,6 +126,20 @@ export function GuidedPrompts({
           閉じる
         </button>
       </div>
+
+      {/* context（その分野の目指す状態など） */}
+      {step.context && step.context.length > 0 && (
+        <div className="bg-[var(--color-paper-soft)] border-l-2 border-[var(--color-gold)] px-4 py-3 space-y-1">
+          {step.context.map((c, i) => (
+            <div key={i} className="text-[11px] leading-relaxed">
+              <span className="text-[var(--color-fg-faint)] tracking-[0.2em] mr-2">
+                {c.label}
+              </span>
+              <span className="text-[var(--color-ink)]">{c.text}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* prompt */}
       <div>
