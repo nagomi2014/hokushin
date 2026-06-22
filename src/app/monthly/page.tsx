@@ -76,6 +76,16 @@ export default function MonthlyPage() {
     [selectedFields, state.fields],
   );
 
+  // 先月（前月）の振り返り
+  const prevYm =
+    ym.month === 1
+      ? { year: ym.year - 1, month: 12 }
+      : { year: ym.year, month: ym.month - 1 };
+  const prevReflection =
+    state.monthlyPlans
+      .find((p) => p.year === prevYm.year && p.month === prevYm.month)
+      ?.reflection?.trim() ?? "";
+
   function update<K extends keyof MonthlyPlan>(key: K, value: MonthlyPlan[K]) {
     const next: MonthlyPlan = {
       ...plan,
@@ -86,19 +96,11 @@ export default function MonthlyPage() {
     upsertMonthlyPlan(next);
   }
 
-  function addSuccessPoint() {
-    update("successPoints", [...plan.successPoints, ""]);
-  }
-  function updateSuccessPoint(i: number, v: string) {
-    const next = [...plan.successPoints];
-    next[i] = v;
-    update("successPoints", next);
-  }
-  function removeSuccessPoint(i: number) {
-    update(
-      "successPoints",
-      plan.successPoints.filter((_, idx) => idx !== i),
-    );
+  function setGoalFromField(fieldId: FieldId) {
+    const g = state.fields[fieldId];
+    const target = (g.shortTerm || g.midTerm || g.longTerm).trim();
+    if (!target) return;
+    update("primaryGoal", `${FIELD_MAP[fieldId].nameJaShort}「${target}」に近づく`);
   }
 
   function shiftMonth(delta: number) {
@@ -157,85 +159,118 @@ export default function MonthlyPage() {
           </div>
         </div>
         <p className="text-[var(--color-fg-mute)] text-sm mt-4 tracking-wider">
-          ピラミッドの「計画」── 今月この一手を、どこに置くか。
+          選んだ目標から、今月この一手をどこに置くか。
         </p>
-        <button
-          type="button"
-          onClick={() => setCoachOpen(true)}
-          className="mt-6 text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-gold)] hover:border-[var(--color-ink)] pb-0.5"
-        >
-          ★ 質問で今月の計画を作る →
-        </button>
       </section>
 
-      {/* Primary goal */}
-      <Section number="01" title="最重要目標" caption="MOST IMPORTANT GOAL">
+      {/* 先月の振り返り（読むだけ・今月を決める手がかり） */}
+      <Section number="00" title="先月の振り返り" caption="LAST MONTH">
+        <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+          {prevYm.year}.{String(prevYm.month).padStart(2, "0")}
+        </div>
+        {prevReflection ? (
+          <div className="border-l-2 border-[var(--color-gold)] pl-4 text-sm leading-relaxed text-[var(--color-ink)] whitespace-pre-wrap">
+            {prevReflection}
+          </div>
+        ) : (
+          <p className="text-[12px] text-[var(--color-fg-faint)] italic">
+            先月の振り返りはまだありません。
+            <button
+              type="button"
+              onClick={() => shiftMonth(-1)}
+              className="ml-2 not-italic border-b border-[var(--color-line)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+            >
+              先月を開いて書く →
+            </button>
+          </p>
+        )}
+      </Section>
+
+      {/* Primary goal（選んだ分野の長期・中期・短期から作る） */}
+      <Section number="01" title="今月の最重要目標" caption="THIS MONTH'S GOAL">
+        {fieldsWithStates.length > 0 && (
+          <div className="mb-5">
+            <div className="flex items-baseline justify-between mb-3">
+              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                選んだ目標から決める
+              </div>
+              <button
+                type="button"
+                onClick={() => setCoachOpen(true)}
+                className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-gold)] hover:border-[var(--color-ink)] pb-0.5"
+              >
+                ★ 質問で決める →
+              </button>
+            </div>
+            <div className="space-y-px bg-[var(--color-line)] border border-[var(--color-line)]">
+              {fieldsWithStates.map((f) => {
+                const g = state.fields[f.id];
+                return (
+                  <div key={f.id} className="bg-white px-4 py-3">
+                    <div className="flex items-baseline justify-between gap-3 mb-1.5">
+                      <span className="serif text-sm text-[var(--color-ink)]">
+                        {f.nameJa}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setGoalFromField(f.id)}
+                        className="text-[10px] tracking-[0.2em] text-[var(--color-ink)] border border-[var(--color-line)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)] transition whitespace-nowrap"
+                      >
+                        今月これを進める →
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] leading-relaxed">
+                      {g.longTerm.trim() && (
+                        <span>
+                          <span className="text-[var(--color-fg-faint)] tracking-[0.15em] mr-1">
+                            長期
+                          </span>
+                          <span className="text-[var(--color-fg-mute)]">
+                            {g.longTerm.trim()}
+                          </span>
+                        </span>
+                      )}
+                      {g.midTerm.trim() && (
+                        <span>
+                          <span className="text-[var(--color-fg-faint)] tracking-[0.15em] mr-1">
+                            中期
+                          </span>
+                          <span className="text-[var(--color-fg-mute)]">
+                            {g.midTerm.trim()}
+                          </span>
+                        </span>
+                      )}
+                      {g.shortTerm.trim() && (
+                        <span>
+                          <span className="text-[var(--color-gold)] tracking-[0.15em] mr-1">
+                            短期
+                          </span>
+                          <span className="text-[var(--color-ink)]">
+                            {g.shortTerm.trim()}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         <textarea
           value={plan.primaryGoal}
           onChange={(e) => update("primaryGoal", e.target.value)}
           rows={2}
-          placeholder="今月、いちばん大切な一手は…"
+          placeholder="今月、いちばん大切な一手は…（上のボタンから引き込んで、整えてもOK）"
           className="w-full border border-[var(--color-line)] px-4 py-3 serif text-xl text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
         />
       </Section>
 
-      {/* Action theme */}
-      <Section number="02" title="行動テーマ" caption="ACTION THEME">
-        <input
-          type="text"
-          value={plan.actionTheme}
-          onChange={(e) => update("actionTheme", e.target.value)}
-          placeholder="今月の合言葉…"
-          className="w-full border border-[var(--color-line)] px-4 py-3 serif text-lg text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition"
-        />
-      </Section>
-
-      {/* Success points */}
-      <Section number="03" title="達成のポイント" caption="KEY POINTS">
-        <div className="space-y-2">
-          {plan.successPoints.map((point, i) => (
-            <div key={i} className="flex items-center gap-3 group">
-              <span className="serif text-[var(--color-fg-faint)] text-sm w-6">
-                —
-              </span>
-              <input
-                type="text"
-                value={point}
-                onChange={(e) => updateSuccessPoint(i, e.target.value)}
-                placeholder={`ポイント ${i + 1}`}
-                className="flex-1 border-b border-[var(--color-line)] px-2 py-2 text-sm text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition"
-              />
-              <button
-                onClick={() => removeSuccessPoint(i)}
-                className="opacity-0 group-hover:opacity-100 text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition text-xs"
-                aria-label="remove"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-          <button
-            onClick={addSuccessPoint}
-            className="mt-3 text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
-          >
-            ＋ ポイントを追加
-          </button>
-        </div>
-      </Section>
-
-      {/* Theme music */}
-      <Section number="04" title="テーマ曲" caption="THEME MUSIC">
-        <input
-          type="text"
-          value={plan.themeMusic}
-          onChange={(e) => update("themeMusic", e.target.value)}
-          placeholder="今月、何度も聴く一曲…"
-          className="w-full border border-[var(--color-line)] px-4 py-3 text-base text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition"
-        />
-      </Section>
-
-      {/* Reflection */}
-      <Section number="05" title="月間振り返り" caption="REFLECTION">
+      {/* Reflection（今月を振り返る・月末に書く） */}
+      <Section number="02" title="今月の振り返り" caption="REFLECTION">
+        <p className="text-[11px] text-[var(--color-fg-faint)] mb-3">
+          月末に、この月を振り返って書きます。来月の「先月の振り返り」として、ここに見えるようになります。
+        </p>
         <textarea
           value={plan.reflection}
           onChange={(e) => update("reflection", e.target.value)}
