@@ -272,6 +272,8 @@ export default function PrimePage() {
         )}
       </section>
 
+      {primeItems.length > 0 && <PrimeNextSteps />}
+
       <div className="hairline-top mt-4 pt-8 pb-16 flex items-center justify-between">
         <Link
           href="/"
@@ -284,5 +286,64 @@ export default function PrimePage() {
         </span>
       </div>
     </div>
+  );
+}
+
+// 第II領域に一手を書いた人への「次の一歩」案内。
+function PrimeNextSteps() {
+  const steps: { no: string; title: string; en: string; href: string; desc: string }[] = [
+    {
+      no: "01",
+      title: "今月の一手にする",
+      en: "MONTHLY",
+      href: "/monthly",
+      desc: "ここで挙げた中から一つを「今月いちばん進めること」に選び、今月の最重要目標にする。",
+    },
+    {
+      no: "02",
+      title: "今日のタスクに落とす",
+      en: "DAILY",
+      href: "/daily",
+      desc: "今月の一手を、今日できる小さな行動に分ける。ここで初めて“動き”が始まる。",
+    },
+  ];
+  return (
+    <section className="mt-12 pt-10 hairline-top">
+      <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        ③ 動く ・ NEXT
+      </div>
+      <h2 className="serif text-2xl md:text-3xl text-[var(--color-ink)] mb-2">
+        一手を書けたら、計画と今日へ
+      </h2>
+      <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-8 max-w-2xl">
+        第II領域に集めた“重要だけど後回しになりがちな一手”を、放っておかずに前へ進めます。
+        まず一つを今月の的に絞り、今日の行動に落としましょう。
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[var(--color-line)]">
+        {steps.map((s) => (
+          <Link
+            key={s.no}
+            href={s.href}
+            className="bg-white p-6 hover:bg-[var(--color-paper-soft)] transition group"
+          >
+            <div className="flex items-baseline justify-between mb-3">
+              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold)] transition">
+                {s.no}
+              </span>
+              <span className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                {s.en}
+              </span>
+            </div>
+            <div className="serif text-lg text-[var(--color-ink)] mb-2">
+              {s.title}
+              <span className="text-[var(--color-gold)] ml-2 text-sm">→</span>
+            </div>
+            <p className="text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
+              {s.desc}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
