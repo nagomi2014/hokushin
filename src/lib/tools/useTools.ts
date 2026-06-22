@@ -36,6 +36,7 @@ export interface PrimeItem {
   text: string;
   done: boolean;
   fieldId?: number; // どの分野の状態に近づくための一手か（任意）
+  cadence?: "daily" | "weekly"; // 日々のタスクへ定期投入する頻度（任意）
 }
 
 // 目標の区切り（毎年末〆）。短期＝今年末、中期＝mid年後、長期＝long年後。
@@ -125,6 +126,7 @@ export interface UseToolsResult extends ToolsData {
   addPrimeItem: (text: string, fieldId?: number) => void;
   togglePrimeItem: (id: string) => void;
   removePrimeItem: (id: string) => void;
+  setPrimeCadence: (id: string, cadence: "none" | "daily" | "weekly") => void;
   // マンダラート派生
   setMandalaSub: (aspect: number, sub: number, text: string) => void;
   addMandalaSub: (aspect: number, text: string) => void; // 空いている枠へ
@@ -207,6 +209,15 @@ export function useTools(): UseToolsResult {
         ...prev,
         primeItems: prev.primeItems.map((p) =>
           p.id === id ? { ...p, done: !p.done } : p,
+        ),
+      })),
+    setPrimeCadence: (id, cadence) =>
+      mutate((prev) => ({
+        ...prev,
+        primeItems: prev.primeItems.map((p) =>
+          p.id === id
+            ? { ...p, cadence: cadence === "none" ? undefined : cadence }
+            : p,
         ),
       })),
     removePrimeItem: (id) =>

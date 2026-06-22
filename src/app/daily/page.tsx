@@ -1,10 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FIELDS } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
+import { useTools } from "@/lib/tools/useTools";
 import type { FieldId } from "@/lib/types";
+
+// ある日付が属する ISO 週のキー（毎週の重複判定用）
+function isoWeekKey(d: string): string {
+  const dt = new Date(`${d}T00:00:00`);
+  const target = new Date(dt.valueOf());
+  const dayNr = (dt.getDay() + 6) % 7;
+  target.setDate(target.getDate() - dayNr + 3);
+  const firstThursday = new Date(target.getFullYear(), 0, 4);
+  const week =
+    1 +
+    Math.round(
+      ((target.getTime() - firstThursday.getTime()) / 86400000 -
+        3 +
+        ((firstThursday.getDay() + 6) % 7)) /
+        7,
+    );
+  return `${target.getFullYear()}-W${week}`;
+}
 
 export default function DailyPage() {
   const {
@@ -15,11 +34,42 @@ export default function DailyPage() {
     removeDailyTask,
   } = useAppState();
 
+  const { loaded: toolsLoaded, primeItems } = useTools();
+
   const [date, setDate] = useState<string>(todayString());
   const [title, setTitle] = useState("");
   const [fieldId, setFieldId] = useState<FieldId | "">("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  const today = todayString();
+
+  // 第II領域で「定期（毎日/毎週）」にした一手を、今日の行へ自動投入する。
+  // 重複は「同じ文言のタスクが今日（毎日）／今週（毎週）に既にあるか」で判定（端末またぎでも安全）。
+  useEffect(() => {
+    if (!loaded || !toolsLoaded) return;
+    if (date !== today) return;
+    const todayWeek = isoWeekKey(today);
+    for (const p of primeItems) {
+      if (!p.cadence || p.done) continue;
+      const exists =
+        p.cadence === "daily"
+          ? state.dailyTasks.some(
+              (t) => t.date === today && t.title === p.text,
+            )
+          : state.dailyTasks.some(
+              (t) => t.title === p.text && isoWeekKey(t.date) === todayWeek,
+            );
+      if (!exists) {
+        addDailyTask({
+          date: today,
+          title: p.text,
+          fieldId: (p.fieldId as FieldId | undefined) ?? null,
+          completed: false,
+        });
+      }
+    }
+  }, [loaded, toolsLoaded, date, today, primeItems, state.dailyTasks, addDailyTask]);
 
   if (!loaded) {
     return (

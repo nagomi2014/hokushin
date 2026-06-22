@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useTools } from "@/lib/tools/useTools";
-import { useAppState } from "@/lib/storage";
+import { todayString, useAppState } from "@/lib/storage";
 import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
 import { FIELD_MAP } from "@/lib/constants";
 import { activeFieldIds, fieldHasState } from "@/lib/fields";
@@ -25,11 +25,24 @@ export default function PrimePage() {
     addPrimeItem,
     togglePrimeItem,
     removePrimeItem,
+    setPrimeCadence,
     selectedFields,
   } = useTools();
-  const { state, loaded: stateLoaded } = useAppState();
+  const { state, loaded: stateLoaded, addDailyTask } = useAppState();
   const [text, setText] = useState("");
   const [guideOpen, setGuideOpen] = useState(false);
+  const [addedId, setAddedId] = useState<string | null>(null);
+
+  function addToToday(p: { id: string; text: string; fieldId?: number }) {
+    addDailyTask({
+      date: todayString(),
+      title: p.text,
+      fieldId: (p.fieldId as FieldId | undefined) ?? null,
+      completed: false,
+    });
+    setAddedId(p.id);
+    setTimeout(() => setAddedId((cur) => (cur === p.id ? null : cur)), 1800);
+  }
 
   // 取り組む分野のうち、状態が一つでも入っているもの
   const fieldsWithStates = useMemo(
@@ -225,42 +238,87 @@ export default function PrimePage() {
                     ? FIELD_MAP[p.fieldId as FieldId]
                     : null;
                 return (
-                  <div
-                    key={p.id}
-                    className="flex items-center gap-4 py-4 hairline-bottom group"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => togglePrimeItem(p.id)}
-                      className={`check-box ${p.done ? "checked" : ""}`}
-                      aria-label="toggle"
-                    >
-                      {p.done && <span className="text-[10px]">✓</span>}
-                    </button>
-                    <div className="flex-1">
-                      {fm && (
-                        <span className="text-[9px] tracking-[0.2em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 mr-2 align-middle">
-                          {fm.nameJaShort}
+                  <div key={p.id} className="py-4 hairline-bottom group">
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => togglePrimeItem(p.id)}
+                        className={`check-box ${p.done ? "checked" : ""}`}
+                        aria-label="toggle"
+                      >
+                        {p.done && <span className="text-[10px]">✓</span>}
+                      </button>
+                      <div className="flex-1">
+                        {fm && (
+                          <span className="text-[9px] tracking-[0.2em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 mr-2 align-middle">
+                            {fm.nameJaShort}
+                          </span>
+                        )}
+                        <span
+                          className={`text-sm align-middle ${
+                            p.done
+                              ? "line-through text-[var(--color-fg-faint)]"
+                              : "text-[var(--color-ink)]"
+                          }`}
+                        >
+                          {p.text}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removePrimeItem(p.id)}
+                        className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
+                        aria-label="削除"
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    {/* 日々のタスクへ：単発追加 ＋ 定期投入 */}
+                    <div className="ml-9 mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[10px]">
+                      <span className="tracking-[0.2em] text-[var(--color-fg-faint)]">
+                        日々へ
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => addToToday(p)}
+                        className="border border-[var(--color-line)] text-[var(--color-ink)] px-2 py-1 hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)] transition"
+                      >
+                        {addedId === p.id ? "追加しました ✓" : "＋ 今日に追加"}
+                      </button>
+                      <span className="text-[var(--color-line)] mx-0.5">|</span>
+                      <span className="tracking-[0.2em] text-[var(--color-fg-faint)]">
+                        定期
+                      </span>
+                      {(
+                        [
+                          { key: "none", label: "なし" },
+                          { key: "daily", label: "毎日" },
+                          { key: "weekly", label: "毎週" },
+                        ] as const
+                      ).map((opt) => {
+                        const on = (p.cadence ?? "none") === opt.key;
+                        return (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            onClick={() => setPrimeCadence(p.id, opt.key)}
+                            className={`px-2 py-1 border transition ${
+                              on
+                                ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
+                                : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                      {p.cadence && (
+                        <span className="tracking-[0.15em] text-[var(--color-gold)]">
+                          {p.cadence === "daily" ? "毎日、本日の行に自動で入ります" : "毎週、本日の行に自動で入ります"}
                         </span>
                       )}
-                      <span
-                        className={`text-sm align-middle ${
-                          p.done
-                            ? "line-through text-[var(--color-fg-faint)]"
-                            : "text-[var(--color-ink)]"
-                        }`}
-                      >
-                        {p.text}
-                      </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removePrimeItem(p.id)}
-                      className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
-                      aria-label="削除"
-                    >
-                      ×
-                    </button>
                   </div>
                 );
               })}
