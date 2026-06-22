@@ -18,8 +18,20 @@ interface Horizon {
   useIdealChips?: boolean;
 }
 
+// 分野ごとの例文（長期/中期/短期）
+const FIELD_EXAMPLES: Record<FieldId, { long: string; mid: string; short: string }> = {
+  1: { long: "いつまでも自分の足で歩ける体でいる", mid: "週3回の運動が習慣になっている", short: "まず毎朝10分のウォーキングから始める" },
+  2: { long: "信頼し合える仲間に囲まれている", mid: "大切な人と月1回は会う関係を保つ", short: "まず疎遠な友人に連絡してみる" },
+  3: { long: "家族みんなが安心して笑い合える家庭", mid: "年1回は家族で旅行に行く", short: "まず週末は一緒に食事をとる" },
+  4: { long: "自分の強みで価値を出し続けている", mid: "収入を1.5倍にする", short: "まず新しいスキルを1つ学び始める" },
+  5: { long: "専門分野で頼られる存在になっている", mid: "資格を取る／英語で話せるようになる", short: "まず毎日15分の学習を始める" },
+  6: { long: "お金の不安なく暮らせる土台がある", mid: "貯蓄を◯◯万円まで増やす", short: "まず固定費を見直して1つ減らす" },
+  7: { long: "夢中になれる趣味が人生を豊かにしている", mid: "趣味を定期的に楽しむ習慣をつくる", short: "まず気になっていたことを1つ始める" },
+};
+
 // 毎年末〆。短期＝今年末、中期＝mid年後の年末、長期＝long年後の年末。
 function buildHorizons(
+  fieldId: FieldId,
   fieldName: string,
   baseYear: number,
   midYears: number,
@@ -27,12 +39,13 @@ function buildHorizons(
 ): Horizon[] {
   const midY = baseYear + midYears;
   const longY = baseYear + longYears;
+  const ex = FIELD_EXAMPLES[fieldId];
   return [
     {
       key: "longTerm",
       label: `長期 ・ ${longY}年末（${longYears}年後）`,
       prompt: `${fieldName}で、${longYears}年後（${longY}年末）には、どうなっていたい？`,
-      placeholder: "例：いつまでも自分の足で歩ける体でいる",
+      placeholder: `例：${ex.long}`,
       hint: "大きな方向でOK。下のボタンから選んでも、自分の言葉でも。",
       useIdealChips: true,
     },
@@ -40,14 +53,14 @@ function buildHorizons(
       key: "midTerm",
       label: `中期 ・ ${midY}年末（${midYears}年後）`,
       prompt: `では、その途中——${midYears}年後（${midY}年末）には、どうなっていたい？`,
-      placeholder: "例：週3回の運動が習慣になっている",
+      placeholder: `例：${ex.mid}`,
       hint: "長期と「今」のあいだの“通過点”を、ひとつ。",
     },
     {
       key: "shortTerm",
       label: `短期 ・ ${baseYear}年末（今年）`,
       prompt: `では、今年（${baseYear}年12月31日）までに何をする？`,
-      placeholder: "例：まず毎朝10分のウォーキングから始める",
+      placeholder: `例：${ex.short}`,
       hint: "小さく、確実にできることから。",
     },
   ];
@@ -75,7 +88,7 @@ export function FieldHorizonGuide({
   onCancel,
 }: FieldHorizonGuideProps) {
   const baseYear = new Date().getFullYear();
-  const horizons = buildHorizons(fieldName, baseYear, midYears, longYears);
+  const horizons = buildHorizons(fieldId, fieldName, baseYear, midYears, longYears);
   // 未入力の地平（長期→中期→短期）から始める＝データそのものから再開（確実）。
   const order = horizons.map((hz) => hz.key);
   const firstEmpty = order.findIndex((k) => !(current[k] ?? "").trim());
