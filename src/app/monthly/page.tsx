@@ -5,12 +5,13 @@ import { useEffect, useMemo, useState } from "react";
 import {
   currentYearMonth,
   daysInMonth,
+  todayString,
   useAppState,
 } from "@/lib/storage";
 import { FIELD_MAP } from "@/lib/constants";
 import { useTools } from "@/lib/tools/useTools";
 import { activeFieldIds } from "@/lib/fields";
-import type { MonthlyPlan } from "@/lib/types";
+import type { FieldId, MonthlyPlan } from "@/lib/types";
 
 function emptyPlan(year: number, month: number): MonthlyPlan {
   return {
@@ -28,7 +29,8 @@ function emptyPlan(year: number, month: number): MonthlyPlan {
 }
 
 export default function MonthlyPage() {
-  const { state, loaded, upsertMonthlyPlan } = useAppState();
+  const { state, loaded, upsertMonthlyPlan, addDailyTask } = useAppState();
+  const [addedMsg, setAddedMsg] = useState(false);
   const {
     selectedFields,
     monthGoals,
@@ -69,8 +71,8 @@ export default function MonthlyPage() {
 
   // 今月の最重要目標（idと本文）
   const primaryId = primaryMonthGoal[ymKey];
-  const primaryText =
-    monthGoals.find((g) => g.id === primaryId)?.text.trim() ?? "";
+  const primaryGoalObj = monthGoals.find((g) => g.id === primaryId);
+  const primaryText = primaryGoalObj?.text.trim() ?? "";
 
   // 先月（前月）の振り返り
   const prevYm =
@@ -102,6 +104,18 @@ export default function MonthlyPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [primaryText, loaded, usesMonthGoals, plan.primaryGoal]);
+
+  function addPrimaryToToday() {
+    if (!primaryText) return;
+    addDailyTask({
+      date: todayString(),
+      title: primaryText,
+      fieldId: (primaryGoalObj?.fieldId as FieldId | undefined) ?? null,
+      completed: false,
+    });
+    setAddedMsg(true);
+    setTimeout(() => setAddedMsg(false), 1800);
+  }
 
   function shiftMonth(delta: number) {
     let m = ym.month + delta;
@@ -190,8 +204,17 @@ export default function MonthlyPage() {
       <Section number="01" title="今月の最重要目標" caption="MOST IMPORTANT">
         {primaryText ? (
           <div className="bg-[var(--color-ink)] text-white px-5 py-4">
-            <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)] mb-1">
-              ★ THIS MONTH
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)]">
+                ★ THIS MONTH
+              </div>
+              <button
+                type="button"
+                onClick={addPrimaryToToday}
+                className="text-[10px] tracking-[0.2em] border border-white/30 text-white px-2.5 py-1 hover:bg-white hover:text-[var(--color-ink)] transition whitespace-nowrap"
+              >
+                {addedMsg ? "追加しました ✓" : "＋ 今日のタスクに追加"}
+              </button>
             </div>
             <div className="serif text-xl leading-relaxed">{primaryText}</div>
           </div>
@@ -309,6 +332,41 @@ export default function MonthlyPage() {
           className="w-full border border-[var(--color-line)] px-4 py-3 text-sm leading-relaxed text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
         />
       </Section>
+
+      {primaryText && (
+        <section className="mt-12 pt-10 hairline-top">
+          <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+            ③ 動く ・ NEXT
+          </div>
+          <h2 className="serif text-2xl md:text-3xl text-[var(--color-ink)] mb-2">
+            今月の目標を、今日の行動へ
+          </h2>
+          <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-8 max-w-2xl">
+            目標は立てただけでは動きません。最重要目標を、今日できる小さな一歩に分けましょう。
+            上の「今日のタスクに追加」を押すか、日々のページで組み立てます。
+          </p>
+          <Link
+            href="/daily"
+            className="block bg-white p-6 hover:bg-[var(--color-paper-soft)] transition group border border-[var(--color-line)]"
+          >
+            <div className="flex items-baseline justify-between mb-3">
+              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold)] transition">
+                →
+              </span>
+              <span className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                DAILY
+              </span>
+            </div>
+            <div className="serif text-lg text-[var(--color-ink)] mb-2">
+              今日のタスクに落とす
+              <span className="text-[var(--color-gold)] ml-2 text-sm">→</span>
+            </div>
+            <p className="text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
+              今月の一手を、今日できる行動に分ける。ここで初めて“動き”が始まる。
+            </p>
+          </Link>
+        </section>
+      )}
 
       <div className="hairline-top mt-8 pt-8 pb-16 flex items-center justify-between">
         <Link
