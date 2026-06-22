@@ -15,6 +15,7 @@ import {
   useAppState,
 } from "@/lib/storage";
 import { useTools } from "@/lib/tools/useTools";
+import { useRevisions } from "@/lib/tools/useRevisions";
 import type { AppState, MonthlyPlan } from "@/lib/types";
 
 // ------------------------------------------------------------
@@ -142,6 +143,7 @@ export default function DashboardPage() {
     state.mandala.cells.filter((c) => c.trim()).length;
   const wishlistCount = state.wishlist.length;
   const tools = useTools();
+  const revisions = useRevisions();
 
   // 現在地（フェーズ）判定：探索（知る→導き出す）か、実践（動く）か。
   // onboarding/field を埋めている段階＝探索、monthly/daily/done＝実践。
@@ -388,9 +390,9 @@ export default function DashboardPage() {
           お金と時間を整える
         </h2>
         <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-10">
-          経済の足場と、重要だが緊急でない時間を、見える化する。
+          経済の足場と、重要だが緊急でない時間を、見える化する。書き直すたび過去の版も残る。
         </p>
-        <div className="grid grid-cols-2 gap-px bg-[var(--color-line)]">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-px bg-[var(--color-line)]">
           <QuickItem
             label="金の記録"
             value={tools.moneyEntries.length > 0 ? String(tools.moneyEntries.length) : "—"}
@@ -402,6 +404,12 @@ export default function DashboardPage() {
             value={tools.primeItems.length > 0 ? String(tools.primeItems.length) : "—"}
             caption="QUADRANT II"
             href="/prime"
+          />
+          <QuickItem
+            label="書き直しの記録"
+            value={revisions.revisions.length > 0 ? String(revisions.revisions.length) : "—"}
+            caption="REVISIONS"
+            href="/revisions"
           />
         </div>
       </section>
