@@ -1,27 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
-import { FIELDS } from "@/lib/constants";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { FIELDS, FIELD_MAP } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
 import { FieldHorizonGuide } from "@/components/FieldHorizonGuide";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import { useTools } from "@/lib/tools/useTools";
+import { activeFieldIds } from "@/lib/fields";
 import type { AppState, DailyTask, FieldId } from "@/lib/types";
 
 const SEQ_KEY = "fields-seq";
 
 export default function FieldsPage() {
   const { state, loaded, setField } = useAppState();
-  const { horizonSpan, setHorizonSpan } = useTools();
+  const {
+    horizonSpan,
+    setHorizonSpan,
+    selectedFields,
+    setSelectedFields,
+    toggleSelectedField,
+    loaded: toolsLoaded,
+  } = useTools();
   const [coachFieldId, setCoachFieldId] = useState<FieldId | null>(null);
   const [materialOpen, setMaterialOpen] = useState(false);
-  // 一分野ずつ質問していく順番モード（null=通常表示、0〜6=その分野）
+  const [chooserOpen, setChooserOpen] = useState(false);
+  // 一分野ずつ質問していく順番モード（null=通常表示、0〜=活性分野の番号）
   const [seqIndex, setSeqIndex] = useState<number | null>(null);
   const today = todayString();
 
+  // 実際に画面へ出す分野（選択があればそれ、無ければ中身のある分野）
+  const activeIds = useMemo(
+    () => activeFieldIds(selectedFields, state.fields),
+    [selectedFields, state.fields],
+  );
+
   function startSeq() {
-    const saved = Math.min(readGuide(SEQ_KEY, 0), FIELDS.length - 1);
+    if (activeIds.length === 0) {
+      setChooserOpen(true);
+      return;
+    }
+    const saved = Math.min(readGuide(SEQ_KEY, 0), activeIds.length - 1);
     setSeqIndex(saved);
   }
 
@@ -31,7 +50,7 @@ export default function FieldsPage() {
   }, [seqIndex]);
   function advanceSeq() {
     if (seqIndex === null) return;
-    if (seqIndex >= FIELDS.length - 1) {
+    if (seqIndex >= activeIds.length - 1) {
       clearGuide(SEQ_KEY);
       setSeqIndex(null);
     } else {
@@ -41,7 +60,7 @@ export default function FieldsPage() {
     }
   }
 
-  if (!loaded) {
+  if (!loaded || !toolsLoaded) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-32 text-center text-[var(--color-fg-faint)] text-sm tracking-widest">
         LOADING…
@@ -50,20 +69,20 @@ export default function FieldsPage() {
   }
 
   // ===== 順番モード（一分野ずつ質問）=====
-  if (seqIndex !== null) {
-    const field = FIELDS[seqIndex];
+  if (seqIndex !== null && activeIds[seqIndex]) {
+    const field = FIELD_MAP[activeIds[seqIndex]];
     return (
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <section className="pt-20 pb-8 hairline-bottom">
           <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-5">
             <span>
-              分野 {seqIndex + 1} / {FIELDS.length}
+              分野 {seqIndex + 1} / {activeIds.length}
             </span>
             <div className="flex-1 h-px bg-[var(--color-line)] relative">
               <div
                 className="absolute inset-y-0 left-0 bg-[var(--color-ink)]"
                 style={{
-                  width: `${((seqIndex + 1) / FIELDS.length) * 100}%`,
+                  width: `${((seqIndex + 1) / activeIds.length) * 100}%`,
                   top: -1,
                   height: 3,
                 }}
@@ -131,6 +150,16 @@ export default function FieldsPage() {
         </p>
       </section>
 
+      {/* 取り組む分野を選ぶ */}
+      <FieldChooser
+        open={chooserOpen || activeIds.length === 0}
+        activeIds={activeIds}
+        selectedFields={selectedFields}
+        onToggle={toggleSelectedField}
+        onPreset={(ids) => setSelectedFields(ids)}
+        onToggleOpen={() => setChooserOpen((v) => !v)}
+      />
+
       <section className="py-8 hairline-bottom">
         <button
           type="button"
@@ -139,7 +168,9 @@ export default function FieldsPage() {
         >
           <span className="text-[var(--color-gold)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
-            質問に沿って、七つの分野を順に立てる
+            {activeIds.length > 0
+              ? `質問に沿って、${activeIds.length}つの分野を順に立てる`
+              : "まず、取り組む分野を選ぶ"}
           </span>
           <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
             一つの分野ずつ、質問に答えるだけ。途中で閉じても続きから
@@ -193,7 +224,15 @@ export default function FieldsPage() {
       />
 
       <section className="py-8 space-y-16">
-        {FIELDS.map((field) => {
+        {activeIds.length === 0 && (
+          <div className="py-16 text-center text-sm text-[var(--color-fg-faint)]">
+            まだ取り組む分野が選ばれていません。
+            <br />
+            上の「取り組む分野を選ぶ」から、まずは1つでも選んでみてください。
+          </div>
+        )}
+        {activeIds.map((fid) => {
+          const field = FIELD_MAP[fid];
           const goal = state.fields[field.id];
           const todayTasks = state.dailyTasks.filter(
             (t) => t.date === today && t.fieldId === field.id,
@@ -356,6 +395,102 @@ export default function FieldsPage() {
       )}
 
     </div>
+  );
+}
+
+// 取り組む分野を選ぶパネル。1つだけでも、全部でもOK。
+function FieldChooser({
+  open,
+  activeIds,
+  selectedFields,
+  onToggle,
+  onPreset,
+  onToggleOpen,
+}: {
+  open: boolean;
+  activeIds: FieldId[];
+  selectedFields: number[];
+  onToggle: (id: number) => void;
+  onPreset: (ids: number[]) => void;
+  onToggleOpen: () => void;
+}) {
+  const presets: { label: string; ids: number[] }[] = [
+    { label: "シンプル3つ（仕事・家庭・健康）", ids: [4, 3, 1] },
+    { label: "バランス5つ（＋学び・お金）", ids: [1, 3, 4, 5, 6] },
+    { label: "7つすべて", ids: [1, 2, 3, 4, 5, 6, 7] },
+  ];
+  return (
+    <section className="py-6 hairline-bottom">
+      <button
+        type="button"
+        onClick={onToggleOpen}
+        className="w-full flex items-center justify-between group"
+        aria-expanded={open}
+      >
+        <span className="flex items-baseline gap-3">
+          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+            FOCUS
+          </span>
+          <span className="serif text-lg text-[var(--color-ink)]">
+            取り組む分野を選ぶ
+          </span>
+          <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+            {activeIds.length > 0 ? `${activeIds.length}つ` : "未選択"}
+          </span>
+        </span>
+        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
+          {open ? "閉じる −" : "選び直す ＋"}
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-5">
+          <p className="text-xs text-[var(--color-fg-mute)] leading-relaxed mb-4">
+            7つ全部やる必要はありません。今の自分に大事なものだけを選んでください。
+            1つだけでも、3つでも、全部でもOK。あとから増やせます。
+          </p>
+
+          {/* 7つのチップ */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            {FIELDS.map((f) => {
+              const on = selectedFields.includes(f.id);
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => onToggle(f.id)}
+                  className={`text-xs border px-3 py-1.5 transition ${
+                    on
+                      ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
+                      : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
+                  }`}
+                >
+                  {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
+                  {f.nameJa}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* おまかせプリセット */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] mr-1">
+              おまかせ：
+            </span>
+            {presets.map((p) => (
+              <button
+                key={p.label}
+                type="button"
+                onClick={() => onPreset(p.ids)}
+                className="text-[11px] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 

@@ -9,8 +9,10 @@ import {
 } from "@/lib/storage";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
 import { buildMonthlyQuestions, synthesizeMonthly } from "@/lib/coach/guided";
-import { FIELDS } from "@/lib/constants";
-import type { MonthlyPlan } from "@/lib/types";
+import { FIELD_MAP } from "@/lib/constants";
+import { useTools } from "@/lib/tools/useTools";
+import { activeFieldIds, fieldHasState } from "@/lib/fields";
+import type { FieldId, MonthlyPlan } from "@/lib/types";
 
 function emptyPlan(year: number, month: number): MonthlyPlan {
   return {
@@ -50,18 +52,28 @@ export default function MonthlyPage() {
 
   const totalDays = useMemo(() => daysInMonth(ym.year, ym.month), [ym]);
 
-  // 分野の“ありたい状態”から今月の問いを組み立てる（紐づけ）
+  const { selectedFields } = useTools();
+
+  // 取り組む分野に絞って、今月の問いを組み立てる（紐づけ）
+  const activeFieldGoals = useMemo(() => {
+    const rec: Partial<
+      Record<FieldId, { shortTerm: string; midTerm: string; longTerm: string }>
+    > = {};
+    for (const id of activeFieldIds(selectedFields, state.fields)) {
+      rec[id] = state.fields[id];
+    }
+    return rec;
+  }, [selectedFields, state.fields]);
   const monthlyQuestions = useMemo(
-    () => buildMonthlyQuestions(state.fields),
-    [state.fields],
+    () => buildMonthlyQuestions(activeFieldGoals),
+    [activeFieldGoals],
   );
   const fieldsWithStates = useMemo(
     () =>
-      FIELDS.filter((f) => {
-        const g = state.fields[f.id];
-        return (g.shortTerm || g.midTerm || g.longTerm || "").trim();
-      }),
-    [state.fields],
+      activeFieldIds(selectedFields, state.fields)
+        .map((id) => FIELD_MAP[id])
+        .filter((f) => fieldHasState(state.fields[f.id])),
+    [selectedFields, state.fields],
   );
 
   function update<K extends keyof MonthlyPlan>(key: K, value: MonthlyPlan[K]) {

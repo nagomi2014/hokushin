@@ -416,7 +416,9 @@ export function synthesizeMonthly(answers: GuidedAnswer[]): string {
 // 分野の状態（短期/中期/長期）から、今月の「どの分野を前に進めるか」の選択肢を作る。
 // 状態が一つも無ければ、分野名だけの汎用選択肢にフォールバックする。
 export function buildMonthlyQuestions(
-  fieldGoals: Record<FieldId, { shortTerm: string; midTerm: string; longTerm: string }>,
+  fieldGoals: Partial<
+    Record<FieldId, { shortTerm: string; midTerm: string; longTerm: string }>
+  >,
 ): GuidedQuestion[] {
   const labeled: GuidedOption[] = [];
   for (let i = 1 as FieldId; i <= 7; i = (i + 1) as FieldId) {

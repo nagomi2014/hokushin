@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import { useTools } from "@/lib/tools/useTools";
 import { useAppState } from "@/lib/storage";
 import { GuidedPrompts, type PromptStep } from "@/components/GuidedPrompts";
-import { FIELDS, FIELD_MAP } from "@/lib/constants";
+import { FIELD_MAP } from "@/lib/constants";
+import { activeFieldIds, fieldHasState } from "@/lib/fields";
 import type { FieldId } from "@/lib/types";
 
 // 分野が未設定のときのフォールバック（汎用の問い）
@@ -24,19 +25,19 @@ export default function PrimePage() {
     addPrimeItem,
     togglePrimeItem,
     removePrimeItem,
+    selectedFields,
   } = useTools();
   const { state, loaded: stateLoaded } = useAppState();
   const [text, setText] = useState("");
   const [guideOpen, setGuideOpen] = useState(false);
 
-  // 状態が一つでも入っている分野
+  // 取り組む分野のうち、状態が一つでも入っているもの
   const fieldsWithStates = useMemo(
     () =>
-      FIELDS.filter((f) => {
-        const g = state.fields[f.id];
-        return (g.longTerm || g.midTerm || g.shortTerm || "").trim();
-      }),
-    [state.fields],
+      activeFieldIds(selectedFields, state.fields)
+        .map((id) => FIELD_MAP[id])
+        .filter((f) => fieldHasState(state.fields[f.id])),
+    [selectedFields, state.fields],
   );
 
   // 分野ごとに「その状態に近づくための一手」を引き出す質問を組み立てる

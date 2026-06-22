@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import {
   FIELDS,
+  FIELD_MAP,
   PYRAMID_TIERS,
   PYRAMID_WIDTHS,
 } from "@/lib/constants";
+import { activeFieldIds } from "@/lib/fields";
 import {
   currentYearMonth,
   daysInMonth,
@@ -144,6 +146,10 @@ export default function DashboardPage() {
   const wishlistCount = state.wishlist.length;
   const tools = useTools();
   const revisions = useRevisions();
+  const dashboardFieldIds = useMemo(
+    () => activeFieldIds(tools.selectedFields, state.fields),
+    [tools.selectedFields, state.fields],
+  );
 
   // 現在地（フェーズ）判定：探索（知る→導き出す）か、実践（動く）か。
   // onboarding/field を埋めている段階＝探索、monthly/daily/done＝実践。
@@ -439,7 +445,16 @@ export default function DashboardPage() {
 
           <div className="col-span-12 md:col-span-9">
             <div className="hairline-top">
-              {FIELDS.map((field) => {
+              {dashboardFieldIds.length === 0 && (
+                <Link
+                  href="/fields"
+                  className="block py-8 text-center text-sm text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+                >
+                  取り組む分野を選ぶ →
+                </Link>
+              )}
+              {dashboardFieldIds.map((fid) => {
+                const field = FIELD_MAP[fid];
                 const goal = state.fields[field.id];
                 const placeholder = "目標を設定する →";
                 const display = goal?.shortTerm || placeholder;

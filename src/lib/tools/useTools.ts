@@ -51,6 +51,8 @@ export interface ToolsData {
   // マンダラート派生：8観点 × 8項目（フル9×9の外周ブロック）
   mandalaSub: string[][];
   horizonSpan: HorizonSpan;
+  // 取り組む分野（七つの分野のうち、自分が選んだものだけ）。空＝未選択。
+  selectedFields: number[];
 }
 
 function emptyMandalaSub(): string[][] {
@@ -64,6 +66,7 @@ function emptyTools(): ToolsData {
     primeItems: [],
     mandalaSub: emptyMandalaSub(),
     horizonSpan: { mid: 3, long: 10 },
+    selectedFields: [],
   };
 }
 
@@ -82,12 +85,16 @@ function loadTools(): ToolsData {
       mid: typeof hs?.mid === "number" ? hs.mid : 3,
       long: typeof hs?.long === "number" ? hs.long : 10,
     };
+    const selectedFields = Array.isArray(parsed.selectedFields)
+      ? parsed.selectedFields.filter((n) => typeof n === "number")
+      : [];
     return {
       lifeEvents: parsed.lifeEvents ?? [],
       moneyEntries: parsed.moneyEntries ?? [],
       primeItems: parsed.primeItems ?? [],
       mandalaSub,
       horizonSpan,
+      selectedFields,
     };
   } catch {
     return emptyTools();
@@ -123,6 +130,9 @@ export interface UseToolsResult extends ToolsData {
   addMandalaSub: (aspect: number, text: string) => void; // 空いている枠へ
   // 目標の区切り
   setHorizonSpan: (patch: Partial<HorizonSpan>) => void;
+  // 取り組む分野の選択
+  setSelectedFields: (ids: number[]) => void;
+  toggleSelectedField: (id: number) => void;
 }
 
 export function useTools(): UseToolsResult {
@@ -233,6 +243,23 @@ export function useTools(): UseToolsResult {
           Math.min(50, patch.long ?? prev.horizonSpan.long),
         );
         return { ...prev, horizonSpan: { mid, long } };
+      }),
+
+    setSelectedFields: (ids) =>
+      mutate((prev) => ({
+        ...prev,
+        selectedFields: [...new Set(ids.filter((n) => n >= 1 && n <= 7))].sort(
+          (a, b) => a - b,
+        ),
+      })),
+    toggleSelectedField: (id) =>
+      mutate((prev) => {
+        if (id < 1 || id > 7) return prev;
+        const has = prev.selectedFields.includes(id);
+        const next = has
+          ? prev.selectedFields.filter((n) => n !== id)
+          : [...prev.selectedFields, id];
+        return { ...prev, selectedFields: next.sort((a, b) => a - b) };
       }),
   };
 }
