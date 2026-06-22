@@ -87,7 +87,7 @@ export default function PrimePage() {
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
           「重要だけど、緊急ではない」こと。ここに時間を使えるかで、人生は変わる。
-          七つの分野で描いた“ありたい状態”に近づく一手を、ここに集めておく。
+          目標設定で描いた“ありたい状態”に近づく一手を、ここに集めておく。
         </p>
       </section>
 
@@ -126,13 +126,13 @@ export default function PrimePage() {
         <section className="py-8 hairline-bottom">
           <div className="flex items-baseline justify-between mb-4">
             <h2 className="serif text-lg text-[var(--color-ink)]">
-              七つの分野・目指す状態
+              目標・目指す状態
             </h2>
             <Link
               href="/fields"
               className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
             >
-              分野を編集 →
+              目標を編集 →
             </Link>
           </div>
           <div className="space-y-2">

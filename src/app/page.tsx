@@ -428,12 +428,12 @@ export default function DashboardPage() {
               ② 導き出す ・ DERIVE
             </div>
             <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
-              七つの分野
+              目標設定
             </h2>
             <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed">
               探索から導き出された目標。
               <br />
-              人生は7つの方角から構成される。偏れば澱み、整えば澄む。
+              大事な分野ごとに、ありたい状態を描く。偏れば澱み、整えば澄む。
             </p>
             <Link
               href="/fields"

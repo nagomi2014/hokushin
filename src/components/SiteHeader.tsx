@@ -21,7 +21,7 @@ const NAV: NavItem[] = [
   { href: "/pyramid", label: "PYRAMID", labelJa: "ピラミッド", group: "know" },
   { href: "/mandala", label: "MANDALA", labelJa: "曼荼羅", group: "know" },
   { href: "/list-100", label: "LIST 100", labelJa: "百のリスト", group: "know" },
-  { href: "/fields", label: "GOALS", labelJa: "七つの分野", group: "derive" },
+  { href: "/fields", label: "GOALS", labelJa: "目標設定", group: "derive" },
   { href: "/daily", label: "DAILY", labelJa: "日々の実践", group: "act" },
   { href: "/monthly", label: "MONTHLY", labelJa: "月次", group: "act" },
   { href: "/journal", label: "JOURNAL", labelJa: "日誌", group: "act" },

@@ -7,7 +7,7 @@ import { todayString, useAppState } from "@/lib/storage";
 import { FieldHorizonGuide } from "@/components/FieldHorizonGuide";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import { useTools } from "@/lib/tools/useTools";
-import { activeFieldIds } from "@/lib/fields";
+import { activeFieldIds, fieldHasState } from "@/lib/fields";
 import type { AppState, DailyTask, FieldId } from "@/lib/types";
 
 const SEQ_KEY = "fields-seq";
@@ -27,6 +27,7 @@ export default function FieldsPage() {
   const [chooserOpen, setChooserOpen] = useState(false);
   // 一分野ずつ質問していく順番モード（null=通常表示、0〜=活性分野の番号）
   const [seqIndex, setSeqIndex] = useState<number | null>(null);
+  const [seqDone, setSeqDone] = useState(false);
   const today = todayString();
 
   // 実際に画面へ出す分野（選択があればそれ、無ければ中身のある分野）
@@ -34,12 +35,18 @@ export default function FieldsPage() {
     () => activeFieldIds(selectedFields, state.fields),
     [selectedFields, state.fields],
   );
+  // 目標（状態）が一つでも書けているか＝「次の一歩」を出す条件
+  const hasAnyGoal = useMemo(
+    () => activeIds.some((id) => fieldHasState(state.fields[id])),
+    [activeIds, state.fields],
+  );
 
   function startSeq() {
     if (activeIds.length === 0) {
       setChooserOpen(true);
       return;
     }
+    setSeqDone(false);
     const saved = Math.min(readGuide(SEQ_KEY, 0), activeIds.length - 1);
     setSeqIndex(saved);
   }
@@ -53,6 +60,7 @@ export default function FieldsPage() {
     if (seqIndex >= activeIds.length - 1) {
       clearGuide(SEQ_KEY);
       setSeqIndex(null);
+      setSeqDone(true);
     } else {
       const n = seqIndex + 1;
       setSeqIndex(n);
@@ -64,6 +72,45 @@ export default function FieldsPage() {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-32 text-center text-[var(--color-fg-faint)] text-sm tracking-widest">
         LOADING…
+      </div>
+    );
+  }
+
+  // ===== 完了画面（順に立てる、を最後まで終えた直後）=====
+  if (seqDone && seqIndex === null) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 lg:px-10">
+        <section className="pt-24 pb-8 text-center">
+          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+            ★ &nbsp; DONE
+          </div>
+          <h1 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.15] mb-4">
+            お疲れさまでした。
+            <br />
+            目標が書けました。
+          </h1>
+          <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed max-w-xl mx-auto">
+            ここで書いたのは「どんな状態でいたいか」。
+            <br />
+            この目標は、書き直すたびに過去の版も残ります。
+          </p>
+        </section>
+        <NextSteps />
+        <div className="hairline-top mt-10 pt-8 pb-16 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setSeqDone(false)}
+            className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+          >
+            ← 目標一覧を見る
+          </button>
+          <Link
+            href="/"
+            className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
+          >
+            DASHBOARD →
+          </Link>
+        </div>
       </div>
     );
   }
@@ -133,10 +180,10 @@ export default function FieldsPage() {
 
       <section className="pt-20 pb-12 hairline-bottom">
         <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
-          ★ &nbsp; SEVEN&nbsp;FIELDS
+          ★ &nbsp; GOAL&nbsp;SETTING
         </div>
         <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
-          七つの分野
+          目標設定
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
           <span className="text-[var(--color-ink)]">長期</span>
@@ -334,6 +381,8 @@ export default function FieldsPage() {
         })}
       </section>
 
+      {hasAnyGoal && <NextSteps />}
+
       <div className="hairline-top mt-8 pt-8 pb-16 flex items-center justify-between">
         <Link
           href="/"
@@ -395,6 +444,73 @@ export default function FieldsPage() {
       )}
 
     </div>
+  );
+}
+
+// 目標（状態）を書き終えた人への「次の一歩」案内。
+function NextSteps() {
+  const steps: { no: string; title: string; en: string; href: string; desc: string }[] = [
+    {
+      no: "01",
+      title: "近づく一手を決める",
+      en: "QUADRANT II",
+      href: "/prime",
+      desc: "その“ありたい状態”に近づくために、重要だけど後回しにしていることを書き出す。",
+    },
+    {
+      no: "02",
+      title: "今月の一手にする",
+      en: "MONTHLY",
+      href: "/monthly",
+      desc: "そのうち一つを「今月いちばん進める分野」に選び、今月の最重要目標にする。",
+    },
+    {
+      no: "03",
+      title: "今日のタスクに落とす",
+      en: "DAILY",
+      href: "/daily",
+      desc: "今月の一手を、今日できる小さな行動に分ける。ここで初めて“動き”が始まる。",
+    },
+  ];
+  return (
+    <section className="mt-12 pt-10 hairline-top">
+      <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        ③ 動く ・ NEXT
+      </div>
+      <h2 className="serif text-3xl text-[var(--color-ink)] mb-2">
+        目標が書けたら、次は“やること”へ
+      </h2>
+      <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-8 max-w-2xl">
+        ここで書いたのは「どんな状態でいたいか（目標）」。
+        次は、その状態に近づくための“やること（行動）”を決めていきます。
+        上から順にどうぞ。
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[var(--color-line)]">
+        {steps.map((s) => (
+          <Link
+            key={s.no}
+            href={s.href}
+            className="bg-white p-6 hover:bg-[var(--color-paper-soft)] transition group"
+          >
+            <div className="flex items-baseline justify-between mb-3">
+              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold)] transition">
+                {s.no}
+              </span>
+              <span className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                {s.en}
+              </span>
+            </div>
+            <div className="serif text-lg text-[var(--color-ink)] mb-2">
+              {s.title}
+              <span className="text-[var(--color-gold)] ml-2 text-sm">→</span>
+            </div>
+            <p className="text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
+              {s.desc}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 

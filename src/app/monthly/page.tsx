@@ -286,7 +286,7 @@ export default function MonthlyPage() {
               {fieldsWithStates.length > 0 && (
                 <div className="mb-5 bg-[var(--color-paper-soft)] border-l-2 border-[var(--color-gold)] px-4 py-3">
                   <div className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
-                    七つの分野・目指す状態
+                    目標・目指す状態
                   </div>
                   <div className="space-y-1">
                     {fieldsWithStates.map((f) => {
