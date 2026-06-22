@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
+import { ResumeChoice } from "./ResumeChoice";
 
 // 人生を時系列でたどるインタビュー台本（$0・LLM不要）。
 // 各ステージで「年齢＋出来事」を1つずつ記録し、年表が埋まっていく。
@@ -139,22 +140,39 @@ export function LifeHistoryGuide({
   const [age, setAge] = useState(String(STAGES[0].defaultAge));
   const [text, setText] = useState("");
   const [addedHere, setAddedHere] = useState(0);
+  const [pendingResume, setPendingResume] = useState<number | null>(null);
 
-  // マウント後に、保存済みの時期を復元する。
-  const restored = useRef(false);
+  // 前回の続きがあれば「途中から/最初から」を選んでもらう。
+  const checked = useRef(false);
   useEffect(() => {
-    if (restored.current || !progressKey) return;
-    restored.current = true;
+    if (checked.current || !progressKey) return;
+    checked.current = true;
     const saved = Math.min(readGuide(progressKey, 0), STAGES.length - 1);
-    if (saved > 0) {
-      setIndex(saved);
-      setAge(String(STAGES[saved].defaultAge));
-    }
+    if (saved > 0) setPendingResume(saved);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progressKey]);
 
   const stage = STAGES[index];
   const isLast = index >= STAGES.length - 1;
+
+  if (pendingResume !== null) {
+    return (
+      <ResumeChoice
+        count={pendingResume + 1}
+        onResume={() => {
+          setIndex(pendingResume);
+          setAge(String(STAGES[pendingResume].defaultAge));
+          setPendingResume(null);
+        }}
+        onRestart={() => {
+          if (progressKey) clearGuide(progressKey);
+          setIndex(0);
+          setAge(String(STAGES[0].defaultAge));
+          setPendingResume(null);
+        }}
+      />
+    );
+  }
 
   function goToStage(i: number) {
     setIndex(i);

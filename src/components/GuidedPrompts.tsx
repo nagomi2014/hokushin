@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
+import { ResumeChoice } from "./ResumeChoice";
 
 // 汎用：プロンプトを順にたどって、各回でいくつでも項目を足していく台本ウォーカー。
 // 100のリストなど「複数追加」する導き出しに使う（AI不要・$0）。
@@ -36,19 +37,37 @@ export function GuidedPrompts({
   const [index, setIndex] = useState(0);
   const [text, setText] = useState("");
   const [addedHere, setAddedHere] = useState(0);
+  const [pendingResume, setPendingResume] = useState<number | null>(null);
 
-  // マウント後に、保存済みの進行位置を復元する。
-  const restored = useRef(false);
+  // 前回の続きがあれば「途中から/最初から」を選んでもらう。
+  const checked = useRef(false);
   useEffect(() => {
-    if (restored.current || !progressKey) return;
-    restored.current = true;
+    if (checked.current || !progressKey) return;
+    checked.current = true;
     const saved = readGuide(progressKey, 0);
-    if (saved > 0) setIndex(Math.min(saved, Math.max(0, steps.length - 1)));
+    if (saved > 0) setPendingResume(Math.min(saved, Math.max(0, steps.length - 1)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progressKey]);
 
   const step = steps[index];
   const isLast = index >= steps.length - 1;
+
+  if (pendingResume !== null) {
+    return (
+      <ResumeChoice
+        count={pendingResume + 1}
+        onResume={() => {
+          setIndex(pendingResume);
+          setPendingResume(null);
+        }}
+        onRestart={() => {
+          if (progressKey) clearGuide(progressKey);
+          setIndex(0);
+          setPendingResume(null);
+        }}
+      />
+    );
+  }
 
   function go(i: number) {
     setIndex(i);

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { fieldIdealOptions } from "@/lib/coach/guided";
-import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import type { FieldId } from "@/lib/types";
 
 // 一分野の目標を「長期 → 中期 → 短期」の順に、質問で立てる（$0・LLM不要）。
@@ -63,7 +62,6 @@ interface FieldHorizonGuideProps {
   onSet: (key: HorizonKey, value: string) => void;
   onDone: () => void;
   onCancel: () => void;
-  progressKey?: string;
 }
 
 export function FieldHorizonGuide({
@@ -75,45 +73,28 @@ export function FieldHorizonGuide({
   onSet,
   onDone,
   onCancel,
-  progressKey,
 }: FieldHorizonGuideProps) {
   const baseYear = new Date().getFullYear();
   const horizons = buildHorizons(fieldName, baseYear, midYears, longYears);
-  const key = progressKey ? `${progressKey}-horizon` : undefined;
+  // 未入力の地平（長期→中期→短期）から始める＝データそのものから再開（確実）。
+  const order = horizons.map((hz) => hz.key);
+  const firstEmpty = order.findIndex((k) => !(current[k] ?? "").trim());
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(firstEmpty === -1 ? 0 : firstEmpty);
   const h = horizons[step];
   const [text, setText] = useState(current[h.key] ?? "");
   const isLast = step >= horizons.length - 1;
   const chips = h.useIdealChips ? fieldIdealOptions(fieldId) : [];
 
-  // マウント後に、保存済みの地平（長期/中期/短期）を復元する。
-  const restored = useRef(false);
-  useEffect(() => {
-    if (restored.current || !key) return;
-    restored.current = true;
-    const saved = Math.min(readGuide(key, 0), horizons.length - 1);
-    if (saved > 0) {
-      setStep(saved);
-      setText(current[horizons[saved].key] ?? "");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-
   function go(i: number) {
     setStep(i);
     setText(current[horizons[i].key] ?? "");
-    if (key) writeGuide(key, i);
   }
 
   function next(save: boolean) {
     if (save && text.trim()) onSet(h.key, text.trim());
-    if (isLast) {
-      if (key) clearGuide(key);
-      onDone();
-    } else {
-      go(step + 1);
-    }
+    if (isLast) onDone();
+    else go(step + 1);
   }
 
   return (

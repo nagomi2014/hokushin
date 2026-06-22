@@ -103,7 +103,6 @@ export default function FieldsPage() {
             onSet={(k, v) => setField(field.id, { [k]: v })}
             onDone={advanceSeq}
             onCancel={() => setSeqIndex(null)}
-            progressKey={`field-${field.id}`}
           />
         </section>
       </div>
@@ -350,7 +349,6 @@ export default function FieldsPage() {
                 onSet={(k, v) => setField(coachFieldId, { [k]: v })}
                 onDone={() => setCoachFieldId(null)}
                 onCancel={() => setCoachFieldId(null)}
-                progressKey={`field-${coachFieldId}`}
               />
             </div>
           </aside>
