@@ -13,6 +13,7 @@ import { activeFieldIds } from "@/lib/fields";
 import {
   currentYearMonth,
   daysInMonth,
+  monthMoment,
   todayString,
   useAppState,
 } from "@/lib/storage";
@@ -150,6 +151,7 @@ export default function DashboardPage() {
     () => activeFieldIds(tools.selectedFields, state.fields),
     [tools.selectedFields, state.fields],
   );
+  const moment = useMemo(() => monthMoment(), []);
 
   // 現在地（フェーズ）判定：探索（知る→導き出す）か、実践（動く）か。
   // onboarding/field を埋めている段階＝探索、monthly/daily/done＝実践。
@@ -240,6 +242,30 @@ export default function DashboardPage() {
           <FlowMap phase={phase} />
         </div>
       </section>
+
+      {/* ===== 月初/月末の合図 ===== */}
+      {moment && (
+        <section className="pt-8">
+          <Link
+            href="/monthly"
+            className="group flex items-center justify-between gap-4 border-2 border-[var(--color-gold)] bg-[var(--color-paper-soft)] px-6 py-4 hover:bg-white transition"
+          >
+            <div>
+              <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+                ★ {moment === "start" ? "月のはじめ" : "月の終わり"}
+              </div>
+              <div className="serif text-lg text-[var(--color-ink)]">
+                {moment === "start"
+                  ? "今月の目標を立てましょう"
+                  : "今月のふり返りを書きましょう"}
+              </div>
+            </div>
+            <span className="text-[var(--color-gold)] text-2xl group-hover:translate-x-1 transition">
+              →
+            </span>
+          </Link>
+        </section>
+      )}
 
       {/* ===== Next Step ===== */}
       <section className="py-10 hairline-bottom">

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   currentYearMonth,
   daysInMonth,
+  monthMoment,
   todayString,
   useAppState,
 } from "@/lib/storage";
@@ -31,6 +32,10 @@ function emptyPlan(year: number, month: number): MonthlyPlan {
 export default function MonthlyPage() {
   const { state, loaded, upsertMonthlyPlan, addDailyTask } = useAppState();
   const [addedMsg, setAddedMsg] = useState(false);
+  const [reflectOpen, setReflectOpen] = useState(false);
+
+  // 今が月初（目標を立てる）／月末（振り返る）か
+  const moment = useMemo(() => monthMoment(), []);
   const {
     selectedFields,
     monthGoals,
@@ -45,6 +50,8 @@ export default function MonthlyPage() {
   const [ym, setYm] = useState(initial);
 
   const ymKey = `${ym.year}-${String(ym.month).padStart(2, "0")}`;
+  const isViewingThisMonth =
+    ym.year === initial.year && ym.month === initial.month;
 
   const existing = state.monthlyPlans.find(
     (p) => p.year === ym.year && p.month === ym.month,
@@ -177,28 +184,50 @@ export default function MonthlyPage() {
         </p>
       </section>
 
-      {/* 先月の振り返り（読むだけ・今月を決める手がかり） */}
-      <Section number="00" title="先月の振り返り" caption="LAST MONTH">
-        <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
-          {prevYm.year}.{String(prevYm.month).padStart(2, "0")}
-        </div>
-        {prevReflection ? (
-          <div className="border-l-2 border-[var(--color-gold)] pl-4 text-sm leading-relaxed text-[var(--color-ink)] whitespace-pre-wrap">
-            {prevReflection}
-          </div>
-        ) : (
-          <p className="text-[12px] text-[var(--color-fg-faint)] italic">
-            先月の振り返りはまだありません。
-            <button
-              type="button"
-              onClick={() => shiftMonth(-1)}
-              className="ml-2 not-italic border-b border-[var(--color-line)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
-            >
-              先月を開いて書く →
-            </button>
-          </p>
-        )}
-      </Section>
+      {/* 月初／月末の合図（開いてすぐ気づくように） */}
+      {isViewingThisMonth && moment === "start" && (
+        <button
+          type="button"
+          onClick={() => {
+            document
+              .getElementById("month-goals")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 mt-6 hover:bg-[var(--color-ink-soft)] transition"
+        >
+          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-sm tracking-[0.15em]">
+            新しい月のはじまりです。今月の目標を立てましょう
+          </span>
+          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            先月の振り返りを手がかりに、分野ごとの今月の目標を →
+          </span>
+        </button>
+      )}
+      {isViewingThisMonth && moment === "end" && (
+        <button
+          type="button"
+          onClick={() => {
+            setReflectOpen(true);
+            setTimeout(
+              () =>
+                document
+                  .getElementById("this-month-reflection")
+                  ?.scrollIntoView({ behavior: "smooth" }),
+              60,
+            );
+          }}
+          className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 mt-6 hover:bg-[var(--color-ink-soft)] transition"
+        >
+          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-sm tracking-[0.15em]">
+            今月もおつかれさまでした。ふり返りを書きましょう
+          </span>
+          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            来月の「先月の振り返り」として、ここに残ります →
+          </span>
+        </button>
+      )}
 
       {/* 今月の最重要目標（★で選ばれたもの） */}
       <Section number="01" title="今月の最重要目標" caption="MOST IMPORTANT">
@@ -226,7 +255,7 @@ export default function MonthlyPage() {
       </Section>
 
       {/* 今月の目標（分野ごとに複数） */}
-      <Section number="02" title="今月の目標" caption="THIS MONTH'S GOALS">
+      <Section number="02" title="今月の目標" caption="THIS MONTH'S GOALS" id="month-goals">
         <p className="text-[11px] text-[var(--color-fg-faint)] mb-6 leading-relaxed">
           選んだ分野ごとに、今月の目標を書きます（いくつでも）。
           いちばん大切なものを ★ で選ぶと、上の「最重要目標」になります。
@@ -319,20 +348,6 @@ export default function MonthlyPage() {
         )}
       </Section>
 
-      {/* 今月の振り返り（月末に書く） */}
-      <Section number="03" title="今月の振り返り" caption="REFLECTION">
-        <p className="text-[11px] text-[var(--color-fg-faint)] mb-3">
-          月末に、この月を振り返って書きます。来月の「先月の振り返り」として、ここに見えるようになります。
-        </p>
-        <textarea
-          value={plan.reflection}
-          onChange={(e) => update("reflection", e.target.value)}
-          rows={6}
-          placeholder="この月、何ができたか・何ができなかったか・気づいたこと…"
-          className="w-full border border-[var(--color-line)] px-4 py-3 text-sm leading-relaxed text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
-        />
-      </Section>
-
       {primaryText && (
         <section className="mt-12 pt-10 hairline-top">
           <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
@@ -368,6 +383,67 @@ export default function MonthlyPage() {
         </section>
       )}
 
+      {/* 先月の振り返り（読むだけ・下に置く） */}
+      <Section number="03" title="先月の振り返り" caption="LAST MONTH">
+        <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+          {prevYm.year}.{String(prevYm.month).padStart(2, "0")}
+        </div>
+        {prevReflection ? (
+          <div className="border-l-2 border-[var(--color-gold)] pl-4 text-sm leading-relaxed text-[var(--color-ink)] whitespace-pre-wrap">
+            {prevReflection}
+          </div>
+        ) : (
+          <p className="text-[12px] text-[var(--color-fg-faint)] italic">
+            先月の振り返りはまだありません。
+            <button
+              type="button"
+              onClick={() => shiftMonth(-1)}
+              className="ml-2 not-italic border-b border-[var(--color-line)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+            >
+              先月を開いて書く →
+            </button>
+          </p>
+        )}
+      </Section>
+
+      {/* 今月の振り返り（ふだんは畳んでおく・月末に書く） */}
+      <section id="this-month-reflection" className="py-8 hairline-bottom scroll-mt-24">
+        {reflectOpen ? (
+          <>
+            <div className="flex items-baseline justify-between mb-3">
+              <h2 className="serif text-lg text-[var(--color-ink)]">
+                今月の振り返り
+              </h2>
+              <button
+                type="button"
+                onClick={() => setReflectOpen(false)}
+                className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
+              >
+                閉じる −
+              </button>
+            </div>
+            <p className="text-[11px] text-[var(--color-fg-faint)] mb-3">
+              この月を振り返って書きます。来月の「先月の振り返り」として見えるようになります。
+            </p>
+            <textarea
+              value={plan.reflection}
+              onChange={(e) => update("reflection", e.target.value)}
+              rows={6}
+              placeholder="この月、何ができたか・何ができなかったか・気づいたこと…"
+              className="w-full border border-[var(--color-line)] px-4 py-3 text-sm leading-relaxed text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
+            />
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setReflectOpen(true)}
+            className="text-xs tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
+          >
+            ＋ 今月の振り返りを書く{plan.reflection.trim() ? "（記入済み）" : ""}
+          </button>
+        )}
+      </section>
+
       <div className="hairline-top mt-8 pt-8 pb-16 flex items-center justify-between">
         <Link
           href="/"
@@ -389,14 +465,16 @@ function Section({
   title,
   caption,
   children,
+  id,
 }: {
   number: string;
   title: string;
   caption: string;
   children: React.ReactNode;
+  id?: string;
 }) {
   return (
-    <section className="py-10 hairline-bottom">
+    <section id={id} className="py-10 hairline-bottom scroll-mt-24">
       <div className="flex items-baseline justify-between mb-5">
         <div className="flex items-baseline gap-4">
           <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">

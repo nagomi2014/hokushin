@@ -199,20 +199,9 @@ export default function OnboardingPage() {
             人生のビジョン
           </h2>
           <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-8 max-w-xl">
-            理念を踏まえて、5 年後の自分が望んでいる景色を描きます。
-            さきほど書いた人生理念を見つめながら、言葉にしていきましょう。
+            5 年後の自分が望んでいる景色を描きます。
+            （いちばん下に、さきほどの人生理念を参考として置いてあります）
           </p>
-
-          {state.pyramid[1]?.content && (
-            <div className="border-l-2 border-[var(--color-gold)] pl-4 mb-8">
-              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
-                あなたの人生理念
-              </div>
-              <div className="text-sm text-[var(--color-fg-mute)] leading-relaxed whitespace-pre-wrap">
-                {state.pyramid[1].content}
-              </div>
-            </div>
-          )}
 
           {step === "vision_done" && state.pyramid[2]?.content && (
             <div className="bg-[var(--color-paper-soft)] border border-[var(--color-line)] p-6 mb-8">
@@ -252,6 +241,18 @@ export default function OnboardingPage() {
               onApply={handleVisionApply}
               placeholder="5 年後に望んでいる景色を、一段落で書く…"
             />
+          )}
+
+          {/* 参考：人生理念（手がかりとして下に置く） */}
+          {state.pyramid[1]?.content && (
+            <div className="mt-10 pt-6 hairline-top border-l-2 border-[var(--color-line)] pl-4">
+              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+                参考 ・ あなたの人生理念
+              </div>
+              <div className="text-[13px] text-[var(--color-fg-mute)] leading-relaxed whitespace-pre-wrap">
+                {state.pyramid[1].content}
+              </div>
+            </div>
           )}
         </div>
       )}

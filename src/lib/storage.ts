@@ -146,3 +146,12 @@ export function currentYearMonth(): { year: number; month: number } {
 export function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
+
+// 月初（最初の5日）／月末（最後の4日）かを判定。目標設定・振り返りを促すため。
+export function monthMoment(d: Date = new Date()): "start" | "end" | null {
+  const day = d.getDate();
+  const total = daysInMonth(d.getFullYear(), d.getMonth() + 1);
+  if (day <= 5) return "start";
+  if (day >= total - 3) return "end";
+  return null;
+}
