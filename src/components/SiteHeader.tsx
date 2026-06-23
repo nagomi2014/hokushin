@@ -37,9 +37,7 @@ const GROUP_LABEL: Record<NavGroup, string> = {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const { state, loaded, supabaseEnabled, userEmail, mode, saveNow } =
-    useAppState();
-  const plan = loaded ? state.userPlan : "free";
+  const { supabaseEnabled, userEmail, mode, saveNow } = useAppState();
   const [menuOpen, setMenuOpen] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -129,14 +127,10 @@ export function SiteHeader() {
           </button>
           <Link
             href="/settings"
-            className={`text-[10px] tracking-[0.3em] px-2.5 py-1 border transition ${
-              plan === "premium"
-                ? "border-[var(--color-gold)] text-[var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-white"
-                : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
-            }`}
-            title="プラン設定"
+            className="text-[10px] tracking-[0.3em] px-2.5 py-1 border border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
+            title="設定"
           >
-            {plan === "premium" ? "★ PREMIUM" : "FREE"}
+            設定
           </Link>
           {supabaseEnabled && !userEmail && (
             <Link

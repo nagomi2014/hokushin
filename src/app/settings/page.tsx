@@ -2,11 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  PLAN_FEATURES,
-  PREMIUM_PRICE_MONTHLY_JPY,
-  PREMIUM_PRICE_YEARLY_JPY,
-} from "@/lib/constants";
 import { useAppState } from "@/lib/storage";
 import { IngestTokensSection } from "@/components/IngestTokensSection";
 
@@ -14,7 +9,6 @@ export default function SettingsPage() {
   const {
     state,
     loaded,
-    setUserPlan,
     supabaseEnabled,
     userEmail,
     mode,
@@ -41,9 +35,6 @@ export default function SettingsPage() {
     );
   }
 
-  const plan = state.userPlan;
-  const isPremium = plan === "premium";
-
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
 
@@ -56,7 +47,7 @@ export default function SettingsPage() {
           設定
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm tracking-wider">
-          プラン・データ・アプリの設定を管理します。
+          アカウント・データ・アプリの設定を管理します。
         </p>
       </section>
 
@@ -131,118 +122,10 @@ export default function SettingsPage() {
         )}
       </section>
 
-      {/* Current plan */}
-      <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          01 ・ 現在のプラン
-        </div>
-
-        <div className="border border-[var(--color-line)] p-6 mb-6">
-          <div className="flex items-center justify-between mb-4 gap-4">
-            <div>
-              <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-1">
-                YOUR PLAN
-              </div>
-              <div className="serif text-3xl text-[var(--color-ink)]">
-                {isPremium ? "Premium" : "Free"}
-              </div>
-            </div>
-            {isPremium ? (
-              <div className="text-right">
-                <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
-                  ★ ACTIVE
-                </div>
-                <div className="serif text-xl text-[var(--color-ink)] mt-1">
-                  ¥{PREMIUM_PRICE_MONTHLY_JPY.toLocaleString()}
-                  <span className="text-sm text-[var(--color-fg-mute)] ml-1">/月</span>
-                </div>
-              </div>
-            ) : (
-              <div className="text-right">
-                <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
-                  無料で全機能（コーチ除く）
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Dev-mode toggle */}
-          <div className="hairline-top pt-4">
-            <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
-              開発用 ・ プラン切替（Phase 3 で Stripe 接続予定）
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setUserPlan("free")}
-                className={`flex-1 py-2.5 text-xs tracking-[0.3em] border transition ${
-                  plan === "free"
-                    ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
-                    : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
-                }`}
-              >
-                FREE
-              </button>
-              <button
-                onClick={() => setUserPlan("premium")}
-                className={`flex-1 py-2.5 text-xs tracking-[0.3em] border transition ${
-                  plan === "premium"
-                    ? "border-[var(--color-gold)] bg-[var(--color-gold)] text-white"
-                    : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
-                }`}
-              >
-                ★ PREMIUM
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Plan comparison */}
-      <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          02 ・ プランで使えるもの
-        </div>
-
-        <div className="hairline-top">
-          <div className="grid grid-cols-12 gap-3 py-2.5 hairline-bottom text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-            <div className="col-span-6">機能</div>
-            <div className="col-span-3 text-center">FREE</div>
-            <div className="col-span-3 text-center text-[var(--color-gold)]">★ PREMIUM</div>
-          </div>
-          {PLAN_FEATURES.map((f, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-12 gap-3 items-center py-3 hairline-bottom text-sm"
-            >
-              <div className="col-span-6 text-[var(--color-ink)]">{f.label}</div>
-              <div className="col-span-3 text-center">
-                {f.free ? (
-                  <span className="text-[var(--color-ink)]">✓</span>
-                ) : (
-                  <span className="text-[var(--color-fg-faint)]">—</span>
-                )}
-              </div>
-              <div className="col-span-3 text-center">
-                {f.premium ? (
-                  <span className="text-[var(--color-gold)]">★</span>
-                ) : (
-                  <span className="text-[var(--color-fg-faint)]">—</span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-6 text-[11px] text-[var(--color-fg-faint)] leading-relaxed">
-          Premium: ¥{PREMIUM_PRICE_MONTHLY_JPY.toLocaleString()}/月 ・ 年払い ¥
-          {PREMIUM_PRICE_YEARLY_JPY.toLocaleString()}（2 ヶ月分お得）
-        </div>
-      </section>
-
       {/* Daily report import */}
       <section className="py-12 hairline-bottom">
         <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          03 ・ 日報インポート
+          01 ・ 日報インポート
         </div>
         {mode === "cloud" ? (
           <IngestTokensSection />
@@ -262,7 +145,7 @@ export default function SettingsPage() {
       {/* Data management */}
       <section className="py-12 hairline-bottom">
         <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          04 ・ データ
+          02 ・ データ
         </div>
         <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-4">
           {mode === "cloud"
@@ -279,14 +162,14 @@ export default function SettingsPage() {
           }}
           className="text-xs tracking-[0.3em] border border-red-500/40 text-red-600 px-4 py-2 hover:bg-red-50 transition"
         >
-          ⚠ すべてのデータを消去（開発用）
+          ⚠ すべてのデータを消去
         </button>
       </section>
 
       {/* Legal */}
       <section className="py-12 hairline-bottom">
         <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          05 ・ 規約
+          03 ・ 規約
         </div>
         <Link
           href="/privacy"
