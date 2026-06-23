@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.yagami.hokushin",
+      "package_name": "app.vercel.hokushin.twa",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_YOUR_APP_SIGNING_SHA256_FINGERPRINT"
+        "48:4A:69:61:E2:35:99:01:37:FE:EA:98:86:47:48:CA:65:6F:5C:E2:AC:E8:E4:79:49:FD:44:6F:A0:37:65:C9"
       ]
     }
   }
