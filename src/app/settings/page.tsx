@@ -283,6 +283,19 @@ export default function SettingsPage() {
         </button>
       </section>
 
+      {/* Legal */}
+      <section className="py-12 hairline-bottom">
+        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+          05 ・ 規約
+        </div>
+        <Link
+          href="/privacy"
+          className="text-sm text-[var(--color-ink)] border-b border-[var(--color-line)] hover:border-[var(--color-ink)]"
+        >
+          プライバシーポリシー →
+        </Link>
+      </section>
+
       <div className="hairline-top mt-8 pt-8 pb-16">
         <Link
           href="/"
