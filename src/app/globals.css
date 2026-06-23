@@ -28,6 +28,10 @@ html, body {
   letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 横スワイプで左右にズレない（縦スクロールのみ） */
+  overflow-x: hidden;
+  max-width: 100%;
+  overscroll-behavior-x: none;
 }
 
 /* ========== Component utilities ========== */

@@ -292,6 +292,66 @@ export default function DashboardPage() {
         </Link>
       </section>
 
+      {/* ===== 本日のタスク（動き出している人向けに上部へ） ===== */}
+      {phase === "act" && (
+        <section className="py-10 hairline-bottom">
+          <div className="flex items-baseline justify-between mb-5">
+            <div className="flex items-baseline gap-4">
+              <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+                ★ TODAY
+              </span>
+              <h2 className="serif text-2xl text-[var(--color-ink)]">
+                本日のタスク
+              </h2>
+            </div>
+            <Link
+              href="/daily"
+              className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+            >
+              日々へ →
+            </Link>
+          </div>
+          {todayTasks.length === 0 ? (
+            <Link
+              href="/daily"
+              className="block py-6 text-center text-sm text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] border border-[var(--color-line)] transition"
+            >
+              今日のタスクはまだありません。＋ 追加する →
+            </Link>
+          ) : (
+            <div className="hairline-top">
+              {todayTasks.slice(0, 6).map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-center gap-3 py-3 hairline-bottom"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleDailyTask(t.id)}
+                    className={`check-box ${t.completed ? "checked" : ""}`}
+                    aria-label="toggle"
+                  >
+                    {t.completed && <span className="text-[10px]">✓</span>}
+                  </button>
+                  <span
+                    className={`text-sm flex-1 ${
+                      t.completed
+                        ? "line-through text-[var(--color-fg-faint)]"
+                        : "text-[var(--color-ink)]"
+                    }`}
+                  >
+                    {t.title}
+                  </span>
+                </div>
+              ))}
+              <div className="mt-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                {completedToday} / {todayTasks.length} 完了
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* ===== Pyramid ===== */}
       <section className="py-16 hairline-bottom">
         <div className="grid grid-cols-12 gap-8">

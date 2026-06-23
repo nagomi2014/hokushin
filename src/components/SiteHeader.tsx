@@ -37,19 +37,8 @@ const GROUP_LABEL: Record<NavGroup, string> = {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const { supabaseEnabled, userEmail, mode, saveNow } = useAppState();
+  const { supabaseEnabled, userEmail, mode } = useAppState();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  async function handleSave() {
-    if (saving) return;
-    setSaving(true);
-    const res = await saveNow();
-    setSaving(false);
-    setSaveMsg(res.message);
-    window.setTimeout(() => setSaveMsg(null), 3000);
-  }
 
   // ルート遷移したらメニューを閉じる
   useEffect(() => {
@@ -116,15 +105,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="text-[10px] tracking-[0.3em] px-3 py-1 border border-[var(--color-ink)] text-[var(--color-ink)] hover:bg-[var(--color-ink)] hover:text-white transition disabled:opacity-40"
-            title="ここまでの内容を保存する"
-          >
-            {saving ? "保存中…" : "保存"}
-          </button>
           <Link
             href="/settings"
             className="text-[10px] tracking-[0.3em] px-2.5 py-1 border border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
@@ -179,13 +159,6 @@ export function SiteHeader() {
           </button>
         </div>
       </div>
-
-      {/* 保存結果トースト */}
-      {saveMsg && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[var(--color-ink)] text-white text-xs tracking-wider px-4 py-2 shadow-lg">
-          ✓ {saveMsg}
-        </div>
-      )}
 
       {/* モバイルメニュー */}
       {menuOpen && (
