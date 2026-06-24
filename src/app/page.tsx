@@ -19,7 +19,7 @@ import {
 } from "@/lib/storage";
 import { useTools } from "@/lib/tools/useTools";
 import { useRevisions } from "@/lib/tools/useRevisions";
-import type { AppState, MonthlyPlan } from "@/lib/types";
+import type { AppState, FieldId, MonthlyPlan } from "@/lib/types";
 
 // ------------------------------------------------------------
 // Next-step suggester
@@ -31,7 +31,12 @@ interface NextStep {
   href: string;
 }
 
-function getNextStep(state: AppState, year: number, month: number): NextStep {
+function getNextStep(
+  state: AppState,
+  year: number,
+  month: number,
+  activeIds: FieldId[],
+): NextStep {
   // 1. Onboarding: 人生理念 or 人生のビジョンが未入力なら、対話で書く
   const p1 = state.pyramid[1]?.content?.trim();
   const p2 = state.pyramid[2]?.content?.trim();
@@ -53,15 +58,26 @@ function getNextStep(state: AppState, year: number, month: number): NextStep {
       href: "/onboarding",
     };
   }
-  // 2. Fields: short-term unset
-  for (const f of FIELDS) {
-    if (!state.fields[f.id]?.shortTerm?.trim()) {
+  // 2. Fields: まず取り組む分野を選ぶ
+  if (activeIds.length === 0) {
+    return {
+      kind: "field",
+      label: "取り組む分野を選ぶ",
+      caption:
+        "土台と方角が整いました。次は、人生の大事な分野を選びます。1つだけでもOK。",
+      href: "/fields",
+    };
+  }
+  // 選んだ分野で、短期目標が未入力のものを案内
+  for (const fid of activeIds) {
+    if (!state.fields[fid]?.shortTerm?.trim()) {
+      const f = FIELD_MAP[fid];
       return {
         kind: "field",
         label: `${f.nameJa} の短期目標を立てる`,
         caption:
-          "土台と方角が整いました。ビジョンを 7 分野に落とし込みます（長期 → 中期 → 短期）。",
-        href: `/fields#field-${f.id}`,
+          "選んだ分野に、ビジョンを落とし込みます（長期 → 中期 → 短期）。",
+        href: `/fields#field-${fid}`,
       };
     }
   }
@@ -135,9 +151,14 @@ export default function DashboardPage() {
   const monthlyPlan: MonthlyPlan | undefined = state.monthlyPlans.find(
     (p) => p.year === ym.year && p.month === ym.month,
   );
+  const tools = useTools();
+  const dashboardFieldIds = useMemo(
+    () => activeFieldIds(tools.selectedFields, state.fields),
+    [tools.selectedFields, state.fields],
+  );
   const nextStep = useMemo(
-    () => getNextStep(state, ym.year, ym.month),
-    [state, ym.year, ym.month],
+    () => getNextStep(state, ym.year, ym.month, dashboardFieldIds),
+    [state, ym.year, ym.month, dashboardFieldIds],
   );
 
   // 「そのほかの記録」用の充足数（実在ページのみ実値を出す）
@@ -145,12 +166,7 @@ export default function DashboardPage() {
     (state.mandala.center.trim() ? 1 : 0) +
     state.mandala.cells.filter((c) => c.trim()).length;
   const wishlistCount = state.wishlist.length;
-  const tools = useTools();
   const revisions = useRevisions();
-  const dashboardFieldIds = useMemo(
-    () => activeFieldIds(tools.selectedFields, state.fields),
-    [tools.selectedFields, state.fields],
-  );
   const moment = useMemo(() => monthMoment(), []);
 
   // 現在地（フェーズ）判定：探索（知る→導き出す）か、実践（動く）か。
@@ -171,75 +187,25 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
-      {/* ===== Hero ===== */}
-      <section className="pt-20 pb-16 hairline-bottom">
-        <div className="grid grid-cols-12 gap-6 items-end">
-          <div className="col-span-12 md:col-span-8">
-            <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
-              ★ &nbsp; YOUR&nbsp;NORTH&nbsp;STAR
-            </div>
-            <h1 className="serif text-5xl md:text-7xl text-[var(--color-ink)] leading-[1.05] font-medium tracking-tight">
-              澄み切る、
-              <br />
-              一日を。
+      {/* ===== Hero（コンパクト） ===== */}
+      <section className="pt-10 pb-6 hairline-bottom">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
+              澄み切る、一日を。
             </h1>
-            <p className="text-[var(--color-fg-mute)] mt-6 text-sm tracking-wider">
+            <p className="text-[var(--color-fg-faint)] mt-1 text-[11px] tracking-wider">
               迷わぬ者は、北辰（北極星）を仰ぐ。
             </p>
           </div>
-          <div className="col-span-12 md:col-span-4 md:text-right">
-            <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
-              TODAY
-            </div>
-            <div className="serif text-3xl text-[var(--color-ink)]">
+          <div className="text-right">
+            <div className="serif text-xl text-[var(--color-ink)] leading-none">
               {formatDateDot(today)}
             </div>
-            <div className="text-xs text-[var(--color-fg-mute)] mt-1 tracking-widest">
+            <div className="text-[10px] text-[var(--color-fg-mute)] mt-1 tracking-widest">
               {WEEKDAYS_EN[today.getDay()]} · DAY {dayOfMonth} / {totalDays}
             </div>
-            <div className="mt-6 inline-flex items-center gap-3 text-xs">
-              <span className="text-[var(--color-fg-mute)] tracking-widest">
-                MONTHLY
-              </span>
-              <div className="w-24 h-px bg-[var(--color-line)] relative">
-                <div
-                  className="absolute inset-y-0 left-0 bg-[var(--color-ink)]"
-                  style={{ width: `${monthlyPct}%`, top: -1, height: 3 }}
-                />
-              </div>
-              <span className="serif text-[var(--color-ink)]">
-                {monthlyPct}
-                <span className="text-[var(--color-fg-faint)] text-xs">%</span>
-              </span>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* ===== 現在地 ＋ フローマップ（知る → 導き出す → 動く） ===== */}
-      <section className="py-8 hairline-bottom">
-        <div className="flex flex-col gap-5">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
-              いま
-            </span>
-            <span
-              className={`text-[11px] tracking-[0.25em] px-3 py-1 border ${
-                phase === "explore"
-                  ? "border-[var(--color-gold)] text-[var(--color-gold)]"
-                  : "border-[var(--color-ink)] text-[var(--color-ink)]"
-              }`}
-            >
-              {phase === "explore" ? "① 探索フェーズ" : "② 実践フェーズ"}
-            </span>
-            <span className="text-xs text-[var(--color-fg-mute)] hidden sm:inline">
-              {phase === "explore"
-                ? "自分を深掘りして、やるべきことを導き出す段階です。"
-                : "導き出した目標を、日々の行動で見失わない段階です。"}
-            </span>
-          </div>
-
-          <FlowMap phase={phase} />
         </div>
       </section>
 
@@ -276,7 +242,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between gap-6">
             <div className="flex-1">
               <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-3">
-                ★&nbsp;&nbsp;{nextStep.kind === "done" ? "整いました" : "次の一手"}
+                ★&nbsp;&nbsp;{nextStep.kind === "done" ? "整いました" : "今すべきこと"}
               </div>
               <div className="serif text-2xl md:text-3xl text-white mb-2">
                 {nextStep.label}
@@ -368,31 +334,52 @@ export default function DashboardPage() {
         </section>
       )}
 
+      {/* ===== 現在地 ＋ フローマップ（知る → 導き出す → 動く） ===== */}
+      <section className="py-8 hairline-bottom">
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
+              いま
+            </span>
+            <span
+              className={`text-[11px] tracking-[0.25em] px-3 py-1 border ${
+                phase === "explore"
+                  ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+                  : "border-[var(--color-ink)] text-[var(--color-ink)]"
+              }`}
+            >
+              {phase === "explore" ? "① 探索フェーズ" : "② 実践フェーズ"}
+            </span>
+            <span className="text-xs text-[var(--color-fg-mute)] hidden sm:inline">
+              {phase === "explore"
+                ? "自分を深掘りして、やるべきことを導き出す段階です。"
+                : "導き出した目標を、日々の行動で見失わない段階です。"}
+            </span>
+          </div>
+          <FlowMap phase={phase} />
+        </div>
+      </section>
+
       {/* ===== Pyramid ===== */}
       <section className="py-16 hairline-bottom">
-        <div className="grid grid-cols-12 gap-8">
-          <div className="col-span-12 md:col-span-3">
-            <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-              全体像 ・ MAP
-            </div>
-            <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
-              成功のピラミッド
-            </h2>
-            <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed">
-              上3層が「知る・導き出す」、下2層が「動く」。
-              <br />
-              5つの階層が整うほど、毎日のやるべきことは澄み切ってゆく。
-            </p>
-            <Link
-              href="/pyramid"
-              className="inline-block mt-6 text-xs tracking-[0.25em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5"
-            >
-              編集する →
-            </Link>
+        <div className="text-center mb-8">
+          <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+            全体像 ・ MAP
           </div>
-
-          <div className="col-span-12 md:col-span-9">
-            <div className="flex flex-col items-center max-w-2xl mx-auto">
+          <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
+            成功のピラミッド
+          </h2>
+          <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed max-w-xl mx-auto">
+            上3層が「知る・導き出す」、下2層が「動く」。整うほど、毎日のやるべきことは澄み切ってゆく。
+          </p>
+          <Link
+            href="/pyramid"
+            className="inline-block mt-5 text-xs tracking-[0.25em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5"
+          >
+            編集する →
+          </Link>
+        </div>
+        <div className="flex flex-col items-center max-w-2xl mx-auto">
               {PYRAMID_TIERS.map((tier) => {
                 const entry = state.pyramid[tier.level];
                 const isFoundation = tier.level === 1;
@@ -441,8 +428,6 @@ export default function DashboardPage() {
                 本日の行 へ
               </Link>
             </div>
-          </div>
-        </div>
       </section>
 
       {/* ===== ① 知る（探索の道具） ===== */}
