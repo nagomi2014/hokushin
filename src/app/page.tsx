@@ -9,7 +9,7 @@ import {
   PYRAMID_TIERS,
   PYRAMID_WIDTHS,
 } from "@/lib/constants";
-import { activeFieldIds } from "@/lib/fields";
+import { activeFieldIds, fieldHasState } from "@/lib/fields";
 import {
   currentYearMonth,
   daysInMonth,
@@ -161,6 +161,16 @@ export default function DashboardPage() {
     [state, ym.year, ym.month, dashboardFieldIds],
   );
 
+  // 「今日のフォーカス」用：今月の最重要目標に紐づく分野（無ければ中身のある最初の分野）
+  const ymKey = `${ym.year}-${String(ym.month).padStart(2, "0")}`;
+  const primaryMonthGoalId = tools.primaryMonthGoal?.[ymKey];
+  const focusFieldId: FieldId | undefined =
+    (tools.monthGoals.find((g) => g.id === primaryMonthGoalId)?.fieldId as
+      | FieldId
+      | undefined) ??
+    dashboardFieldIds.find((id) => fieldHasState(state.fields[id]));
+  const focusGoal = focusFieldId ? state.fields[focusFieldId] : undefined;
+
   // 「そのほかの記録」用の充足数（実在ページのみ実値を出す）
   const mandalaFilled =
     (state.mandala.center.trim() ? 1 : 0) +
@@ -233,41 +243,16 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {/* ===== Next Step ===== */}
-      <section className="py-10 hairline-bottom">
-        <Link
-          href={nextStep.href}
-          className="group block bg-[var(--color-ink)] text-white p-6 md:p-8 hover:bg-[var(--color-ink-soft)] transition"
-        >
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex-1">
-              <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-3">
-                ★&nbsp;&nbsp;{nextStep.kind === "done" ? "整いました" : "今すべきこと"}
-              </div>
-              <div className="serif text-2xl md:text-3xl text-white mb-2">
-                {nextStep.label}
-              </div>
-              <div className="text-sm text-white/60 max-w-xl leading-relaxed">
-                {nextStep.caption}
-              </div>
-            </div>
-            <div className="text-[var(--color-gold)] text-3xl group-hover:translate-x-1 transition flex-shrink-0">
-              →
-            </div>
-          </div>
-        </Link>
-      </section>
-
       {/* ===== 本日のタスク（動き出している人向けに上部へ） ===== */}
       {phase === "act" && (
         <section className="py-10 hairline-bottom">
           <div className="flex items-baseline justify-between mb-5">
             <div className="flex items-baseline gap-4">
               <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
-                ★ TODAY
+                ★ FOCUS
               </span>
               <h2 className="serif text-2xl text-[var(--color-ink)]">
-                本日のタスク
+                今日のフォーカス
               </h2>
             </div>
             <Link
@@ -277,6 +262,39 @@ export default function DashboardPage() {
               日々へ →
             </Link>
           </div>
+
+          {/* 分野の 長期 → 中期 → 短期（目標を忘れない） */}
+          {focusFieldId && focusGoal && fieldHasState(focusGoal) && (
+            <Link
+              href={`/fields#field-${focusFieldId}`}
+              className="block border border-[var(--color-line)] mb-4 hover:border-[var(--color-ink)] transition"
+            >
+              <div className="px-4 py-1.5 bg-[var(--color-paper-soft)] text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)]">
+                {FIELD_MAP[focusFieldId].nameJa} の目標
+              </div>
+              {(
+                [
+                  ["長期", focusGoal.longTerm],
+                  ["中期", focusGoal.midTerm],
+                  ["短期", focusGoal.shortTerm],
+                ] as const
+              )
+                .filter(([, v]) => v.trim())
+                .map(([lbl, v]) => (
+                  <div
+                    key={lbl}
+                    className="px-4 py-1.5 flex gap-3 text-[12px] hairline-top"
+                  >
+                    <span className="text-[var(--color-gold)] tracking-[0.15em] w-8 shrink-0">
+                      {lbl}
+                    </span>
+                    <span className="text-[var(--color-ink)] flex-1">
+                      {v.trim()}
+                    </span>
+                  </div>
+                ))}
+            </Link>
+          )}
 
           {/* 今月の最重要目標 */}
           {monthlyPlan?.primaryGoal?.trim() && (
@@ -333,6 +351,31 @@ export default function DashboardPage() {
           )}
         </section>
       )}
+
+      {/* ===== 今すべきこと（次の一手） ===== */}
+      <section className="py-10 hairline-bottom">
+        <Link
+          href={nextStep.href}
+          className="group block bg-[var(--color-ink)] text-white p-6 md:p-8 hover:bg-[var(--color-ink-soft)] transition"
+        >
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex-1">
+              <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-3">
+                ★&nbsp;&nbsp;{nextStep.kind === "done" ? "整いました" : "今すべきこと"}
+              </div>
+              <div className="serif text-2xl md:text-3xl text-white mb-2">
+                {nextStep.label}
+              </div>
+              <div className="text-sm text-white/60 max-w-xl leading-relaxed">
+                {nextStep.caption}
+              </div>
+            </div>
+            <div className="text-[var(--color-gold)] text-3xl group-hover:translate-x-1 transition flex-shrink-0">
+              →
+            </div>
+          </div>
+        </Link>
+      </section>
 
       {/* ===== 現在地 ＋ フローマップ（知る → 導き出す → 動く） ===== */}
       <section className="py-8 hairline-bottom">

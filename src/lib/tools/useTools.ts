@@ -53,6 +53,14 @@ export interface MonthGoal {
   text: string;
 }
 
+// 繰り返しタスク：指定した曜日に、本日のタスクへ自動で入る
+export interface RecurringTask {
+  id: string;
+  title: string;
+  fieldId?: number;
+  days: number[]; // 0=日, 1=月, … 6=土
+}
+
 export interface ToolsData {
   lifeEvents: LifeEvent[];
   moneyEntries: MoneyEntry[];
@@ -66,6 +74,8 @@ export interface ToolsData {
   monthGoals: MonthGoal[];
   // 月ごとの最重要目標（ym -> monthGoalのid）
   primaryMonthGoal: Record<string, string>;
+  // 繰り返しタスク
+  recurringTasks: RecurringTask[];
 }
 
 function emptyMandalaSub(): string[][] {
@@ -82,6 +92,7 @@ function emptyTools(): ToolsData {
     selectedFields: [],
     monthGoals: [],
     primaryMonthGoal: {},
+    recurringTasks: [],
   };
 }
 
@@ -113,6 +124,12 @@ function loadTools(): ToolsData {
       parsed.primaryMonthGoal && typeof parsed.primaryMonthGoal === "object"
         ? (parsed.primaryMonthGoal as Record<string, string>)
         : {};
+    const recurringTasks = Array.isArray(parsed.recurringTasks)
+      ? parsed.recurringTasks.filter(
+          (t): t is RecurringTask =>
+            !!t && typeof t.id === "string" && Array.isArray(t.days),
+        )
+      : [];
     return {
       lifeEvents: parsed.lifeEvents ?? [],
       moneyEntries: parsed.moneyEntries ?? [],
@@ -122,6 +139,7 @@ function loadTools(): ToolsData {
       selectedFields,
       monthGoals,
       primaryMonthGoal,
+      recurringTasks,
     };
   } catch {
     return emptyTools();
@@ -166,6 +184,9 @@ export interface UseToolsResult extends ToolsData {
   setMonthGoalText: (id: string, text: string) => void;
   removeMonthGoal: (id: string) => void;
   setPrimaryMonthGoal: (ym: string, goalId: string) => void;
+  // 繰り返しタスク
+  addRecurringTask: (title: string, days: number[], fieldId?: number) => void;
+  removeRecurringTask: (id: string) => void;
 }
 
 export function useTools(): UseToolsResult {
@@ -338,5 +359,22 @@ export function useTools(): UseToolsResult {
         else primaryMonthGoal[ym] = goalId;
         return { ...prev, primaryMonthGoal };
       }),
+
+    addRecurringTask: (title, days, fieldId) => {
+      const t = title.trim();
+      if (!t || days.length === 0) return;
+      mutate((prev) => ({
+        ...prev,
+        recurringTasks: [
+          ...prev.recurringTasks,
+          { id: uid("rt"), title: t, days: [...days].sort(), ...(fieldId ? { fieldId } : {}) },
+        ],
+      }));
+    },
+    removeRecurringTask: (id) =>
+      mutate((prev) => ({
+        ...prev,
+        recurringTasks: prev.recurringTasks.filter((r) => r.id !== id),
+      })),
   };
 }
