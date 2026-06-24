@@ -52,8 +52,9 @@ html, body {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 16px;
   color: #fff;
   cursor: pointer;
   transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -66,23 +67,16 @@ html, body {
 .pyramid-tier .tier-num {
   font-family: var(--font-serif);
   color: var(--color-gold-soft);
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  width: 30px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  flex: none;
 }
 .pyramid-tier .tier-name {
   font-family: var(--font-serif);
-  font-size: 15px;
-  letter-spacing: 0.25em;
-  flex: 1;
+  font-size: 14px;
+  letter-spacing: 0.15em;
   text-align: center;
-}
-.pyramid-tier .tier-en {
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  opacity: 0.75;
-  width: 80px;
-  text-align: right;
+  white-space: nowrap;
 }
 
 /* Field row (list of 7 fields) */

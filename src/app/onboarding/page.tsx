@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { GuidedDerivation } from "@/components/GuidedDerivation";
 import {
   CREED_QUESTIONS,
@@ -29,18 +29,11 @@ export default function OnboardingPage() {
   const { state, loaded, setPyramid } = useAppState();
   const [step, setStep] = useState<Step>("welcome");
 
-  // 再訪時：理念が済んでいればビジョンから、両方済みなら完了から再開する。
-  const resumed = useRef(false);
-  useEffect(() => {
-    if (!loaded || resumed.current) return;
-    resumed.current = true;
-    const p1 = state.pyramid[1]?.content?.trim();
-    const p2 = state.pyramid[2]?.content?.trim();
-    if (p1 && p2) setStep("complete");
-    else if (p1) setStep("vision");
-    // どちらも未入力なら welcome のまま
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded]);
+  // 進み具合（welcome 画面で「最初から / 続きから」を出すために使う）
+  const p1 = state.pyramid[1]?.content?.trim();
+  const p2 = state.pyramid[2]?.content?.trim();
+  const hasProgress = !!p1;
+  const resumeStep: Step = p1 && p2 ? "complete" : p1 ? "vision" : "philosophy";
 
   if (!loaded) {
     return (
@@ -111,13 +104,31 @@ export default function OnboardingPage() {
             <br />
             やさしい質問に答えていくと、人生理念とビジョンが見えてきます。
           </p>
-          <button
-            onClick={start}
-            className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
-          >
-            <span className="text-[var(--color-gold)]">★</span>
-            はじめる
-          </button>
+          {hasProgress ? (
+            <div className="flex flex-col items-center gap-4">
+              <button
+                onClick={() => setStep(resumeStep)}
+                className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
+              >
+                <span className="text-[var(--color-gold)]">→</span>
+                続きから
+              </button>
+              <button
+                onClick={start}
+                className="text-[11px] tracking-[0.3em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-line)] hover:border-[var(--color-ink)] pb-0.5"
+              >
+                最初からやり直す
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={start}
+              className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
+            >
+              <span className="text-[var(--color-gold)]">★</span>
+              はじめる
+            </button>
+          )}
           <div className="mt-10 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
             所要時間：約 5 分
           </div>

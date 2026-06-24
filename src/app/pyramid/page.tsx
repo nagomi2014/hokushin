@@ -65,15 +65,6 @@ export default function PyramidPage() {
                   {tier.kanji}
                 </span>
                 <span className="tier-name">{tier.nameJa}</span>
-                <span
-                  className="tier-en"
-                  style={
-                    isFoundation ? { color: "var(--color-gold)" } : undefined
-                  }
-                >
-                  {tier.nameEn}
-                  {isFoundation && " ★"}
-                </span>
               </a>
             );
           })}

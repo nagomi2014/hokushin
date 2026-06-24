@@ -38,7 +38,7 @@ export const PYRAMID_TIERS: PyramidTierMeta[] = [
   {
     level: 3,
     kanji: "③",
-    nameJa: "目標の設定",
+    nameJa: "目標設定",
     nameEn: "GOAL",
     gradient: "linear-gradient(180deg, #3A4870 0%, #2E3C64 100%)",
     description: "ビジョンを実現するための、具体的な目標。",
@@ -54,7 +54,7 @@ export const PYRAMID_TIERS: PyramidTierMeta[] = [
   {
     level: 1,
     kanji: "①",
-    nameJa: "人生理念  ──  土台",
+    nameJa: "人生理念",
     nameEn: "PHILOSOPHY",
     gradient: "linear-gradient(180deg, #0A1228 0%, #050A1A 100%)",
     description: "動かぬ核となる、人生で大切にする価値観。",
@@ -62,10 +62,10 @@ export const PYRAMID_TIERS: PyramidTierMeta[] = [
 ];
 
 export const PYRAMID_WIDTHS: Record<PyramidLevel, string> = {
-  5: "36%",
-  4: "52%",
-  3: "68%",
-  2: "84%",
+  5: "60%",
+  4: "70%",
+  3: "80%",
+  2: "90%",
   1: "100%",
 };
 

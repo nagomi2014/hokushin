@@ -105,13 +105,6 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/settings"
-            className="text-[10px] tracking-[0.3em] px-2.5 py-1 border border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
-            title="設定"
-          >
-            設定
-          </Link>
           {supabaseEnabled && !userEmail && (
             <Link
               href="/login"

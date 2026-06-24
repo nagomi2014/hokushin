@@ -166,10 +166,26 @@ export default function SettingsPage() {
         </button>
       </section>
 
+      {/* はじめ方 */}
+      <section className="py-12 hairline-bottom">
+        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+          03 ・ はじめ方
+        </div>
+        <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-4">
+          人生理念・ビジョンを、最初から立て直したり、続きから設定できます。
+        </p>
+        <Link
+          href="/onboarding"
+          className="inline-block text-xs tracking-[0.3em] border border-[var(--color-ink)] text-[var(--color-ink)] px-5 py-2.5 hover:bg-[var(--color-ink)] hover:text-white transition"
+        >
+          ★ 理念・ビジョンを設定する →
+        </Link>
+      </section>
+
       {/* Legal */}
       <section className="py-12 hairline-bottom">
         <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
-          03 ・ 規約
+          04 ・ 規約
         </div>
         <Link
           href="/privacy"

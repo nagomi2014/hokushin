@@ -311,6 +311,22 @@ export default function DashboardPage() {
               日々へ →
             </Link>
           </div>
+
+          {/* 今月の最重要目標 */}
+          {monthlyPlan?.primaryGoal?.trim() && (
+            <Link
+              href="/monthly"
+              className="block bg-[var(--color-ink)] text-white px-5 py-3 mb-4 hover:bg-[var(--color-ink-soft)] transition"
+            >
+              <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)] mb-1">
+                ★ 今月の最重要目標
+              </div>
+              <div className="serif text-base leading-relaxed">
+                {monthlyPlan.primaryGoal}
+              </div>
+            </Link>
+          )}
+
           {todayTasks.length === 0 ? (
             <Link
               href="/daily"
@@ -402,17 +418,6 @@ export default function DashboardPage() {
                       {tier.kanji}
                     </span>
                     <span className="tier-name">{tier.nameJa}</span>
-                    <span
-                      className="tier-en"
-                      style={
-                        isFoundation
-                          ? { color: "var(--color-gold)" }
-                          : undefined
-                      }
-                    >
-                      {tier.nameEn}
-                      {isFoundation && " ★"}
-                    </span>
                   </Link>
                 );
               })}
