@@ -35,16 +35,15 @@ export default function RevisionsPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
-      <section className="pt-20 pb-10 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+      <section className="pt-12 pb-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
           ★ &nbsp; REVISIONS
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           書き直しの記録
         </h1>
-        <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
-          理念・ビジョン・七つの分野・月次目標を書き直すたび、過去の版が自動で残ります。
-          「あのとき自分は何を書いていたか」を、いつでも振り返れる。
+        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+          書き直すたび、過去の版が自動で残ります。
         </p>
       </section>
 

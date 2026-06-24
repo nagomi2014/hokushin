@@ -91,11 +91,11 @@ export default function PrimePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
-      <section className="pt-20 pb-10 hairline-bottom">
+      <section className="pt-12 pb-6 hairline-bottom">
         <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
           ★ &nbsp; QUADRANT&nbsp;II
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight mb-1">
           第II領域
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">

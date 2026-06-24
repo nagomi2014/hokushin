@@ -14,6 +14,7 @@ export default function MandalaPage() {
   const { state, loaded, setMandalaCenter, setMandalaCell } = useAppState();
   const { mandalaSub, setMandalaSub, addMandalaSub } = useTools();
   const [guideOpen, setGuideOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   if (!loaded) {
     return (
@@ -28,18 +29,15 @@ export default function MandalaPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 lg:px-10">
 
-      <section className="pt-20 pb-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+      <section className="pt-12 pb-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
           ★ &nbsp; SELF&nbsp;DISCOVERY
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           マンダラチャート
         </h1>
-        <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl leading-relaxed">
-          中央に「自分が人生で大切にしたいこと」を、
-          まわりの8マスにそこから派生するキーワードを書きます。
-          <br />
-          ここで集めた言葉が、目標を立てる時の <span className="text-[var(--color-ink)]">材料</span> になります。
+        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+          中央テーマ → 8つの観点 → 64の派生。集めた言葉が目標の材料に。
         </p>
       </section>
 
@@ -72,8 +70,22 @@ export default function MandalaPage() {
         </section>
       )}
 
-      {/* Mandalart 9×9 grid */}
-      <section className="py-12 hairline-bottom">
+      {/* Mandalart 9×9 grid（ふだんは小さく、タップで拡大編集） */}
+      <section className="py-8 hairline-bottom">
+        {expanded ? (
+        <>
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+            81マスを編集
+          </span>
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+          >
+            小さく表示 −
+          </button>
+        </div>
         <div className="overflow-x-auto -mx-6 px-6 lg:mx-0 lg:px-0">
           <div className="grid grid-cols-9 gap-px bg-[var(--color-line)] min-w-[680px]">
             {Array.from({ length: 81 }).map((_, idx) => {
@@ -147,6 +159,24 @@ export default function MandalaPage() {
           <span>中央テーマ＋8観点＋64派生 ＝ 81マス</span>
           <span>SAVED · THIS DEVICE</span>
         </div>
+        </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="block w-full group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                マンダラ全体
+              </span>
+              <span className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] group-hover:text-[var(--color-ink)]">
+                タップで拡大・編集 →
+              </span>
+            </div>
+            <MiniMandala m={m} sub={mandalaSub} />
+          </button>
+        )}
       </section>
 
       {/* Hints */}
@@ -176,6 +206,48 @@ export default function MandalaPage() {
           → 次は 100 のリストへ
         </Link>
       </div>
+    </div>
+  );
+}
+
+// 小さな読み取り専用プレビュー（タップで拡大編集へ）
+function MiniMandala({
+  m,
+  sub,
+}: {
+  m: { center: string; cells: string[] };
+  sub: string[][];
+}) {
+  return (
+    <div className="grid grid-cols-9 gap-px bg-[var(--color-line)] max-w-[300px] mx-auto border border-[var(--color-line)]">
+      {Array.from({ length: 81 }).map((_, idx) => {
+        const r = Math.floor(idx / 9);
+        const c = idx % 9;
+        const block = Math.floor(r / 3) * 3 + (Math.floor(c / 3) % 3);
+        const pos = (r % 3) * 3 + (c % 3);
+        const style: React.CSSProperties = {
+          borderRight:
+            c % 3 === 2 && c !== 8 ? "1.5px solid var(--color-ink)" : undefined,
+          borderBottom:
+            r % 3 === 2 && r !== 8 ? "1.5px solid var(--color-ink)" : undefined,
+        };
+        let filled = false;
+        let cls = "bg-white";
+        if (block === 4 && pos === 4) {
+          filled = !!m.center.trim();
+          cls = filled ? "bg-[var(--color-ink)]" : "bg-[var(--color-ink)]/15";
+        } else if (block === 4) {
+          filled = !!(m.cells[sIdx(pos)] ?? "").trim();
+          cls = filled ? "bg-[var(--color-gold)]" : "bg-[var(--color-gold)]/15";
+        } else if (pos === 4) {
+          filled = !!(m.cells[sIdx(block)] ?? "").trim();
+          cls = filled ? "bg-[var(--color-gold)]/70" : "bg-[var(--color-gold)]/10";
+        } else {
+          filled = !!(sub[sIdx(block)]?.[sIdx(pos)] ?? "").trim();
+          cls = filled ? "bg-[var(--color-ink)]/55" : "bg-white";
+        }
+        return <div key={idx} className={`aspect-square ${cls}`} style={style} />;
+      })}
     </div>
   );
 }

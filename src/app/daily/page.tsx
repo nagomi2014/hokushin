@@ -107,15 +107,15 @@ export default function DailyPage() {
     <div className="max-w-4xl mx-auto px-6 lg:px-10">
 
       {/* Header */}
-      <section className="pt-20 pb-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+      <section className="pt-12 pb-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
           ★ &nbsp; DAILY&nbsp;PRACTICE
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           本日の行
         </h1>
-        <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
-          ピラミッドの頂点 ── ここで、今日この瞬間の一手を選ぶ。
+        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+          今日この瞬間の一手を、ここで選ぶ。
         </p>
       </section>
 

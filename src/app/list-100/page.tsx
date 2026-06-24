@@ -59,17 +59,15 @@ export default function List100Page() {
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
 
-      <section className="pt-20 pb-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+      <section className="pt-12 pb-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
           ★ &nbsp; LIST&nbsp;OF&nbsp;100
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           人生でやりたいこと 100
         </h1>
-        <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl leading-relaxed">
-          頭に浮かんだ「やりたいこと」を、思いつくまま 100 個書き出します。
-          <br />
-          書いた一つ一つが、目標を立てる時の <span className="text-[var(--color-ink)]">材料</span> になります。
+        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+          思いつくまま書き出す。一つ一つが目標の材料に。
         </p>
       </section>
 

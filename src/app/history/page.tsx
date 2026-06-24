@@ -41,16 +41,15 @@ export default function HistoryPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
       {/* Header */}
-      <section className="pt-20 pb-10 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+      <section className="pt-12 pb-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
           ★ &nbsp; LIFE&nbsp;HISTORY
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           100年史
         </h1>
-        <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
-          人生を時間軸で見渡す。過去の出来事と、これから叶えたいことを、
-          年齢の順に並べていく。自分の物語が見えてくる。
+        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+          過去の出来事と、これから叶えたいことを、年齢順に並べる。
         </p>
       </section>
 

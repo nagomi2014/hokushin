@@ -39,15 +39,15 @@ export default function SettingsPage() {
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
 
       {/* Header */}
-      <section className="pt-20 pb-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+      <section className="pt-12 pb-6 hairline-bottom">
+        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
           ★ &nbsp; SETTINGS
         </div>
-        <h1 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] font-medium tracking-tight mb-4">
+        <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           設定
         </h1>
-        <p className="text-[var(--color-fg-mute)] text-sm tracking-wider">
-          アカウント・データ・アプリの設定を管理します。
+        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+          アカウント・データ・アプリの設定。
         </p>
       </section>
 
