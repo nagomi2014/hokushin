@@ -19,6 +19,7 @@ import {
 } from "@/lib/storage";
 import { useTools } from "@/lib/tools/useTools";
 import { useRevisions } from "@/lib/tools/useRevisions";
+import NorthStarCard from "@/components/NorthStarCard";
 import type { AppState, FieldId, MonthlyPlan } from "@/lib/types";
 
 // ------------------------------------------------------------
@@ -242,6 +243,12 @@ export default function DashboardPage() {
           </Link>
         </section>
       )}
+
+      {/* ===== 私の北極星（最重要目標：長期・中期・短期） ===== */}
+      <NorthStarCard
+        northStar={tools.northStar}
+        setNorthStar={tools.setNorthStar}
+      />
 
       {/* ===== 本日のタスク（動き出している人向けに上部へ） ===== */}
       {phase === "act" && (

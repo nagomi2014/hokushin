@@ -61,6 +61,21 @@ export interface RecurringTask {
   days: number[]; // 0=日, 1=月, … 6=土
 }
 
+// 北極星：長期・中期・短期それぞれの「最重要目標」。
+// text＝自由記入の見出し、fieldId＝任意で7分野のどれかに紐づける。
+export type Horizon = "long" | "mid" | "short";
+
+export interface NorthStarGoal {
+  text: string;
+  fieldId?: number; // 任意（1〜7）。分野と紐づけたいとき。
+}
+
+export type NorthStar = Record<Horizon, NorthStarGoal>;
+
+function emptyNorthStar(): NorthStar {
+  return { long: { text: "" }, mid: { text: "" }, short: { text: "" } };
+}
+
 export interface ToolsData {
   lifeEvents: LifeEvent[];
   moneyEntries: MoneyEntry[];
@@ -76,6 +91,8 @@ export interface ToolsData {
   primaryMonthGoal: Record<string, string>;
   // 繰り返しタスク
   recurringTasks: RecurringTask[];
+  // 北極星（長期・中期・短期の最重要目標）
+  northStar: NorthStar;
 }
 
 function emptyMandalaSub(): string[][] {
@@ -93,6 +110,7 @@ function emptyTools(): ToolsData {
     monthGoals: [],
     primaryMonthGoal: {},
     recurringTasks: [],
+    northStar: emptyNorthStar(),
   };
 }
 
@@ -130,6 +148,16 @@ function loadTools(): ToolsData {
             !!t && typeof t.id === "string" && Array.isArray(t.days),
         )
       : [];
+    const ns = parsed.northStar as Partial<NorthStar> | undefined;
+    const normHorizon = (g: Partial<NorthStarGoal> | undefined): NorthStarGoal => ({
+      text: typeof g?.text === "string" ? g.text : "",
+      ...(typeof g?.fieldId === "number" ? { fieldId: g.fieldId } : {}),
+    });
+    const northStar: NorthStar = {
+      long: normHorizon(ns?.long),
+      mid: normHorizon(ns?.mid),
+      short: normHorizon(ns?.short),
+    };
     return {
       lifeEvents: parsed.lifeEvents ?? [],
       moneyEntries: parsed.moneyEntries ?? [],
@@ -140,6 +168,7 @@ function loadTools(): ToolsData {
       monthGoals,
       primaryMonthGoal,
       recurringTasks,
+      northStar,
     };
   } catch {
     return emptyTools();
@@ -187,6 +216,8 @@ export interface UseToolsResult extends ToolsData {
   // 繰り返しタスク
   addRecurringTask: (title: string, days: number[], fieldId?: number) => void;
   removeRecurringTask: (id: string) => void;
+  // 北極星
+  setNorthStar: (horizon: Horizon, patch: Partial<NorthStarGoal>) => void;
 }
 
 export function useTools(): UseToolsResult {
@@ -376,5 +407,19 @@ export function useTools(): UseToolsResult {
         ...prev,
         recurringTasks: prev.recurringTasks.filter((r) => r.id !== id),
       })),
+
+    setNorthStar: (horizon, patch) =>
+      mutate((prev) => {
+        const cur = prev.northStar[horizon];
+        const next: NorthStarGoal = {
+          text: patch.text != null ? patch.text : cur.text,
+          ...(("fieldId" in patch
+            ? patch.fieldId
+            : cur.fieldId) != null
+            ? { fieldId: ("fieldId" in patch ? patch.fieldId : cur.fieldId) as number }
+            : {}),
+        };
+        return { ...prev, northStar: { ...prev.northStar, [horizon]: next } };
+      }),
   };
 }
