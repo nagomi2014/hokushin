@@ -20,6 +20,7 @@ import {
 import { useTools } from "@/lib/tools/useTools";
 import { useRevisions } from "@/lib/tools/useRevisions";
 import NorthStarCard from "@/components/NorthStarCard";
+import QuickAddTask from "@/components/QuickAddTask";
 import type { AppState, FieldId, MonthlyPlan } from "@/lib/types";
 
 // ------------------------------------------------------------
@@ -124,7 +125,8 @@ function formatDateDot(d: Date) {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { state, loaded, toggleDailyTask } = useAppState();
+  const { state, loaded, toggleDailyTask, addDailyTask, removeDailyTask } =
+    useAppState();
 
   // First visit: redirect to onboarding if 壱 (人生理念) is empty.
   // Skip if the user has explicitly chosen "あとで設定する" once.
@@ -188,21 +190,21 @@ export default function DashboardPage() {
     <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
       {/* ===== Hero（コンパクト） ===== */}
-      <section className="pt-10 pb-6 hairline-bottom">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
+      <section className="pt-6 pb-3 hairline-bottom">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
+            <h1 className="serif text-base md:text-lg text-[var(--color-ink)] leading-tight font-medium tracking-tight">
               澄み切る、一日を。
             </h1>
-            <p className="text-[var(--color-fg-faint)] mt-1 text-[11px] tracking-wider">
+            <p className="text-[var(--color-fg-faint)] mt-0.5 text-[10px] tracking-wider">
               迷わぬ者は、北辰（北極星）を仰ぐ。
             </p>
           </div>
           <div className="text-right">
-            <div className="serif text-xl text-[var(--color-ink)] leading-none">
+            <div className="serif text-sm text-[var(--color-ink)] leading-none">
               {formatDateDot(today)}
             </div>
-            <div className="text-[10px] text-[var(--color-fg-mute)] mt-1 tracking-widest">
+            <div className="text-[9px] text-[var(--color-fg-mute)] mt-0.5 tracking-widest">
               {WEEKDAYS_EN[today.getDay()]} · DAY {dayOfMonth} / {totalDays}
             </div>
           </div>
@@ -274,34 +276,52 @@ export default function DashboardPage() {
             </Link>
           )}
 
+          {/* 本日のタスク（横スワイプ＋その場で追加/削除） */}
+          <div className="flex items-baseline justify-between mb-2">
+            <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              本日のタスク
+            </span>
+            {todayTasks.length > 0 && (
+              <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+                {completedToday} / {todayTasks.length} 完了
+              </span>
+            )}
+          </div>
+
           {todayTasks.length === 0 ? (
-            <Link
-              href="/daily"
-              className="block py-6 text-center text-sm text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] border border-[var(--color-line)] transition"
-            >
-              今日のタスクはまだありません。＋ 追加する →
-            </Link>
+            <div className="py-5 text-center text-sm text-[var(--color-fg-faint)] border border-dashed border-[var(--color-line)]">
+              まだありません。下から追加できます。
+            </div>
           ) : (
             <>
-              {/* 横スワイプで本日のタスクを全部見れる */}
               <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 ns-scroll">
                 {todayTasks.map((t) => (
-                  <button
+                  <div
                     key={t.id}
-                    type="button"
-                    onClick={() => toggleDailyTask(t.id)}
-                    className={`snap-start shrink-0 w-44 text-left border p-3 transition ${
+                    className={`snap-start shrink-0 w-44 border p-3 ${
                       t.completed
                         ? "border-[var(--color-line)] bg-[var(--color-paper-soft)]"
-                        : "border-[var(--color-line)] hover:border-[var(--color-ink)]"
+                        : "border-[var(--color-line)]"
                     }`}
-                    aria-label="toggle"
                   >
-                    <span
-                      className={`check-box ${t.completed ? "checked" : ""} mb-2 inline-flex`}
-                    >
-                      {t.completed && <span className="text-[10px]">✓</span>}
-                    </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleDailyTask(t.id)}
+                        className={`check-box ${t.completed ? "checked" : ""}`}
+                        aria-label="完了を切り替える"
+                      >
+                        {t.completed && <span className="text-[10px]">✓</span>}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeDailyTask(t.id)}
+                        className="text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] text-sm leading-none px-1"
+                        aria-label="削除"
+                      >
+                        ×
+                      </button>
+                    </div>
                     <span
                       className={`block text-sm leading-snug line-clamp-3 ${
                         t.completed
@@ -311,15 +331,21 @@ export default function DashboardPage() {
                     >
                       {t.title}
                     </span>
-                  </button>
+                  </div>
                 ))}
               </div>
-              <div className="mt-1 flex items-center justify-between text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
-                <span>← スワイプで全部見る</span>
-                <span>{completedToday} / {todayTasks.length} 完了</span>
+              <div className="mt-1 text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+                ← スワイプで全部見る
               </div>
             </>
           )}
+
+          {/* その場でタスクを追加 */}
+          <QuickAddTask
+            onAdd={(title, fieldId) =>
+              addDailyTask({ date: todayStr, title, fieldId, completed: false })
+            }
+          />
         </section>
       )}
 
