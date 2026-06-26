@@ -189,8 +189,8 @@ export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
-      {/* ===== Hero（コンパクト） ===== */}
-      <section className="pt-6 pb-3 hairline-bottom">
+      {/* ===== Hero（固定・コンパクト：スクロールしても動かない） ===== */}
+      <section className="sticky top-16 z-30 bg-[var(--color-paper)] pt-4 pb-3 hairline-bottom">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h1 className="serif text-base md:text-lg text-[var(--color-ink)] leading-tight font-medium tracking-tight">
@@ -241,46 +241,51 @@ export default function DashboardPage() {
         setNorthStar={tools.setNorthStar}
       />
 
-      {/* ===== 本日のタスク（動き出している人向けに上部へ） ===== */}
-      {phase === "act" && (
-        <section className="py-10 hairline-bottom">
-          <div className="flex items-baseline justify-between mb-5">
-            <div className="flex items-baseline gap-4">
-              <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
-                ★ FOCUS
-              </span>
-              <h2 className="serif text-2xl text-[var(--color-ink)]">
-                今日のフォーカス
-              </h2>
-            </div>
-            <Link
-              href="/daily"
-              className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
-            >
-              日々へ →
-            </Link>
-          </div>
+      {/* ===== 目標設定への導線 ===== */}
+      <div className="py-2 hairline-bottom flex justify-end">
+        <Link
+          href="/fields"
+          className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+        >
+          目標設定をする →
+        </Link>
+      </div>
 
-          {/* 今月の最重要目標 */}
-          {monthlyPlan?.primaryGoal?.trim() && (
+      {/* ===== 今月の目標 ＋ 本日のタスク（トップでそのまま管理） ===== */}
+      {phase === "act" && (
+        <section className="py-6 hairline-bottom">
+          {/* 今月の目標（タップで月次へ） */}
+          {monthlyPlan?.primaryGoal?.trim() ? (
             <Link
               href="/monthly"
               className="block bg-[var(--color-ink)] text-white px-5 py-3 mb-4 hover:bg-[var(--color-ink-soft)] transition"
             >
               <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)] mb-1">
-                ★ 今月の最重要目標
+                ★ 今月の目標
               </div>
               <div className="serif text-base leading-relaxed">
                 {monthlyPlan.primaryGoal}
               </div>
             </Link>
+          ) : (
+            <Link
+              href="/monthly"
+              className="block border border-dashed border-[var(--color-line)] px-5 py-3 mb-4 text-sm text-[var(--color-fg-faint)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
+            >
+              ＋ 今月の目標を設定する →
+            </Link>
           )}
 
-          {/* 本日のタスク（横スワイプ＋その場で追加/削除） */}
+          {/* 本日のタスク（縦の一覧＋日付＋その場で追加/削除） */}
           <div className="flex items-baseline justify-between mb-2">
-            <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-              本日のタスク
-            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-[10px] tracking-[0.3em] text-[var(--color-gold)]">
+                本日のタスク
+              </span>
+              <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+                {today.getMonth() + 1}/{today.getDate()}（{WEEKDAYS_EN[today.getDay()]}）
+              </span>
+            </div>
             {todayTasks.length > 0 && (
               <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
                 {completedToday} / {todayTasks.length} 完了
@@ -293,51 +298,46 @@ export default function DashboardPage() {
               まだありません。下から追加できます。
             </div>
           ) : (
-            <>
-              <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 ns-scroll">
-                {todayTasks.map((t) => (
-                  <div
-                    key={t.id}
-                    className={`snap-start shrink-0 w-44 border p-3 ${
+            <div className="hairline-top">
+              {todayTasks.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-center gap-3 py-2.5 hairline-bottom group"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleDailyTask(t.id)}
+                    className={`check-box ${t.completed ? "checked" : ""} shrink-0`}
+                    aria-label="完了を切り替える"
+                  >
+                    {t.completed && <span className="text-[10px]">✓</span>}
+                  </button>
+                  <span
+                    className={`flex-1 text-sm leading-snug ${
                       t.completed
-                        ? "border-[var(--color-line)] bg-[var(--color-paper-soft)]"
-                        : "border-[var(--color-line)]"
+                        ? "line-through text-[var(--color-fg-faint)]"
+                        : "text-[var(--color-ink)]"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleDailyTask(t.id)}
-                        className={`check-box ${t.completed ? "checked" : ""}`}
-                        aria-label="完了を切り替える"
-                      >
-                        {t.completed && <span className="text-[10px]">✓</span>}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeDailyTask(t.id)}
-                        className="text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] text-sm leading-none px-1"
-                        aria-label="削除"
-                      >
-                        ×
-                      </button>
-                    </div>
-                    <span
-                      className={`block text-sm leading-snug line-clamp-3 ${
-                        t.completed
-                          ? "line-through text-[var(--color-fg-faint)]"
-                          : "text-[var(--color-ink)]"
-                      }`}
-                    >
-                      {t.title}
+                    {t.title}
+                  </span>
+                  {t.fieldId != null && (
+                    <span className="text-[9px] tracking-[0.15em] text-[var(--color-fg-mute)] shrink-0">
+                      {String(t.fieldId).padStart(2, "0")}{" "}
+                      {FIELDS.find((f) => f.id === t.fieldId)?.nameJaShort}
                     </span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-1 text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
-                ← スワイプで全部見る
-              </div>
-            </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeDailyTask(t.id)}
+                    className="shrink-0 text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] text-sm leading-none px-1 opacity-60 group-hover:opacity-100 transition"
+                    aria-label="削除"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
 
           {/* その場でタスクを追加 */}
