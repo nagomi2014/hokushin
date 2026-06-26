@@ -9,7 +9,7 @@ import {
   PYRAMID_TIERS,
   PYRAMID_WIDTHS,
 } from "@/lib/constants";
-import { activeFieldIds, fieldHasState } from "@/lib/fields";
+import { activeFieldIds } from "@/lib/fields";
 import {
   currentYearMonth,
   daysInMonth,
@@ -145,7 +145,6 @@ export default function DashboardPage() {
   const ym = currentYearMonth();
   const totalDays = daysInMonth(ym.year, ym.month);
   const dayOfMonth = today.getDate();
-  const monthlyPct = Math.round((dayOfMonth / totalDays) * 100);
 
   const todayTasks = state.dailyTasks.filter((t) => t.date === todayStr);
   const completedToday = todayTasks.filter((t) => t.completed).length;
@@ -161,16 +160,6 @@ export default function DashboardPage() {
     () => getNextStep(state, ym.year, ym.month, dashboardFieldIds),
     [state, ym.year, ym.month, dashboardFieldIds],
   );
-
-  // 「今日のフォーカス」用：今月の最重要目標に紐づく分野（無ければ中身のある最初の分野）
-  const ymKey = `${ym.year}-${String(ym.month).padStart(2, "0")}`;
-  const primaryMonthGoalId = tools.primaryMonthGoal?.[ymKey];
-  const focusFieldId: FieldId | undefined =
-    (tools.monthGoals.find((g) => g.id === primaryMonthGoalId)?.fieldId as
-      | FieldId
-      | undefined) ??
-    dashboardFieldIds.find((id) => fieldHasState(state.fields[id]));
-  const focusGoal = focusFieldId ? state.fields[focusFieldId] : undefined;
 
   // 「そのほかの記録」用の充足数（実在ページのみ実値を出す）
   const mandalaFilled =
@@ -270,39 +259,6 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {/* 分野の 長期 → 中期 → 短期（目標を忘れない） */}
-          {focusFieldId && focusGoal && fieldHasState(focusGoal) && (
-            <Link
-              href={`/fields#field-${focusFieldId}`}
-              className="block border border-[var(--color-line)] mb-4 hover:border-[var(--color-ink)] transition"
-            >
-              <div className="px-4 py-1.5 bg-[var(--color-paper-soft)] text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)]">
-                {FIELD_MAP[focusFieldId].nameJa} の目標
-              </div>
-              {(
-                [
-                  ["長期", focusGoal.longTerm],
-                  ["中期", focusGoal.midTerm],
-                  ["短期", focusGoal.shortTerm],
-                ] as const
-              )
-                .filter(([, v]) => v.trim())
-                .map(([lbl, v]) => (
-                  <div
-                    key={lbl}
-                    className="px-4 py-1.5 flex gap-3 text-[12px] hairline-top"
-                  >
-                    <span className="text-[var(--color-gold)] tracking-[0.15em] w-8 shrink-0">
-                      {lbl}
-                    </span>
-                    <span className="text-[var(--color-ink)] flex-1">
-                      {v.trim()}
-                    </span>
-                  </div>
-                ))}
-            </Link>
-          )}
-
           {/* 今月の最重要目標 */}
           {monthlyPlan?.primaryGoal?.trim() && (
             <Link
@@ -326,63 +282,46 @@ export default function DashboardPage() {
               今日のタスクはまだありません。＋ 追加する →
             </Link>
           ) : (
-            <div className="hairline-top">
-              {todayTasks.slice(0, 6).map((t) => (
-                <div
-                  key={t.id}
-                  className="flex items-center gap-3 py-3 hairline-bottom"
-                >
+            <>
+              {/* 横スワイプで本日のタスクを全部見れる */}
+              <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 ns-scroll">
+                {todayTasks.map((t) => (
                   <button
+                    key={t.id}
                     type="button"
                     onClick={() => toggleDailyTask(t.id)}
-                    className={`check-box ${t.completed ? "checked" : ""}`}
+                    className={`snap-start shrink-0 w-44 text-left border p-3 transition ${
+                      t.completed
+                        ? "border-[var(--color-line)] bg-[var(--color-paper-soft)]"
+                        : "border-[var(--color-line)] hover:border-[var(--color-ink)]"
+                    }`}
                     aria-label="toggle"
                   >
-                    {t.completed && <span className="text-[10px]">✓</span>}
+                    <span
+                      className={`check-box ${t.completed ? "checked" : ""} mb-2 inline-flex`}
+                    >
+                      {t.completed && <span className="text-[10px]">✓</span>}
+                    </span>
+                    <span
+                      className={`block text-sm leading-snug line-clamp-3 ${
+                        t.completed
+                          ? "line-through text-[var(--color-fg-faint)]"
+                          : "text-[var(--color-ink)]"
+                      }`}
+                    >
+                      {t.title}
+                    </span>
                   </button>
-                  <span
-                    className={`text-sm flex-1 ${
-                      t.completed
-                        ? "line-through text-[var(--color-fg-faint)]"
-                        : "text-[var(--color-ink)]"
-                    }`}
-                  >
-                    {t.title}
-                  </span>
-                </div>
-              ))}
-              <div className="mt-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-                {completedToday} / {todayTasks.length} 完了
+                ))}
               </div>
-            </div>
+              <div className="mt-1 flex items-center justify-between text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+                <span>← スワイプで全部見る</span>
+                <span>{completedToday} / {todayTasks.length} 完了</span>
+              </div>
+            </>
           )}
         </section>
       )}
-
-      {/* ===== 今すべきこと（次の一手） ===== */}
-      <section className="py-10 hairline-bottom">
-        <Link
-          href={nextStep.href}
-          className="group block bg-[var(--color-ink)] text-white p-6 md:p-8 hover:bg-[var(--color-ink-soft)] transition"
-        >
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex-1">
-              <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-3">
-                ★&nbsp;&nbsp;{nextStep.kind === "done" ? "整いました" : "今すべきこと"}
-              </div>
-              <div className="serif text-2xl md:text-3xl text-white mb-2">
-                {nextStep.label}
-              </div>
-              <div className="text-sm text-white/60 max-w-xl leading-relaxed">
-                {nextStep.caption}
-              </div>
-            </div>
-            <div className="text-[var(--color-gold)] text-3xl group-hover:translate-x-1 transition flex-shrink-0">
-              →
-            </div>
-          </div>
-        </Link>
-      </section>
 
       {/* ===== 現在地 ＋ フローマップ（知る → 導き出す → 動く） ===== */}
       <section className="py-8 hairline-bottom">

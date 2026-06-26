@@ -112,3 +112,16 @@ html, body {
   color: var(--color-gold);
   text-shadow: 0 0 6px rgba(184, 144, 44, 0.3);
 }
+
+/* 横スワイプ（本日のタスク）：細く控えめなスクロールバー */
+.ns-scroll {
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.ns-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.ns-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 4px;
+}
