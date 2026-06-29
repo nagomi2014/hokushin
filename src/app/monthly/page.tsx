@@ -81,6 +81,11 @@ export default function MonthlyPage() {
   const primaryGoalObj = monthGoals.find((g) => g.id === primaryId);
   const primaryText = primaryGoalObj?.text.trim() ?? "";
 
+  // この月に書いた「今月の目標」（振り返りへ引用する対象）
+  const thisMonthGoals = monthGoals.filter(
+    (g) => g.ym === ymKey && g.text.trim(),
+  );
+
   // 先月（前月）の振り返り
   const prevYm =
     ym.month === 1
@@ -122,6 +127,24 @@ export default function MonthlyPage() {
     });
     setAddedMsg(true);
     setTimeout(() => setAddedMsg(false), 1800);
+  }
+
+  // 今月の目標を、達成チェック（☐＝未達がデフォルト）付きで振り返り欄に引用する
+  function quoteGoalsIntoReflection() {
+    if (thisMonthGoals.length === 0) return;
+    const header = "■ 今月の目標の振り返り";
+    if (plan.reflection.includes(header)) return; // 二重挿入を防ぐ
+    const lines = thisMonthGoals.map((g) => {
+      const fname =
+        g.fieldId != null ? `${FIELD_MAP[g.fieldId as FieldId].nameJaShort}：` : "";
+      const star = g.id === primaryId ? "（★最重要）" : "";
+      return `☐ ${fname}${g.text.trim()}${star}`;
+    });
+    const block = `${header}\n${lines.join(
+      "\n",
+    )}\n（☐＝未達／☑＝達成。達成できたものは☑に変えてください）`;
+    const cur = plan.reflection.trim();
+    update("reflection", cur ? `${cur}\n\n${block}` : block);
   }
 
   function shiftMonth(delta: number) {
@@ -425,6 +448,23 @@ export default function MonthlyPage() {
             <p className="text-[11px] text-[var(--color-fg-faint)] mb-3">
               この月を振り返って書きます。来月の「先月の振り返り」として見えるようになります。
             </p>
+            {thisMonthGoals.length > 0 && (
+              <div className="mb-3 flex items-center gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={quoteGoalsIntoReflection}
+                  disabled={plan.reflection.includes("■ 今月の目標の振り返り")}
+                  className="text-[11px] tracking-[0.2em] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ★ 今月の目標を引用
+                </button>
+                <span className="text-[10px] text-[var(--color-fg-faint)]">
+                  {plan.reflection.includes("■ 今月の目標の振り返り")
+                    ? "引用済み"
+                    : `${thisMonthGoals.length}件の目標を達成チェック付きで挿入`}
+                </span>
+              </div>
+            )}
             <textarea
               value={plan.reflection}
               onChange={(e) => update("reflection", e.target.value)}
