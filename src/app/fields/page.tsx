@@ -20,6 +20,8 @@ export default function FieldsPage() {
     selectedFields,
     setSelectedFields,
     toggleSelectedField,
+    northStar,
+    setNorthStar,
     loaded: toolsLoaded,
   } = useTools();
   const [coachFieldId, setCoachFieldId] = useState<FieldId | null>(null);
@@ -344,6 +346,13 @@ export default function FieldsPage() {
                   arrow
                   value={goal?.longTerm ?? ""}
                   onChange={(v) => setField(field.id, { longTerm: v })}
+                  dashboardActive={northStar.long.fieldId === field.id}
+                  onToggleDashboard={() =>
+                    setNorthStar("long", {
+                      fieldId:
+                        northStar.long.fieldId === field.id ? undefined : field.id,
+                    })
+                  }
                 />
                 <FieldTermInput
                   label="中期目標"
@@ -351,6 +360,13 @@ export default function FieldsPage() {
                   arrow
                   value={goal?.midTerm ?? ""}
                   onChange={(v) => setField(field.id, { midTerm: v })}
+                  dashboardActive={northStar.mid.fieldId === field.id}
+                  onToggleDashboard={() =>
+                    setNorthStar("mid", {
+                      fieldId:
+                        northStar.mid.fieldId === field.id ? undefined : field.id,
+                    })
+                  }
                 />
                 <FieldTermInput
                   label="短期目標"
@@ -358,6 +374,13 @@ export default function FieldsPage() {
                   arrow
                   value={goal?.shortTerm ?? ""}
                   onChange={(v) => setField(field.id, { shortTerm: v })}
+                  dashboardActive={northStar.short.fieldId === field.id}
+                  onToggleDashboard={() =>
+                    setNorthStar("short", {
+                      fieldId:
+                        northStar.short.fieldId === field.id ? undefined : field.id,
+                    })
+                  }
                 />
                 <TodayTasksColumn tasks={todayTasks} />
               </div>
@@ -828,12 +851,16 @@ function FieldTermInput({
   value,
   onChange,
   arrow = false,
+  dashboardActive = false,
+  onToggleDashboard,
 }: {
   label: string;
   caption: string;
   value: string;
   onChange: (v: string) => void;
   arrow?: boolean;
+  dashboardActive?: boolean;
+  onToggleDashboard?: () => void;
 }) {
   return (
     <div className="relative">
@@ -843,6 +870,20 @@ function FieldTermInput({
           {caption}
         </span>
       </div>
+      {onToggleDashboard && (
+        <button
+          type="button"
+          onClick={onToggleDashboard}
+          className={`mb-2 inline-flex items-center gap-1 text-[10px] tracking-[0.15em] px-2 py-1 border transition ${
+            dashboardActive
+              ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+              : "border-[var(--color-line)] text-[var(--color-fg-faint)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+          }`}
+          title="ダッシュボードの「私の北極星」に表示する"
+        >
+          {dashboardActive ? "★ 北極星に表示中" : "☆ 北極星に入れる"}
+        </button>
+      )}
       <textarea
         rows={5}
         value={value}

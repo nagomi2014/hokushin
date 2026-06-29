@@ -239,6 +239,7 @@ export default function DashboardPage() {
       <NorthStarCard
         northStar={tools.northStar}
         setNorthStar={tools.setNorthStar}
+        fields={state.fields}
       />
 
       {/* ===== 目標設定への導線 ===== */}

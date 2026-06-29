@@ -3,23 +3,28 @@
 import { useState } from "react";
 import { FIELDS, FIELD_MAP } from "@/lib/constants";
 import type { Horizon, NorthStar, NorthStarGoal } from "@/lib/tools/useTools";
-import type { FieldId } from "@/lib/types";
+import type { Fields, FieldId } from "@/lib/types";
 
 // 長期・中期・短期それぞれの「最重要目標」を、開いた瞬間に一望できるコンパクトなカード。
-// 自由記入（text）＋任意で分野（fieldId）に紐づけ。クリックでその場編集。
+// 分野を選ぶと、その分野の長期/中期/短期目標が "そのまま" 反映される（ライブ）。
+// 分野を選ばない場合は、自由記入の text を表示・編集できる。
 
-const ROWS: { horizon: Horizon; label: string; span: string }[] = [
-  { horizon: "long", label: "長期", span: "5年〜" },
-  { horizon: "mid", label: "中期", span: "1〜5年" },
-  { horizon: "short", label: "短期", span: "1年" },
+type TermKey = "longTerm" | "midTerm" | "shortTerm";
+
+const ROWS: { horizon: Horizon; label: string; span: string; term: TermKey }[] = [
+  { horizon: "long", label: "長期", span: "5年〜", term: "longTerm" },
+  { horizon: "mid", label: "中期", span: "1〜5年", term: "midTerm" },
+  { horizon: "short", label: "短期", span: "1年", term: "shortTerm" },
 ];
 
 export default function NorthStarCard({
   northStar,
   setNorthStar,
+  fields,
 }: {
   northStar: NorthStar;
   setNorthStar: (horizon: Horizon, patch: Partial<NorthStarGoal>) => void;
+  fields: Fields;
 }) {
   return (
     <section className="pt-4 pb-3 hairline-bottom">
@@ -36,17 +41,25 @@ export default function NorthStarCard({
       </div>
 
       <div className="border border-[var(--color-line)]">
-        {ROWS.map((r, i) => (
-          <NorthRow
-            key={r.horizon}
-            label={r.label}
-            span={r.span}
-            goal={northStar[r.horizon]}
-            top={i === 0}
-            onChangeText={(text) => setNorthStar(r.horizon, { text })}
-            onChangeField={(fieldId) => setNorthStar(r.horizon, { fieldId })}
-          />
-        ))}
+        {ROWS.map((r, i) => {
+          const goal = northStar[r.horizon];
+          const linkedText =
+            goal.fieldId != null
+              ? (fields[goal.fieldId as FieldId]?.[r.term] ?? "").trim()
+              : "";
+          return (
+            <NorthRow
+              key={r.horizon}
+              label={r.label}
+              span={r.span}
+              goal={goal}
+              linkedText={linkedText}
+              top={i === 0}
+              onChangeText={(text) => setNorthStar(r.horizon, { text })}
+              onChangeField={(fieldId) => setNorthStar(r.horizon, { fieldId })}
+            />
+          );
+        })}
       </div>
     </section>
   );
@@ -56,6 +69,7 @@ function NorthRow({
   label,
   span,
   goal,
+  linkedText,
   top,
   onChangeText,
   onChangeField,
@@ -63,6 +77,7 @@ function NorthRow({
   label: string;
   span: string;
   goal: NorthStarGoal;
+  linkedText: string;
   top: boolean;
   onChangeText: (text: string) => void;
   onChangeField: (fieldId: number | undefined) => void;
@@ -91,9 +106,22 @@ function NorthRow({
         </span>
       </div>
 
-      {/* goal text (click to edit) — 1行で省略表示 */}
+      {/* goal text — 分野連動なら目標をそのまま表示、なければ自由記入 */}
       <div className="flex-1 min-w-0">
-        {editing ? (
+        {linkedField ? (
+          linkedText ? (
+            <span
+              className="block text-sm text-[var(--color-ink)] truncate"
+              title={linkedText}
+            >
+              {linkedText}
+            </span>
+          ) : (
+            <span className="block text-xs text-[var(--color-fg-faint)] italic truncate">
+              {linkedField.nameJaShort}の{label}目標が未記入（目標設定で記入）
+            </span>
+          )
+        ) : editing ? (
           <input
             autoFocus
             value={draft}
@@ -131,16 +159,20 @@ function NorthRow({
         )}
       </div>
 
-      {/* optional field link（任意） */}
+      {/* 分野を選ぶ＝その分野の目標を反映（任意） */}
       <select
         value={goal.fieldId ?? ""}
         onChange={(e) =>
           onChangeField(e.target.value === "" ? undefined : Number(e.target.value))
         }
         className="shrink-0 max-w-[5.5rem] text-[10px] text-[var(--color-fg-mute)] bg-transparent border-b border-[var(--color-line)] py-0.5 focus:outline-none focus:border-[var(--color-ink)]"
-        title={linkedField ? `${linkedField.nameJa} に紐づけ中` : "分野に紐づける（任意）"}
+        title={
+          linkedField
+            ? `${linkedField.nameJa} の目標を反映中`
+            : "分野を選ぶとその目標を反映（任意）"
+        }
       >
-        <option value="">分野</option>
+        <option value="">自由記入</option>
         {FIELDS.map((f) => (
           <option key={f.id} value={f.id}>
             {f.number} {f.nameJaShort}
