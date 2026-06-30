@@ -155,14 +155,22 @@ export default function SettingsPage() {
         <button
           onClick={() => {
             if (typeof window === "undefined") return;
-            if (!confirm("すべてのデータを消去しますか？\nこの操作は取り消せません。")) return;
-            window.localStorage.removeItem("hokushin:v3:state");
-            window.localStorage.removeItem("hokushin:onboardingSkipped");
+            if (
+              !confirm(
+                "すべてのデータを消去して最初からにしますか？\n目標・タスク・北極星・記録などがすべて消えます。この操作は取り消せません。",
+              )
+            )
+              return;
+            // hokushin: で始まる保存データを全消去（状態・ツール・北極星・繰り返し
+            // タスク・ガイド進捗・書き直し記録・オンボーディングなど一式）。
+            for (const k of Object.keys(window.localStorage)) {
+              if (k.startsWith("hokushin:")) window.localStorage.removeItem(k);
+            }
             window.location.href = "/";
           }}
           className="text-xs tracking-[0.3em] border border-red-500/40 text-red-600 px-4 py-2 hover:bg-red-50 transition"
         >
-          ⚠ すべてのデータを消去
+          ⚠ すべてのデータを消去して最初から
         </button>
       </section>
 
