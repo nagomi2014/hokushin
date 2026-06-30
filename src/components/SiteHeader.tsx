@@ -18,6 +18,7 @@ interface NavItem {
 // 流れ順に並べる：ダッシュボード → ①知る → ②導き出す → ③動く
 const NAV: NavItem[] = [
   { href: "/", label: "DASHBOARD", labelJa: "ダッシュボード", group: "home" },
+  { href: "/news", label: "NEWS", labelJa: "3分ニュース", group: "home" },
   { href: "/pyramid", label: "PYRAMID", labelJa: "ピラミッド", group: "know" },
   { href: "/mandala", label: "MANDALA", labelJa: "曼荼羅", group: "know" },
   { href: "/list-100", label: "LIST 100", labelJa: "百のリスト", group: "know" },
