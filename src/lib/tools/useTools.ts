@@ -53,12 +53,18 @@ export interface MonthGoal {
   text: string;
 }
 
-// 繰り返しタスク：指定した曜日に、本日のタスクへ自動で入る
+// 繰り返し／予定タスク：条件に合う日に、本日のタスクへ自動で入る。
+// 次のいずれかで「いつ出すか」を決める（どれか1つを使う）：
+//   days      … 曜日指定（毎日=全7・平日など）。0=日,1=月,…6=土
+//   monthlyDay… 毎月N日（1〜31）
+//   onceDate  … 特定の日付に一回だけ（YYYY-MM-DD）
 export interface RecurringTask {
   id: string;
   title: string;
   fieldId?: number;
-  days: number[]; // 0=日, 1=月, … 6=土
+  days?: number[];
+  monthlyDay?: number;
+  onceDate?: string;
 }
 
 // 北極星：長期・中期・短期それぞれの「最重要目標」。
@@ -145,7 +151,11 @@ function loadTools(): ToolsData {
     const recurringTasks = Array.isArray(parsed.recurringTasks)
       ? parsed.recurringTasks.filter(
           (t): t is RecurringTask =>
-            !!t && typeof t.id === "string" && Array.isArray(t.days),
+            !!t &&
+            typeof t.id === "string" &&
+            (Array.isArray(t.days) ||
+              typeof t.monthlyDay === "number" ||
+              typeof t.onceDate === "string"),
         )
       : [];
     const ns = parsed.northStar as Partial<NorthStar> | undefined;
@@ -213,8 +223,8 @@ export interface UseToolsResult extends ToolsData {
   setMonthGoalText: (id: string, text: string) => void;
   removeMonthGoal: (id: string) => void;
   setPrimaryMonthGoal: (ym: string, goalId: string) => void;
-  // 繰り返しタスク
-  addRecurringTask: (title: string, days: number[], fieldId?: number) => void;
+  // 繰り返し／予定タスク
+  addRecurringTask: (task: Omit<RecurringTask, "id">) => void;
   removeRecurringTask: (id: string) => void;
   // 北極星
   setNorthStar: (horizon: Horizon, patch: Partial<NorthStarGoal>) => void;
@@ -391,14 +401,28 @@ export function useTools(): UseToolsResult {
         return { ...prev, primaryMonthGoal };
       }),
 
-    addRecurringTask: (title, days, fieldId) => {
-      const t = title.trim();
-      if (!t || days.length === 0) return;
+    addRecurringTask: (task) => {
+      const title = task.title.trim();
+      if (!title) return;
+      const hasSchedule =
+        (task.days && task.days.length > 0) ||
+        task.monthlyDay != null ||
+        !!task.onceDate;
+      if (!hasSchedule) return;
       mutate((prev) => ({
         ...prev,
         recurringTasks: [
           ...prev.recurringTasks,
-          { id: uid("rt"), title: t, days: [...days].sort(), ...(fieldId ? { fieldId } : {}) },
+          {
+            id: uid("rt"),
+            title,
+            ...(task.fieldId ? { fieldId: task.fieldId } : {}),
+            ...(task.days && task.days.length
+              ? { days: [...task.days].sort((a, b) => a - b) }
+              : {}),
+            ...(task.monthlyDay != null ? { monthlyDay: task.monthlyDay } : {}),
+            ...(task.onceDate ? { onceDate: task.onceDate } : {}),
+          },
         ],
       }));
     },

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { FIELDS, FIELD_MAP } from "@/lib/constants";
 import { todayString, useAppState } from "@/lib/storage";
 import { FieldHorizonGuide } from "@/components/FieldHorizonGuide";
+import TaskScheduler from "@/components/TaskScheduler";
 import { clearGuide, readGuide, writeGuide } from "@/lib/tools/guideProgress";
 import { useTools } from "@/lib/tools/useTools";
 import { activeFieldIds, fieldHasState } from "@/lib/fields";
@@ -22,6 +23,9 @@ export default function FieldsPage() {
     toggleSelectedField,
     northStar,
     setNorthStar,
+    recurringTasks,
+    addRecurringTask,
+    removeRecurringTask,
     loaded: toolsLoaded,
   } = useTools();
   const [coachFieldId, setCoachFieldId] = useState<FieldId | null>(null);
@@ -403,6 +407,13 @@ export default function FieldsPage() {
           );
         })}
       </section>
+
+      {/* タスクを作る（曜日・毎月N日・特定日付 → 本日のタスクに自動反映） */}
+      <TaskScheduler
+        recurringTasks={recurringTasks}
+        onAdd={addRecurringTask}
+        onRemove={removeRecurringTask}
+      />
 
       {hasAnyGoal && <NextSteps />}
 

@@ -5,6 +5,7 @@ import { APP_NAME, APP_TAGLINE_EN } from "@/lib/constants";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { RevisionsRecorder } from "@/components/RevisionsRecorder";
+import RecurringInjector from "@/components/RecurringInjector";
 import { AppStateProvider } from "@/lib/store/AppStateProvider";
 
 const inter = Inter({
@@ -62,6 +63,7 @@ export default function RootLayout({
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <RevisionsRecorder />
+          <RecurringInjector />
         </AppStateProvider>
         <ServiceWorkerRegister />
       </body>
