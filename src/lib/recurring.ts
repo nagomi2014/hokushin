@@ -28,12 +28,35 @@ export function isoWeekKey(dateStr: string): string {
   return `${target.getFullYear()}-W${week}`;
 }
 
-// その日に、このタスクを「本日のタスク」へ出すべきか
-export function taskAppliesOn(t: RecurringTask, date: Date): boolean {
-  if (t.onceDate) return t.onceDate === dateToStr(date);
-  if (t.monthlyDay != null) return date.getDate() === t.monthlyDay;
-  if (t.days && t.days.length > 0) return t.days.includes(date.getDay());
+// floating（曜日/日にちを決めず、期間内にやればよい）か
+export function isFloating(t: RecurringTask): boolean {
+  if (t.cadence === "weekly") return !t.days || t.days.length === 0;
+  if (t.cadence === "monthly") return t.monthlyDay == null;
   return false;
+}
+
+// その日に、このタスクを「本日のタスク」へ出すべきか（floatingは出さない）
+export function taskAppliesOn(t: RecurringTask, date: Date): boolean {
+  switch (t.cadence) {
+    case "daily":
+      return true;
+    case "weekly":
+      return !!t.days && t.days.includes(date.getDay());
+    case "monthly":
+      return t.monthlyDay != null && date.getDate() === t.monthlyDay;
+    case "once":
+      return t.onceDate === dateToStr(date);
+    default:
+      return false;
+  }
+}
+
+// 期間タスクの完了キーに使う「いまの期間」（週次=ISO週／月次=YYYY-MM）
+export function periodKeyFor(cadence: RecurringTask["cadence"], date: Date): string {
+  if (cadence === "monthly") {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  }
+  return isoWeekKey(dateToStr(date));
 }
 
 export function describeDays(days: number[]): string {
@@ -47,11 +70,20 @@ export function describeDays(days: number[]): string {
 
 // スケジュールを短い日本語で説明する
 export function describeSchedule(t: RecurringTask): string {
-  if (t.onceDate) {
-    const dt = new Date(`${t.onceDate}T00:00:00`);
-    return `${dt.getMonth() + 1}/${dt.getDate()}（${DOW_LABELS[dt.getDay()]}）に1回`;
+  switch (t.cadence) {
+    case "daily":
+      return "毎日";
+    case "weekly":
+      return t.days && t.days.length > 0 ? describeDays(t.days) : "今週";
+    case "monthly":
+      return t.monthlyDay != null ? `毎月${t.monthlyDay}日` : "今月";
+    case "once":
+      if (t.onceDate) {
+        const dt = new Date(`${t.onceDate}T00:00:00`);
+        return `${dt.getMonth() + 1}/${dt.getDate()}（${DOW_LABELS[dt.getDay()]}）に1回`;
+      }
+      return "—";
+    default:
+      return "—";
   }
-  if (t.monthlyDay != null) return `毎月${t.monthlyDay}日`;
-  if (t.days && t.days.length > 0) return describeDays(t.days);
-  return "—";
 }

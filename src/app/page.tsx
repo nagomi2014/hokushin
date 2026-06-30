@@ -21,6 +21,8 @@ import { useTools } from "@/lib/tools/useTools";
 import { useRevisions } from "@/lib/tools/useRevisions";
 import NorthStarCard from "@/components/NorthStarCard";
 import QuickAddTask from "@/components/QuickAddTask";
+import PeriodTasks from "@/components/PeriodTasks";
+import { isFloating, periodKeyFor } from "@/lib/recurring";
 import type { AppState, FieldId, MonthlyPlan } from "@/lib/types";
 
 // ------------------------------------------------------------
@@ -177,6 +179,16 @@ export default function DashboardPage() {
     nextStep.kind === "onboarding" || nextStep.kind === "field"
       ? "explore"
       : "act";
+
+  // 今週／今月の「期間内タスク」（floating）と、その期間キー
+  const weekKey = periodKeyFor("weekly", today);
+  const monthKey = periodKeyFor("monthly", today);
+  const weeklyFloating = tools.recurringTasks.filter(
+    (t) => t.cadence === "weekly" && isFloating(t),
+  );
+  const monthlyFloating = tools.recurringTasks.filter(
+    (t) => t.cadence === "monthly" && isFloating(t),
+  );
 
   if (!loaded) {
     return (
@@ -349,6 +361,26 @@ export default function DashboardPage() {
           />
         </section>
       )}
+
+      {/* ===== 今週のタスク（週次・期間内） ===== */}
+      <PeriodTasks
+        title="今週のタスク"
+        dateLabel="今週中に"
+        tasks={weeklyFloating}
+        periodKey={weekKey}
+        taskChecks={tools.taskChecks}
+        onToggle={tools.toggleTaskCheck}
+      />
+
+      {/* ===== 今月のタスク（月次・期間内） ===== */}
+      <PeriodTasks
+        title="今月のタスク"
+        dateLabel={`${today.getMonth() + 1}月中に`}
+        tasks={monthlyFloating}
+        periodKey={monthKey}
+        taskChecks={tools.taskChecks}
+        onToggle={tools.toggleTaskCheck}
+      />
 
       {/* ===== 現在地 ＋ フローマップ（知る → 導き出す → 動く） ===== */}
       <section className="py-8 hairline-bottom">

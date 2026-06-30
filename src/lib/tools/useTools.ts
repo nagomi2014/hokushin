@@ -53,18 +53,33 @@ export interface MonthGoal {
   text: string;
 }
 
-// 繰り返し／予定タスク：条件に合う日に、本日のタスクへ自動で入る。
-// 次のいずれかで「いつ出すか」を決める（どれか1つを使う）：
-//   days      … 曜日指定（毎日=全7・平日など）。0=日,1=月,…6=土
-//   monthlyDay… 毎月N日（1〜31）
-//   onceDate  … 特定の日付に一回だけ（YYYY-MM-DD）
+// 繰り返し／予定タスク。cadence で「日次・週次・月次・単発」を区別する。
+//   daily   … 毎日（本日のタスクに毎日入る）
+//   weekly  … 週次。days があれば「その曜日」（本日に入る）、無ければ「今週やる」(floating)
+//   monthly … 月次。monthlyDay があれば「毎月N日」（本日に入る）、無ければ「今月やる」(floating)
+//   once    … onceDate に一回だけ（本日に入る）
+export type Cadence = "daily" | "weekly" | "monthly" | "once";
+
 export interface RecurringTask {
   id: string;
   title: string;
   fieldId?: number;
+  cadence: Cadence;
+  days?: number[]; // weekly固定：0=日,1=月,…6=土
+  monthlyDay?: number; // monthly固定：1〜31
+  onceDate?: string; // once：YYYY-MM-DD
+}
+
+// 既存データ（cadence 未設定）から cadence を推定する（後方互換）
+export function deriveCadence(t: {
   days?: number[];
   monthlyDay?: number;
   onceDate?: string;
+}): Cadence {
+  if (t.onceDate) return "once";
+  if (t.monthlyDay != null) return "monthly";
+  if (t.days && t.days.length > 0) return t.days.length === 7 ? "daily" : "weekly";
+  return "daily";
 }
 
 // 北極星：長期・中期・短期それぞれの「最重要目標」。
@@ -97,6 +112,8 @@ export interface ToolsData {
   primaryMonthGoal: Record<string, string>;
   // 繰り返しタスク
   recurringTasks: RecurringTask[];
+  // 期間タスクの完了記録。key = `${taskId}:${期間キー}`（今週=ISO週／今月=YYYY-MM）
+  taskChecks: Record<string, boolean>;
   // 北極星（長期・中期・短期の最重要目標）
   northStar: NorthStar;
 }
@@ -116,6 +133,7 @@ function emptyTools(): ToolsData {
     monthGoals: [],
     primaryMonthGoal: {},
     recurringTasks: [],
+    taskChecks: {},
     northStar: emptyNorthStar(),
   };
 }
@@ -148,16 +166,21 @@ function loadTools(): ToolsData {
       parsed.primaryMonthGoal && typeof parsed.primaryMonthGoal === "object"
         ? (parsed.primaryMonthGoal as Record<string, string>)
         : {};
-    const recurringTasks = Array.isArray(parsed.recurringTasks)
-      ? parsed.recurringTasks.filter(
-          (t): t is RecurringTask =>
-            !!t &&
-            typeof t.id === "string" &&
-            (Array.isArray(t.days) ||
-              typeof t.monthlyDay === "number" ||
-              typeof t.onceDate === "string"),
-        )
+    const recurringTasks: RecurringTask[] = Array.isArray(parsed.recurringTasks)
+      ? parsed.recurringTasks
+          .filter(
+            (t): t is RecurringTask =>
+              !!t && typeof t.id === "string" && typeof t.title === "string",
+          )
+          .map((t) => ({
+            ...t,
+            cadence: t.cadence ?? deriveCadence(t),
+          }))
       : [];
+    const taskChecks =
+      parsed.taskChecks && typeof parsed.taskChecks === "object"
+        ? (parsed.taskChecks as Record<string, boolean>)
+        : {};
     const ns = parsed.northStar as Partial<NorthStar> | undefined;
     const normHorizon = (g: Partial<NorthStarGoal> | undefined): NorthStarGoal => ({
       text: typeof g?.text === "string" ? g.text : "",
@@ -178,6 +201,7 @@ function loadTools(): ToolsData {
       monthGoals,
       primaryMonthGoal,
       recurringTasks,
+      taskChecks,
       northStar,
     };
   } catch {
@@ -224,8 +248,12 @@ export interface UseToolsResult extends ToolsData {
   removeMonthGoal: (id: string) => void;
   setPrimaryMonthGoal: (ym: string, goalId: string) => void;
   // 繰り返し／予定タスク
-  addRecurringTask: (task: Omit<RecurringTask, "id">) => void;
+  addRecurringTask: (
+    task: Omit<RecurringTask, "id" | "cadence"> & { cadence?: Cadence },
+  ) => void;
   removeRecurringTask: (id: string) => void;
+  // 期間タスク（今週・今月）の完了トグル
+  toggleTaskCheck: (taskId: string, periodKey: string) => void;
   // 北極星
   setNorthStar: (horizon: Horizon, patch: Partial<NorthStarGoal>) => void;
 }
@@ -404,11 +432,9 @@ export function useTools(): UseToolsResult {
     addRecurringTask: (task) => {
       const title = task.title.trim();
       if (!title) return;
-      const hasSchedule =
-        (task.days && task.days.length > 0) ||
-        task.monthlyDay != null ||
-        !!task.onceDate;
-      if (!hasSchedule) return;
+      const cadence = task.cadence ?? deriveCadence(task);
+      // 単発/固定は対象日が必須。floating（週次/月次の期間内）はスケジュール不要。
+      if (cadence === "once" && !task.onceDate) return;
       mutate((prev) => ({
         ...prev,
         recurringTasks: [
@@ -416,6 +442,7 @@ export function useTools(): UseToolsResult {
           {
             id: uid("rt"),
             title,
+            cadence,
             ...(task.fieldId ? { fieldId: task.fieldId } : {}),
             ...(task.days && task.days.length
               ? { days: [...task.days].sort((a, b) => a - b) }
@@ -431,6 +458,15 @@ export function useTools(): UseToolsResult {
         ...prev,
         recurringTasks: prev.recurringTasks.filter((r) => r.id !== id),
       })),
+
+    toggleTaskCheck: (taskId, periodKey) =>
+      mutate((prev) => {
+        const key = `${taskId}:${periodKey}`;
+        const taskChecks = { ...prev.taskChecks };
+        if (taskChecks[key]) delete taskChecks[key];
+        else taskChecks[key] = true;
+        return { ...prev, taskChecks };
+      }),
 
     setNorthStar: (horizon, patch) =>
       mutate((prev) => {

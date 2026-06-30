@@ -2,15 +2,22 @@
 
 import { useState } from "react";
 import { FIELDS } from "@/lib/constants";
-import type { RecurringTask } from "@/lib/tools/useTools";
+import type { Cadence, RecurringTask } from "@/lib/tools/useTools";
 import { describeSchedule } from "@/lib/recurring";
 
-// 目標設定ページで「繰り返し／予定タスク」を作る。
-// 曜日（毎日・平日・曜日選択）／毎月N日／特定の日付（1回）に対応。
-// 作ったタスクは、その日になると自動で「本日のタスク」に入る。
+// 目標設定ページで「タスク」を作る。日次／週次／月次／単発で分ける。
+// 週次・月次は「曜日/日にちを決める（固定）」と「期間内にやる（いつでも）」の両対応。
+// 作ったタスクは、日次/固定/単発は当日「本日のタスク」へ、週次/月次の期間内タスクは
+// ダッシュボードの「今週／今月のタスク」に並ぶ。
 
 const DOW = ["日", "月", "火", "水", "木", "金", "土"];
-type Mode = "weekday" | "monthly" | "once";
+
+const CADENCE_LABEL: Record<Cadence, string> = {
+  daily: "日次",
+  weekly: "週次",
+  monthly: "月次",
+  once: "単発",
+};
 
 export default function TaskScheduler({
   recurringTasks,
@@ -18,22 +25,19 @@ export default function TaskScheduler({
   onRemove,
 }: {
   recurringTasks: RecurringTask[];
-  onAdd: (task: Omit<RecurringTask, "id">) => void;
+  onAdd: (
+    task: Omit<RecurringTask, "id" | "cadence"> & { cadence?: Cadence },
+  ) => void;
   onRemove: (id: string) => void;
 }) {
   const [title, setTitle] = useState("");
   const [fieldId, setFieldId] = useState<number | "">("");
-  const [mode, setMode] = useState<Mode>("weekday");
-  const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 0]);
-  const [monthlyDay, setMonthlyDay] = useState<number>(1);
-  const [onceDate, setOnceDate] = useState<string>("");
-
-  const presets: { label: string; days: number[] }[] = [
-    { label: "毎日", days: [0, 1, 2, 3, 4, 5, 6] },
-    { label: "平日", days: [1, 2, 3, 4, 5] },
-    { label: "日曜以外", days: [1, 2, 3, 4, 5, 6] },
-    { label: "週末", days: [0, 6] },
-  ];
+  const [mode, setMode] = useState<Cadence>("daily");
+  const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [weeklyFixed, setWeeklyFixed] = useState(true);
+  const [monthlyFixed, setMonthlyFixed] = useState(true);
+  const [monthlyDay, setMonthlyDay] = useState(1);
+  const [onceDate, setOnceDate] = useState("");
 
   function toggleDay(d: number) {
     setDays((prev) =>
@@ -43,8 +47,9 @@ export default function TaskScheduler({
 
   const canAdd =
     title.trim() !== "" &&
-    ((mode === "weekday" && days.length > 0) ||
-      (mode === "monthly" && monthlyDay >= 1 && monthlyDay <= 31) ||
+    (mode === "daily" ||
+      (mode === "weekly" && (!weeklyFixed || days.length > 0)) ||
+      (mode === "monthly" && (!monthlyFixed || (monthlyDay >= 1 && monthlyDay <= 31))) ||
       (mode === "once" && !!onceDate));
 
   function add() {
@@ -53,11 +58,26 @@ export default function TaskScheduler({
       title: title.trim(),
       ...(fieldId !== "" ? { fieldId: Number(fieldId) } : {}),
     };
-    if (mode === "weekday") onAdd({ ...base, days });
-    else if (mode === "monthly") onAdd({ ...base, monthlyDay });
-    else if (mode === "once") onAdd({ ...base, onceDate });
+    if (mode === "daily") onAdd({ ...base, cadence: "daily" });
+    else if (mode === "weekly")
+      onAdd({ ...base, cadence: "weekly", ...(weeklyFixed ? { days } : {}) });
+    else if (mode === "monthly")
+      onAdd({
+        ...base,
+        cadence: "monthly",
+        ...(monthlyFixed ? { monthlyDay } : {}),
+      });
+    else if (mode === "once") onAdd({ ...base, cadence: "once", onceDate });
     setTitle("");
   }
+
+  const grouped: Record<Cadence, RecurringTask[]> = {
+    daily: [],
+    weekly: [],
+    monthly: [],
+    once: [],
+  };
+  for (const t of recurringTasks) grouped[t.cadence].push(t);
 
   return (
     <section className="py-10 hairline-bottom scroll-mt-24" id="task-scheduler">
@@ -66,18 +86,12 @@ export default function TaskScheduler({
           <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
             ↻ TASKS
           </span>
-          <h2 className="serif text-2xl text-[var(--color-ink)]">
-            タスクを作る
-          </h2>
+          <h2 className="serif text-2xl text-[var(--color-ink)]">タスクを作る</h2>
         </div>
         <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
-          → 本日のタスクに自動で入る
+          日次 / 週次 / 月次
         </span>
       </div>
-
-      <p className="text-[11px] text-[var(--color-fg-faint)] mb-5 leading-relaxed">
-        曜日・毎月の日にち・特定の日付で繰り返しを設定すると、その日になるたび「本日のタスク」に自動で入ります。
-      </p>
 
       {/* タイトル＋分野 */}
       <div className="flex flex-col md:flex-row gap-2 mb-4">
@@ -104,15 +118,9 @@ export default function TaskScheduler({
         </select>
       </div>
 
-      {/* 繰り返しの種類 */}
+      {/* 区分（日次/週次/月次/単発） */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {(
-          [
-            ["weekday", "曜日で"],
-            ["monthly", "毎月N日"],
-            ["once", "特定の日付"],
-          ] as const
-        ).map(([m, label]) => (
+        {(["daily", "weekly", "monthly", "once"] as Cadence[]).map((m) => (
           <button
             key={m}
             type="button"
@@ -123,67 +131,97 @@ export default function TaskScheduler({
                 : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
             }`}
           >
-            {label}
+            {CADENCE_LABEL[m]}
           </button>
         ))}
       </div>
 
-      {/* 種類ごとの設定 */}
-      {mode === "weekday" && (
+      {/* 区分ごとの設定 */}
+      {mode === "daily" && (
+        <p className="text-[11px] text-[var(--color-fg-faint)] mb-4">
+          毎日「本日のタスク」に入ります。
+        </p>
+      )}
+
+      {mode === "weekly" && (
         <div className="space-y-3 mb-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] mr-1">
-              おまかせ：
-            </span>
-            {presets.map((p) => (
-              <button
-                key={p.label}
-                type="button"
-                onClick={() => setDays(p.days)}
-                className="text-[11px] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
-              >
-                {p.label}
-              </button>
-            ))}
+          <div className="flex gap-2">
+            <SubToggle
+              on={weeklyFixed}
+              onClick={() => setWeeklyFixed(true)}
+              label="曜日を決める"
+            />
+            <SubToggle
+              on={!weeklyFixed}
+              onClick={() => setWeeklyFixed(false)}
+              label="今週やる（いつでも）"
+            />
           </div>
-          <div className="flex flex-wrap gap-2">
-            {DOW.map((label, d) => {
-              const on = days.includes(d);
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => toggleDay(d)}
-                  className={`w-9 h-9 text-sm border transition ${
-                    on
-                      ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
-                      : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)]"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+          {weeklyFixed && (
+            <div className="flex flex-wrap gap-2">
+              {DOW.map((label, d) => {
+                const on = days.includes(d);
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => toggleDay(d)}
+                    className={`w-9 h-9 text-sm border transition ${
+                      on
+                        ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
+                        : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {!weeklyFixed && (
+            <p className="text-[11px] text-[var(--color-fg-faint)]">
+              「今週のタスク」に並びます。日曜まで、週明けにリセットされます。
+            </p>
+          )}
         </div>
       )}
 
       {mode === "monthly" && (
-        <div className="flex items-center gap-2 mb-4 text-sm">
-          <span className="text-[var(--color-fg-mute)]">毎月</span>
-          <input
-            type="number"
-            min={1}
-            max={31}
-            value={monthlyDay}
-            onChange={(e) =>
-              setMonthlyDay(
-                Math.max(1, Math.min(31, Number(e.target.value) || 1)),
-              )
-            }
-            className="w-16 border border-[var(--color-line)] px-2 py-1.5 text-center text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]"
-          />
-          <span className="text-[var(--color-fg-mute)]">日</span>
+        <div className="space-y-3 mb-4">
+          <div className="flex gap-2">
+            <SubToggle
+              on={monthlyFixed}
+              onClick={() => setMonthlyFixed(true)}
+              label="毎月N日"
+            />
+            <SubToggle
+              on={!monthlyFixed}
+              onClick={() => setMonthlyFixed(false)}
+              label="今月やる（いつでも）"
+            />
+          </div>
+          {monthlyFixed ? (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-[var(--color-fg-mute)]">毎月</span>
+              <input
+                type="number"
+                min={1}
+                max={31}
+                value={monthlyDay}
+                onChange={(e) =>
+                  setMonthlyDay(
+                    Math.max(1, Math.min(31, Number(e.target.value) || 1)),
+                  )
+                }
+                className="w-16 border border-[var(--color-line)] px-2 py-1.5 text-center text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]"
+              />
+              <span className="text-[var(--color-fg-mute)]">日</span>
+            </div>
+          ) : (
+            <p className="text-[11px] text-[var(--color-fg-faint)]">
+              「今月のタスク」に並びます。月末まで、月初にリセットされます。
+            </p>
+          )}
         </div>
       )}
 
@@ -195,7 +233,9 @@ export default function TaskScheduler({
             onChange={(e) => setOnceDate(e.target.value)}
             className="border border-[var(--color-line)] px-3 py-1.5 text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]"
           />
-          <span className="text-[11px] text-[var(--color-fg-faint)]">に1回だけ</span>
+          <span className="text-[11px] text-[var(--color-fg-faint)]">
+            に1回だけ「本日のタスク」へ
+          </span>
         </div>
       )}
 
@@ -208,40 +248,70 @@ export default function TaskScheduler({
         ＋ タスクを追加
       </button>
 
-      {/* 登録済み一覧 */}
+      {/* 登録済み一覧（区分ごと） */}
       {recurringTasks.length > 0 && (
-        <div className="hairline-top mt-8 pt-4">
-          <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
-            登録済み（{recurringTasks.length}）
-          </div>
-          {recurringTasks.map((r) => (
-            <div
-              key={r.id}
-              className="flex items-center gap-3 py-2.5 hairline-bottom group"
-            >
-              <span className="text-[9px] tracking-[0.15em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 whitespace-nowrap">
-                {describeSchedule(r)}
-              </span>
-              <span className="text-sm flex-1 text-[var(--color-ink)]">
-                {r.title}
-              </span>
-              {r.fieldId != null && (
-                <span className="text-[10px] tracking-[0.15em] text-[var(--color-fg-mute)]">
-                  {FIELDS.find((f) => f.id === r.fieldId)?.nameJaShort}
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={() => onRemove(r.id)}
-                className="opacity-0 group-hover:opacity-100 text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition text-xs"
-                aria-label="削除"
-              >
-                ×
-              </button>
-            </div>
-          ))}
+        <div className="mt-8 space-y-5">
+          {(["daily", "weekly", "monthly", "once"] as Cadence[])
+            .filter((c) => grouped[c].length > 0)
+            .map((c) => (
+              <div key={c}>
+                <div className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] mb-1 hairline-bottom pb-1">
+                  {CADENCE_LABEL[c]}（{grouped[c].length}）
+                </div>
+                {grouped[c].map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center gap-3 py-2 hairline-bottom group"
+                  >
+                    <span className="text-[9px] tracking-[0.15em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 whitespace-nowrap">
+                      {describeSchedule(r)}
+                    </span>
+                    <span className="text-sm flex-1 text-[var(--color-ink)]">
+                      {r.title}
+                    </span>
+                    {r.fieldId != null && (
+                      <span className="text-[10px] tracking-[0.15em] text-[var(--color-fg-mute)]">
+                        {FIELDS.find((f) => f.id === r.fieldId)?.nameJaShort}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => onRemove(r.id)}
+                      className="opacity-0 group-hover:opacity-100 text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition text-xs"
+                      aria-label="削除"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ))}
         </div>
       )}
     </section>
+  );
+}
+
+function SubToggle({
+  on,
+  onClick,
+  label,
+}: {
+  on: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-[11px] tracking-[0.1em] px-3 py-1.5 border transition ${
+        on
+          ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+          : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
