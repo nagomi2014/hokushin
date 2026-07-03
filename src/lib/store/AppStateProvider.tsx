@@ -52,6 +52,8 @@ export interface StoreMeta {
   signOut: () => Promise<void>;
   /** このデバイスのlocalStorageデータをアカウントへ一括コピー */
   syncLocalToCloud: () => Promise<{ ok: boolean; message: string }>;
+  /** すべてのデータを消去して最初から（クラウドの自分の行＋ローカル＋メモリ） */
+  resetAll: () => Promise<void>;
 }
 
 export type AppStateContextValue = AppStateApi & StoreMeta;
@@ -798,6 +800,34 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // すべてのデータを消去して最初から。
+  // クラウド（ログイン中）は自分の行を全テーブルから削除し、ローカルの
+  // hokushin:* を全消去、メモリ状態も空にする。→ 再読み込みで真っさら。
+  const resetAll = useCallback(async (): Promise<void> => {
+    const supabase = supabaseRef.current;
+    const u = userIdRef.current;
+    if (supabase && u) {
+      const tables = [
+        "pyramid_entries",
+        "field_goals",
+        "daily_tasks",
+        "monthly_plans",
+        "mandala_charts",
+        "wishlist_items",
+        "daily_reports",
+      ];
+      await Promise.all(
+        tables.map((t) => supabase.from(t).delete().eq("user_id", u)),
+      );
+    }
+    if (typeof window !== "undefined") {
+      for (const k of Object.keys(window.localStorage)) {
+        if (k.startsWith("hokushin:")) window.localStorage.removeItem(k);
+      }
+    }
+    setState(emptyState());
+  }, []);
+
   const value: AppStateContextValue = {
     state,
     loaded,
@@ -824,6 +854,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     supabaseEnabled,
     signOut,
     syncLocalToCloud,
+    resetAll,
   };
 
   return (

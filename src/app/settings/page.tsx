@@ -14,6 +14,7 @@ export default function SettingsPage() {
     mode,
     signOut,
     syncLocalToCloud,
+    resetAll,
   } = useAppState();
 
   const [syncing, setSyncing] = useState(false);
@@ -153,19 +154,16 @@ export default function SettingsPage() {
             : "現在、データはこのブラウザにのみ保存されています。ログインするとクラウドで同期できます。"}
         </p>
         <button
-          onClick={() => {
+          onClick={async () => {
             if (typeof window === "undefined") return;
             if (
               !confirm(
-                "すべてのデータを消去して最初からにしますか？\n目標・タスク・北極星・記録などがすべて消えます。この操作は取り消せません。",
+                "すべてのデータを消去して最初からにしますか？\n目標・タスク・北極星・記録などが、この端末とクラウドの両方から消えます。この操作は取り消せません。",
               )
             )
               return;
-            // hokushin: で始まる保存データを全消去（状態・ツール・北極星・繰り返し
-            // タスク・ガイド進捗・書き直し記録・オンボーディングなど一式）。
-            for (const k of Object.keys(window.localStorage)) {
-              if (k.startsWith("hokushin:")) window.localStorage.removeItem(k);
-            }
+            // クラウド（ログイン中）の自分の行＋ローカルの hokushin:* を全消去
+            await resetAll();
             window.location.href = "/";
           }}
           className="text-xs tracking-[0.3em] border border-red-500/40 text-red-600 px-4 py-2 hover:bg-red-50 transition"
