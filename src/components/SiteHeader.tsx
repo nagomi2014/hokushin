@@ -6,32 +6,40 @@ import { Fragment, useEffect, useState } from "react";
 import { APP_MEANING_JA, APP_NAME, APP_NAME_JA } from "@/lib/constants";
 import { useAppState } from "@/lib/storage";
 
-type NavGroup = "home" | "know" | "derive" | "act";
+type NavGroup = "home" | "know" | "derive" | "act" | "tools";
 
 interface NavItem {
   href: string;
   label: string;
   labelJa: string;
   group: NavGroup;
+  primary?: boolean; // 上部バーに常時出す主要ページ
 }
 
-// 流れ順に並べる：ダッシュボード → ①知る → ②導き出す → ③動く
+// 流れ順：ダッシュボード → ①知る → ②導き出す → ③動く → ととのえる。
+// primary の3つだけ上部バーに出し、残りは ☰ メニューに全部入れる。
 const NAV: NavItem[] = [
-  { href: "/", label: "DASHBOARD", labelJa: "ダッシュボード", group: "home" },
+  { href: "/", label: "DASHBOARD", labelJa: "ダッシュボード", group: "home", primary: true },
   { href: "/pyramid", label: "PYRAMID", labelJa: "ピラミッド", group: "know" },
   { href: "/mandala", label: "MANDALA", labelJa: "曼荼羅", group: "know" },
   { href: "/list-100", label: "LIST 100", labelJa: "百のリスト", group: "know" },
-  { href: "/fields", label: "GOALS", labelJa: "目標設定", group: "derive" },
-  { href: "/monthly", label: "MONTHLY", labelJa: "月次", group: "act" },
+  { href: "/history", label: "LIFE 100Y", labelJa: "100年史", group: "know" },
+  { href: "/fields", label: "GOALS", labelJa: "目標設定", group: "derive", primary: true },
+  { href: "/monthly", label: "MONTHLY", labelJa: "月次", group: "act", primary: true },
   { href: "/journal", label: "JOURNAL", labelJa: "日誌", group: "act" },
-  { href: "/revisions", label: "REVISIONS", labelJa: "書き直しの記録", group: "act" },
+  { href: "/money", label: "MONEY", labelJa: "金の記録", group: "tools" },
+  { href: "/prime", label: "QUADRANT II", labelJa: "第II領域", group: "tools" },
+  { href: "/revisions", label: "REVISIONS", labelJa: "書き直しの記録", group: "tools" },
 ];
+
+const PRIMARY_NAV = NAV.filter((n) => n.primary);
 
 const GROUP_LABEL: Record<NavGroup, string> = {
   home: "",
   know: "① 知る",
   derive: "② 導き出す",
   act: "③ 動く",
+  tools: "ととのえる",
 };
 
 export function SiteHeader() {
@@ -75,32 +83,20 @@ export function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 text-xs tracking-[0.2em] text-[var(--color-fg-mute)]">
-          {NAV.map((item, i) => {
-            const prev = NAV[i - 1];
-            const showDivider =
-              !!prev && prev.group !== item.group && item.group !== "home";
-            return (
-              <Fragment key={item.href}>
-                {showDivider && (
-                  <span
-                    className="w-px h-3 bg-[var(--color-line)]"
-                    aria-hidden
-                  />
-                )}
-                <Link
-                  href={item.href}
-                  className={`nav-link ${
-                    isActive(item.href)
-                      ? "active text-[var(--color-ink)] font-medium"
-                      : "hover:text-[var(--color-ink)]"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </Fragment>
-            );
-          })}
+        <nav className="hidden md:flex items-center gap-7 text-xs tracking-[0.2em] text-[var(--color-fg-mute)]">
+          {PRIMARY_NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`nav-link ${
+                isActive(item.href)
+                  ? "active text-[var(--color-ink)] font-medium"
+                  : "hover:text-[var(--color-ink)]"
+              }`}
+            >
+              {item.labelJa}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -124,11 +120,11 @@ export function SiteHeader() {
             )}
           </Link>
 
-          {/* モバイル用ハンバーガー（md未満で表示） */}
+          {/* ☰ メニュー（全サイズ表示・全ページをここに集約） */}
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="md:hidden w-9 h-9 -mr-1.5 flex flex-col items-center justify-center gap-[5px]"
+            className="w-9 h-9 -mr-1.5 flex flex-col items-center justify-center gap-[5px]"
             aria-label={menuOpen ? "メニューを閉じる" : "メニューを開く"}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
@@ -152,9 +148,9 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* モバイルメニュー */}
+      {/* フルメニュー（全ページ・全サイズ） */}
       {menuOpen && (
-        <div className="md:hidden">
+        <div>
           <div
             className="fixed inset-0 top-16 bg-[var(--color-ink)]/20 backdrop-blur-[1px]"
             onClick={() => setMenuOpen(false)}
