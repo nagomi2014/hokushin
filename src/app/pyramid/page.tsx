@@ -29,13 +29,13 @@ export default function PyramidPage() {
 
       {/* Header */}
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; SUCCESS&nbsp;PYRAMID
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           成功のピラミッド
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           土台（人生理念）から順に書き上げ、頂点（日々の実践）へ降りてくる。
         </p>
       </section>
@@ -72,7 +72,7 @@ export default function PyramidPage() {
 
       {/* Editor */}
       <section className="py-12">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           編集
         </div>
         <h2 className="serif text-2xl text-[var(--color-ink)] mb-10">
@@ -104,7 +104,7 @@ export default function PyramidPage() {
                   <div className="serif text-lg text-[var(--color-ink)] mb-1">
                     {tier.nameJa}
                   </div>
-                  <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-3">
+                  <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-3">
                     {tier.nameEn}
                   </div>
                   <p className="text-xs text-[var(--color-fg-mute)] leading-relaxed">
@@ -122,7 +122,7 @@ export default function PyramidPage() {
                   />
                   <div className="mt-2 flex items-center justify-between">
                     {entry?.updatedAt && entry.content ? (
-                      <div className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+                      <div className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
                         LAST UPDATED · {entry.updatedAt.slice(0, 10)}
                       </div>
                     ) : (
@@ -132,7 +132,7 @@ export default function PyramidPage() {
                       <button
                         type="button"
                         onClick={() => setCoachLevel(1)}
-                        className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
+                        className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] hover:text-[var(--color-ink)] transition"
                       >
                         ★ 質問で見つける →
                       </button>
@@ -153,7 +153,7 @@ export default function PyramidPage() {
           >
             ← BACK&nbsp;TO&nbsp;DASHBOARD
           </Link>
-          <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+          <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
             AUTO-SAVED · LOCAL
           </span>
         </div>
@@ -169,7 +169,7 @@ export default function PyramidPage() {
           <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
             <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
               <div>
-                <div className="text-[9px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+                <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-1">
                   ★ &nbsp; 質問で見つける
                 </div>
                 <div className="serif text-base text-[var(--color-ink)]">

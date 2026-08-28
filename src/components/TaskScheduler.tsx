@@ -83,12 +83,12 @@ export default function TaskScheduler({
     <section className="py-10 hairline-bottom scroll-mt-24" id="task-scheduler">
       <div className="flex items-baseline justify-between mb-5">
         <div className="flex items-baseline gap-4">
-          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
             ↻ TASKS
           </span>
           <h2 className="serif text-2xl text-[var(--color-ink)]">タスクを作る</h2>
         </div>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           日次 / 週次 / 月次
         </span>
       </div>
@@ -125,7 +125,7 @@ export default function TaskScheduler({
             key={m}
             type="button"
             onClick={() => setMode(m)}
-            className={`text-[11px] tracking-[0.15em] px-3 py-1.5 border transition ${
+            className={`text-[12px] tracking-[0.15em] px-3 py-1.5 border transition ${
               mode === m
                 ? "border-[var(--color-ink)] bg-[var(--color-ink)] text-white"
                 : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
@@ -138,7 +138,7 @@ export default function TaskScheduler({
 
       {/* 区分ごとの設定 */}
       {mode === "daily" && (
-        <p className="text-[11px] text-[var(--color-fg-faint)] mb-4">
+        <p className="text-[12px] text-[var(--color-fg-faint)] mb-4">
           毎日「本日のタスク」に入ります。
         </p>
       )}
@@ -179,7 +179,7 @@ export default function TaskScheduler({
             </div>
           )}
           {!weeklyFixed && (
-            <p className="text-[11px] text-[var(--color-fg-faint)]">
+            <p className="text-[12px] text-[var(--color-fg-faint)]">
               「今週のタスク」に並びます。日曜まで、週明けにリセットされます。
             </p>
           )}
@@ -218,7 +218,7 @@ export default function TaskScheduler({
               <span className="text-[var(--color-fg-mute)]">日</span>
             </div>
           ) : (
-            <p className="text-[11px] text-[var(--color-fg-faint)]">
+            <p className="text-[12px] text-[var(--color-fg-faint)]">
               「今月のタスク」に並びます。月末まで、月初にリセットされます。
             </p>
           )}
@@ -233,7 +233,7 @@ export default function TaskScheduler({
             onChange={(e) => setOnceDate(e.target.value)}
             className="border border-[var(--color-line)] px-3 py-1.5 text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]"
           />
-          <span className="text-[11px] text-[var(--color-fg-faint)]">
+          <span className="text-[12px] text-[var(--color-fg-faint)]">
             に1回だけ「本日のタスク」へ
           </span>
         </div>
@@ -255,7 +255,7 @@ export default function TaskScheduler({
             .filter((c) => grouped[c].length > 0)
             .map((c) => (
               <div key={c}>
-                <div className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] mb-1 hairline-bottom pb-1">
+                <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] mb-1 hairline-bottom pb-1">
                   {CADENCE_LABEL[c]}（{grouped[c].length}）
                 </div>
                 {grouped[c].map((r) => (
@@ -263,14 +263,14 @@ export default function TaskScheduler({
                     key={r.id}
                     className="flex items-center gap-3 py-2 hairline-bottom group"
                   >
-                    <span className="text-[9px] tracking-[0.15em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 whitespace-nowrap">
+                    <span className="text-[12px] tracking-[0.15em] text-[var(--color-gold-ink)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 whitespace-nowrap">
                       {describeSchedule(r)}
                     </span>
                     <span className="text-sm flex-1 text-[var(--color-ink)]">
                       {r.title}
                     </span>
                     {r.fieldId != null && (
-                      <span className="text-[10px] tracking-[0.15em] text-[var(--color-fg-mute)]">
+                      <span className="text-[12px] tracking-[0.15em] text-[var(--color-fg-mute)]">
                         {FIELDS.find((f) => f.id === r.fieldId)?.nameJaShort}
                       </span>
                     )}
@@ -305,9 +305,9 @@ function SubToggle({
     <button
       type="button"
       onClick={onClick}
-      className={`text-[11px] tracking-[0.1em] px-3 py-1.5 border transition ${
+      className={`text-[12px] tracking-[0.1em] px-3 py-1.5 border transition ${
         on
-          ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+          ? "border-[var(--color-gold)] text-[var(--color-gold-ink)]"
           : "border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
       }`}
     >

@@ -41,20 +41,20 @@ export default function SettingsPage() {
 
       {/* Header */}
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; SETTINGS
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           設定
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           アカウント・データ・アプリの設定。
         </p>
       </section>
 
       {/* Account */}
       <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           00 ・ アカウント
         </div>
 
@@ -67,29 +67,29 @@ export default function SettingsPage() {
           <div className="border border-[var(--color-line)] p-6">
             <div className="flex items-center justify-between gap-4 mb-5">
               <div>
-                <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-1">
+                <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-1">
                   SIGNED IN
                 </div>
                 <div className="serif text-lg text-[var(--color-ink)] break-all">
                   {userEmail}
                 </div>
-                <div className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] mt-1">
+                <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] mt-1">
                   ● クラウド同期中（PC・スマホ共通）
                 </div>
               </div>
               <button
                 onClick={signOut}
-                className="text-[10px] tracking-[0.3em] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition whitespace-nowrap"
+                className="text-[12px] tracking-[0.3em] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition whitespace-nowrap"
               >
                 ログアウト
               </button>
             </div>
 
             <div className="hairline-top pt-4">
-              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
                 このデバイスのデータをアカウントへ移す
               </div>
-              <p className="text-[11px] text-[var(--color-fg-faint)] leading-relaxed mb-3">
+              <p className="text-[12px] text-[var(--color-fg-faint)] leading-relaxed mb-3">
                 ログイン前にこの端末で入力した内容を、クラウドへ一括コピーします。
                 同じ項目はこの端末の内容で上書きされます。
               </p>
@@ -101,7 +101,7 @@ export default function SettingsPage() {
                 {syncing ? "移行中…" : "↑ アカウントへ移す"}
               </button>
               {syncMsg && (
-                <p className="mt-3 text-[11px] text-[var(--color-fg-mute)] leading-relaxed">
+                <p className="mt-3 text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
                   {syncMsg}
                 </p>
               )}
@@ -125,7 +125,7 @@ export default function SettingsPage() {
 
       {/* Daily report import */}
       <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           01 ・ 日報インポート
         </div>
         {mode === "cloud" ? (
@@ -145,7 +145,7 @@ export default function SettingsPage() {
 
       {/* Data management */}
       <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           02 ・ データ
         </div>
         <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-4">
@@ -174,7 +174,7 @@ export default function SettingsPage() {
 
       {/* はじめ方 */}
       <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           03 ・ はじめ方
         </div>
         <p className="text-sm text-[var(--color-fg-mute)] leading-relaxed mb-4">
@@ -190,7 +190,7 @@ export default function SettingsPage() {
 
       {/* Legal */}
       <section className="py-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           04 ・ 規約
         </div>
         <Link

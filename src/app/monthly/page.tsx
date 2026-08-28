@@ -173,7 +173,7 @@ export default function MonthlyPage() {
 
       {/* Header */}
       <section className="pt-20 pb-12 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+        <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-6">
           ★ &nbsp; MONTHLY&nbsp;PLAN
         </div>
         <div className="flex items-end justify-between gap-4 flex-wrap">
@@ -218,11 +218,11 @@ export default function MonthlyPage() {
           }}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 mt-6 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
             新しい月のはじまりです。今月の目標を立てましょう
           </span>
-          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+          <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
             先月の振り返りを手がかりに、分野ごとの今月の目標を →
           </span>
         </button>
@@ -242,11 +242,11 @@ export default function MonthlyPage() {
           }}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 mt-6 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
             今月もおつかれさまでした。ふり返りを書きましょう
           </span>
-          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+          <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
             来月の「先月の振り返り」として、ここに残ります →
           </span>
         </button>
@@ -257,13 +257,13 @@ export default function MonthlyPage() {
         {primaryText ? (
           <div className="bg-[var(--color-ink)] text-white px-5 py-4">
             <div className="flex items-center justify-between gap-3 mb-1">
-              <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)]">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
                 ★ THIS MONTH
               </div>
               <button
                 type="button"
                 onClick={addPrimaryToToday}
-                className="text-[10px] tracking-[0.2em] border border-white/30 text-white px-2.5 py-1 hover:bg-white hover:text-[var(--color-ink)] transition whitespace-nowrap"
+                className="text-[12px] tracking-[0.2em] border border-white/30 text-white px-2.5 py-1 hover:bg-white hover:text-[var(--color-ink)] transition whitespace-nowrap"
               >
                 {addedMsg ? "追加しました ✓" : "＋ 今日のタスクに追加"}
               </button>
@@ -279,7 +279,7 @@ export default function MonthlyPage() {
 
       {/* 今月の目標（分野ごとに複数） */}
       <Section number="02" title="今月の目標" caption="THIS MONTH'S GOALS" id="month-goals">
-        <p className="text-[11px] text-[var(--color-fg-faint)] mb-6 leading-relaxed">
+        <p className="text-[12px] text-[var(--color-fg-faint)] mb-6 leading-relaxed">
           選んだ分野ごとに、今月の目標を書きます（いくつでも）。
           いちばん大切なものを ★ で選ぶと、上の「最重要目標」になります。
         </p>
@@ -309,7 +309,7 @@ export default function MonthlyPage() {
                       {f.nameJa}
                     </span>
                     {shortTerm && (
-                      <span className="text-[10px] text-[var(--color-fg-faint)]">
+                      <span className="text-[12px] text-[var(--color-fg-faint)]">
                         <span className="tracking-[0.15em] mr-1">短期目標</span>
                         {shortTerm}
                       </span>
@@ -326,8 +326,8 @@ export default function MonthlyPage() {
                             onClick={() => setPrimaryMonthGoal(ymKey, g.id)}
                             className={`text-base leading-none ${
                               isPrimary
-                                ? "text-[var(--color-gold)]"
-                                : "text-[var(--color-line)] hover:text-[var(--color-gold)]"
+                                ? "text-[var(--color-gold-ink)]"
+                                : "text-[var(--color-fg-faint)] hover:text-[var(--color-gold-ink)]"
                             } transition`}
                             aria-label="最重要に選ぶ"
                             title="最重要に選ぶ"
@@ -359,7 +359,7 @@ export default function MonthlyPage() {
                     <button
                       type="button"
                       onClick={() => addMonthGoal(ymKey, fid)}
-                      className="mt-1 text-[11px] tracking-[0.2em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
+                      className="mt-1 text-[12px] tracking-[0.2em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition"
                     >
                       ＋ {f.nameJaShort}の目標を追加
                     </button>
@@ -373,7 +373,7 @@ export default function MonthlyPage() {
 
       {primaryText && (
         <section className="mt-12 pt-10 hairline-top">
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
             ③ 動く ・ NEXT
           </div>
           <h2 className="serif text-2xl md:text-3xl text-[var(--color-ink)] mb-2">
@@ -388,16 +388,16 @@ export default function MonthlyPage() {
             className="block bg-white p-6 hover:bg-[var(--color-paper-soft)] transition group border border-[var(--color-line)]"
           >
             <div className="flex items-baseline justify-between mb-3">
-              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold)] transition">
+              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold-ink)] transition">
                 →
               </span>
-              <span className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
                 DAILY
               </span>
             </div>
             <div className="serif text-lg text-[var(--color-ink)] mb-2">
               今日のタスクに落とす
-              <span className="text-[var(--color-gold)] ml-2 text-sm">→</span>
+              <span className="text-[var(--color-gold-ink)] ml-2 text-sm">→</span>
             </div>
             <p className="text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
               今月の一手を、今日できる行動に分ける。ここで初めて“動き”が始まる。
@@ -408,7 +408,7 @@ export default function MonthlyPage() {
 
       {/* 先月の振り返り（読むだけ・下に置く） */}
       <Section number="03" title="先月の振り返り" caption="LAST MONTH">
-        <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+        <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
           {prevYm.year}.{String(prevYm.month).padStart(2, "0")}
         </div>
         {prevReflection ? (
@@ -440,12 +440,12 @@ export default function MonthlyPage() {
               <button
                 type="button"
                 onClick={() => setReflectOpen(false)}
-                className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
+                className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
               >
                 閉じる −
               </button>
             </div>
-            <p className="text-[11px] text-[var(--color-fg-faint)] mb-3">
+            <p className="text-[12px] text-[var(--color-fg-faint)] mb-3">
               この月を振り返って書きます。来月の「先月の振り返り」として見えるようになります。
             </p>
             {thisMonthGoals.length > 0 && (
@@ -454,11 +454,11 @@ export default function MonthlyPage() {
                   type="button"
                   onClick={quoteGoalsIntoReflection}
                   disabled={plan.reflection.includes("■ 今月の目標の振り返り")}
-                  className="text-[11px] tracking-[0.2em] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="text-[12px] tracking-[0.2em] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-3 py-1.5 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   ★ 今月の目標を引用
                 </button>
-                <span className="text-[10px] text-[var(--color-fg-faint)]">
+                <span className="text-[12px] text-[var(--color-fg-faint)]">
                   {plan.reflection.includes("■ 今月の目標の振り返り")
                     ? "引用済み"
                     : `${thisMonthGoals.length}件の目標を達成チェック付きで挿入`}
@@ -491,7 +491,7 @@ export default function MonthlyPage() {
         >
           ← BACK&nbsp;TO&nbsp;DASHBOARD
         </Link>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           {totalDays} DAYS · AUTO-SAVED
         </span>
       </div>
@@ -517,12 +517,12 @@ function Section({
     <section id={id} className="py-10 hairline-bottom scroll-mt-24">
       <div className="flex items-baseline justify-between mb-5">
         <div className="flex items-baseline gap-4">
-          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
             {number}
           </span>
           <h2 className="serif text-2xl text-[var(--color-ink)]">{title}</h2>
         </div>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           {caption}
         </span>
       </div>

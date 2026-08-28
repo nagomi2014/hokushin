@@ -208,7 +208,7 @@ export function LifeHistoryGuide({
   return (
     <div className="space-y-5">
       {/* progress */}
-      <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+      <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
           {index + 1} / {STAGES.length}
         </span>
@@ -233,19 +233,19 @@ export function LifeHistoryGuide({
 
       {/* era + prompt */}
       <div>
-        <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)] mb-2">
           {stage.era}
         </div>
         <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
           {stage.prompt}
         </div>
         {stage.hint && (
-          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
             {stage.hint}
           </div>
         )}
         {addedHere > 0 && (
-          <div className="text-[11px] text-[var(--color-gold)] mt-2">
+          <div className="text-[12px] text-[var(--color-gold-ink)] mt-2">
             ✓ この時期に {addedHere} 件 記録しました
           </div>
         )}
@@ -254,7 +254,7 @@ export function LifeHistoryGuide({
       {/* input */}
       <div className="flex items-end gap-3">
         <div>
-          <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+          <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
             年齢
           </div>
           <input
@@ -267,7 +267,7 @@ export function LifeHistoryGuide({
           />
         </div>
         <div className="flex-1">
-          <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+          <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
             出来事・思い出
           </div>
           <textarea
@@ -311,7 +311,7 @@ export function LifeHistoryGuide({
         <button
           type="button"
           onClick={() => goToStage(index - 1)}
-          className="text-[11px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+          className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
         >
           ← ひとつ前の時期へ
         </button>

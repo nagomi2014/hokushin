@@ -7,13 +7,14 @@
   --color-ink-soft: #1F2A44;
   --color-gold: #B8902C;
   --color-gold-soft: #C9A227;
+  --color-gold-ink: #876A20;  /* 白い地に文字として置く金。色相はそのまま、明度だけ床(4.5)まで下げた */
   --color-line: #EAEAE6;
   --color-line-soft: #F1F1ED;
   --color-paper: #FFFFFF;
   --color-paper-soft: #FAFAF7;
   --color-fg: #1A1A1A;
   --color-fg-mute: #6B6B6B;
-  --color-fg-faint: #9A9A9A;
+  --color-fg-faint: #6E6E6E;  /* 白・#FAFAF7・#F1F1ED の上で 4.5 を越える上限（旧 #9A9A9A は2.48で読めない） */
 
   /* Fonts (Next.js next/font injects these CSS variables via <html> className) */
   --font-serif: var(--font-noto-serif-jp), "Yu Mincho", "Hiragino Mincho ProN", serif;

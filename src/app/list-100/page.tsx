@@ -60,13 +60,13 @@ export default function List100Page() {
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
 
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; LIST&nbsp;OF&nbsp;100
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           人生でやりたいこと 100
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           思いつくまま書き出す。一つ一つが目標の材料に。
         </p>
       </section>
@@ -74,7 +74,7 @@ export default function List100Page() {
       {/* Progress */}
       <section className="py-6 hairline-bottom">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)]">
             PROGRESS
           </div>
           <div className="text-xs">
@@ -84,7 +84,7 @@ export default function List100Page() {
             <span className="text-[var(--color-fg-faint)] mx-1">/</span>
             <span className="text-[var(--color-fg-mute)]">100</span>
             <span className="text-[var(--color-fg-faint)] mx-3">·</span>
-            <span className="text-[var(--color-gold)]">{done} 達成</span>
+            <span className="text-[var(--color-gold-ink)]">{done} 達成</span>
           </div>
         </div>
         <div className="h-px bg-[var(--color-line)] relative">
@@ -94,11 +94,11 @@ export default function List100Page() {
           />
         </div>
         {remaining > 0 ? (
-          <div className="mt-2 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+          <div className="mt-2 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
             あと {remaining} 個 まで書き出せます
           </div>
         ) : (
-          <div className="mt-2 text-[10px] tracking-[0.3em] text-[var(--color-gold)]">
+          <div className="mt-2 text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
             ★ 100 個達成！
           </div>
         )}
@@ -123,9 +123,9 @@ export default function List100Page() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">質問に沿って書き出す</span>
-            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
               テーマごとの質問に答えるだけで、どんどん埋まっていく
             </span>
           </button>
@@ -150,7 +150,7 @@ export default function List100Page() {
             ＋ ADD
           </button>
         </form>
-        <div className="mt-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <div className="mt-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           一行ずつ、短く書く。完璧でなくてOK。
         </div>
       </section>
@@ -179,7 +179,7 @@ export default function List100Page() {
                   className={`check-box ${item.done ? "checked" : ""}`}
                   aria-label="toggle"
                 >
-                  {item.done && <span className="text-[10px]">✓</span>}
+                  {item.done && <span className="text-[12px]">✓</span>}
                 </button>
                 <input
                   type="text"
@@ -214,7 +214,7 @@ export default function List100Page() {
         </Link>
         <Link
           href="/fields"
-          className="text-xs tracking-[0.25em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5 hover:text-[var(--color-gold)] hover:border-[var(--color-gold)] transition"
+          className="text-xs tracking-[0.25em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5 hover:text-[var(--color-gold-ink)] hover:border-[var(--color-gold)] transition"
         >
           → 七つの分野で目標を立てる
         </Link>

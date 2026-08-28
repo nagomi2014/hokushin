@@ -92,7 +92,7 @@ export default function PrimePage() {
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+        <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-6">
           ★ &nbsp; QUADRANT&nbsp;II
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight mb-1">
@@ -106,7 +106,7 @@ export default function PrimePage() {
 
       {/* 4象限の説明 */}
       <section className="py-8 hairline-bottom">
-        <div className="grid grid-cols-2 gap-px bg-[var(--color-line)] max-w-md text-[11px]">
+        <div className="grid grid-cols-2 gap-px bg-[var(--color-line)] max-w-md text-[12px]">
           <div className="bg-[var(--color-paper-soft)] p-3">
             <div className="text-[var(--color-fg-faint)] tracking-[0.2em] mb-1">
               I ・ 緊急 × 重要
@@ -114,7 +114,7 @@ export default function PrimePage() {
             <div className="text-[var(--color-fg-mute)]">締切・トラブル対応</div>
           </div>
           <div className="bg-white p-3 border border-[var(--color-gold)]">
-            <div className="text-[var(--color-gold)] tracking-[0.2em] mb-1">
+            <div className="text-[var(--color-gold-ink)] tracking-[0.2em] mb-1">
               II ・ 重要 × 非緊急
             </div>
             <div className="text-[var(--color-ink)]">準備・学び・健康・関係づくり</div>
@@ -143,7 +143,7 @@ export default function PrimePage() {
             </h2>
             <Link
               href="/fields"
-              className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+              className="text-[12px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
             >
               目標を編集 →
             </Link>
@@ -154,7 +154,7 @@ export default function PrimePage() {
               const goal = (g.shortTerm || g.midTerm || g.longTerm).trim();
               return (
                 <div key={f.id} className="flex items-baseline gap-3 text-[12px]">
-                  <span className="text-[var(--color-gold)] tracking-[0.2em] w-16 shrink-0">
+                  <span className="text-[var(--color-gold-ink)] tracking-[0.2em] w-16 shrink-0">
                     {f.nameJaShort}
                   </span>
                   <span className="text-[var(--color-ink)]">{goal}</span>
@@ -186,13 +186,13 @@ export default function PrimePage() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">
               {fieldsWithStates.length > 0
                 ? "分野の状態から、一手を引き出す"
                 : "質問に沿って書く"}
             </span>
-            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
               {fieldsWithStates.length > 0
                 ? "各分野の“ありたい状態”を見ながら、近づくための一手を集める"
                 : "分野ごとの質問に答えて、大事だけど後回しになることを集める"}
@@ -246,11 +246,11 @@ export default function PrimePage() {
                         className={`check-box ${p.done ? "checked" : ""}`}
                         aria-label="toggle"
                       >
-                        {p.done && <span className="text-[10px]">✓</span>}
+                        {p.done && <span className="text-[12px]">✓</span>}
                       </button>
                       <div className="flex-1">
                         {fm && (
-                          <span className="text-[9px] tracking-[0.2em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 mr-2 align-middle">
+                          <span className="text-[12px] tracking-[0.2em] text-[var(--color-gold-ink)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 mr-2 align-middle">
                             {fm.nameJaShort}
                           </span>
                         )}
@@ -267,7 +267,7 @@ export default function PrimePage() {
                       <button
                         type="button"
                         onClick={() => removePrimeItem(p.id)}
-                        className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
+                        className="text-[12px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
                         aria-label="削除"
                       >
                         ×
@@ -275,7 +275,7 @@ export default function PrimePage() {
                     </div>
 
                     {/* 日々のタスクへ：単発追加 ＋ 定期投入 */}
-                    <div className="ml-9 mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[10px]">
+                    <div className="ml-9 mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12px]">
                       <span className="tracking-[0.2em] text-[var(--color-fg-faint)]">
                         日々へ
                       </span>
@@ -286,7 +286,7 @@ export default function PrimePage() {
                       >
                         {addedId === p.id ? "追加しました ✓" : "＋ 今日に追加"}
                       </button>
-                      <span className="text-[var(--color-line)] mx-0.5">|</span>
+                      <span className="text-[var(--color-fg-faint)] mx-0.5">|</span>
                       <span className="tracking-[0.2em] text-[var(--color-fg-faint)]">
                         定期
                       </span>
@@ -314,7 +314,7 @@ export default function PrimePage() {
                         );
                       })}
                       {p.cadence && (
-                        <span className="tracking-[0.15em] text-[var(--color-gold)]">
+                        <span className="tracking-[0.15em] text-[var(--color-gold-ink)]">
                           {p.cadence === "daily" ? "毎日、本日の行に自動で入ります" : "毎週、本日の行に自動で入ります"}
                         </span>
                       )}
@@ -339,7 +339,7 @@ export default function PrimePage() {
         >
           ← BACK&nbsp;TO&nbsp;DASHBOARD
         </Link>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           SAVED · THIS DEVICE
         </span>
       </div>
@@ -367,7 +367,7 @@ function PrimeNextSteps() {
   ];
   return (
     <section className="mt-12 pt-10 hairline-top">
-      <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+      <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
         ③ 動く ・ NEXT
       </div>
       <h2 className="serif text-2xl md:text-3xl text-[var(--color-ink)] mb-2">
@@ -385,16 +385,16 @@ function PrimeNextSteps() {
             className="bg-white p-6 hover:bg-[var(--color-paper-soft)] transition group"
           >
             <div className="flex items-baseline justify-between mb-3">
-              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold)] transition">
+              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold-ink)] transition">
                 {s.no}
               </span>
-              <span className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
                 {s.en}
               </span>
             </div>
             <div className="serif text-lg text-[var(--color-ink)] mb-2">
               {s.title}
-              <span className="text-[var(--color-gold)] ml-2 text-sm">→</span>
+              <span className="text-[var(--color-gold-ink)] ml-2 text-sm">→</span>
             </div>
             <p className="text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
               {s.desc}

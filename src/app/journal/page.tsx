@@ -62,13 +62,13 @@ export default function JournalPage() {
     <div className="max-w-4xl mx-auto px-6 lg:px-10">
       {/* Header */}
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; JOURNAL
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           日報
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           一日を振り返り、言葉にして残す。
         </p>
       </section>
@@ -77,7 +77,7 @@ export default function JournalPage() {
       <section className="py-8 hairline-bottom">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
+            <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
               DATE
             </div>
             <input
@@ -88,9 +88,9 @@ export default function JournalPage() {
             />
           </div>
           {report && (
-            <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+            <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
               {report.source === "import" ? (
-                <span className="text-[var(--color-gold)]">
+                <span className="text-[var(--color-gold-ink)]">
                   ⇣ 取り込み（Claude Code 等）
                 </span>
               ) : (
@@ -114,7 +114,7 @@ export default function JournalPage() {
               <button
                 type="button"
                 onClick={applyDraft}
-                className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
+                className="text-[12px] tracking-[0.25em] text-[var(--color-gold-ink)] hover:text-[var(--color-ink)] transition"
               >
                 ＋ 完了タスクを差し込む
               </button>
@@ -144,7 +144,7 @@ export default function JournalPage() {
             日報を保存
           </button>
           {savedMsg && (
-            <span className="text-[10px] tracking-[0.3em] text-[var(--color-gold)]">
+            <span className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
               ✓ {savedMsg}
             </span>
           )}
@@ -154,7 +154,7 @@ export default function JournalPage() {
       {/* Recent reports */}
       {recent.length > 0 && (
         <section className="py-8 hairline-top">
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-4">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-4">
             これまでの日報
           </div>
           <div className="space-y-2">
@@ -179,7 +179,7 @@ export default function JournalPage() {
                     {preview}
                   </span>
                   {r.source === "import" && (
-                    <span className="text-[10px] tracking-[0.2em] text-[var(--color-gold)] flex-shrink-0">
+                    <span className="text-[12px] tracking-[0.2em] text-[var(--color-gold-ink)] flex-shrink-0">
                       ⇣
                     </span>
                   )}
@@ -222,7 +222,7 @@ function Field({
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-3">
           <span className="serif text-lg text-[var(--color-ink)]">{label}</span>
-          <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+          <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
             {en}
           </span>
         </div>

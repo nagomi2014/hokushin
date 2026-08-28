@@ -42,13 +42,13 @@ export default function HistoryPage() {
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
       {/* Header */}
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; LIFE&nbsp;HISTORY
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           100年史
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           過去の出来事と、これから叶えたいことを、年齢順に並べる。
         </p>
       </section>
@@ -73,16 +73,16 @@ export default function HistoryPage() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
-            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
               生まれた時から順に、質問に答えるだけで年表ができる
             </span>
           </button>
 
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-[var(--color-line)]" />
-            <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+            <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
               または自分で1件ずつ
             </span>
             <div className="flex-1 h-px bg-[var(--color-line)]" />
@@ -90,7 +90,7 @@ export default function HistoryPage() {
 
           <div className="flex flex-wrap items-end gap-3">
           <div>
-            <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+            <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
               年齢
             </div>
             <input
@@ -104,7 +104,7 @@ export default function HistoryPage() {
             />
           </div>
           <div className="flex-1 min-w-[180px]">
-            <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+            <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
               出来事 ・ 願い
             </div>
             <input
@@ -121,7 +121,7 @@ export default function HistoryPage() {
                 key={k}
                 type="button"
                 onClick={() => setKind(k)}
-                className={`text-[11px] tracking-[0.2em] px-3 py-2 transition ${
+                className={`text-[12px] tracking-[0.2em] px-3 py-2 transition ${
                   kind === k
                     ? "bg-[var(--color-ink)] text-white"
                     : "text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
@@ -169,9 +169,9 @@ export default function HistoryPage() {
                     </span>
                   </span>
                   <span
-                    className={`text-[9px] tracking-[0.3em] px-1.5 py-0.5 ${
+                    className={`text-[12px] tracking-[0.3em] px-1.5 py-0.5 ${
                       e.kind === "future"
-                        ? "text-[var(--color-gold)] border border-[var(--color-gold)]"
+                        ? "text-[var(--color-gold-ink)] border border-[var(--color-gold)]"
                         : "text-[var(--color-fg-faint)] border border-[var(--color-line)]"
                     }`}
                   >
@@ -180,7 +180,7 @@ export default function HistoryPage() {
                   <button
                     type="button"
                     onClick={() => removeLifeEvent(e.id)}
-                    className="ml-auto text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
+                    className="ml-auto text-[12px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
                     aria-label="削除"
                   >
                     ×
@@ -202,7 +202,7 @@ export default function HistoryPage() {
         >
           ← BACK&nbsp;TO&nbsp;DASHBOARD
         </Link>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           SAVED · THIS DEVICE
         </span>
       </div>

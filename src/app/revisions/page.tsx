@@ -36,13 +36,13 @@ export default function RevisionsPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; REVISIONS
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           書き直しの記録
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           書き直すたび、過去の版が自動で残ります。
         </p>
       </section>
@@ -67,13 +67,13 @@ export default function RevisionsPage() {
                   onClick={() => setOpenKey(isOpen ? null : doc.docKey)}
                   className="w-full text-left py-5 flex items-baseline gap-4 group"
                 >
-                  <span className="serif text-lg text-[var(--color-ink)] group-hover:text-[var(--color-gold)] transition">
+                  <span className="serif text-lg text-[var(--color-ink)] group-hover:text-[var(--color-gold-ink)] transition">
                     {doc.label}
                   </span>
-                  <span className="text-[10px] tracking-[0.25em] text-[var(--color-gold)]">
+                  <span className="text-[12px] tracking-[0.25em] text-[var(--color-gold-ink)]">
                     {doc.count}版
                   </span>
-                  <span className="text-[11px] text-[var(--color-fg-faint)] ml-auto">
+                  <span className="text-[12px] text-[var(--color-fg-faint)] ml-auto">
                     最終 {fmt(doc.lastSavedAt)}
                   </span>
                   <span className="text-[var(--color-fg-faint)] text-xs">
@@ -105,7 +105,7 @@ export default function RevisionsPage() {
                           setOpenKey(null);
                         }
                       }}
-                      className="mt-4 text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+                      className="mt-4 text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
                     >
                       この履歴を削除
                     </button>
@@ -124,7 +124,7 @@ export default function RevisionsPage() {
         >
           ← BACK&nbsp;TO&nbsp;DASHBOARD
         </Link>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           SAVED · THIS DEVICE
         </span>
       </div>
@@ -152,15 +152,15 @@ function Version({
       />
       <span className="absolute left-[4.5px] top-4 bottom-0 w-px bg-[var(--color-line)]" />
       <div className="flex items-baseline gap-3 mb-1.5">
-        <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
           v{ordinal}
         </span>
         {isLatest && (
-          <span className="text-[9px] tracking-[0.2em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5">
+          <span className="text-[12px] tracking-[0.2em] text-[var(--color-gold-ink)] border border-[var(--color-gold)]/40 px-1.5 py-0.5">
             最新
           </span>
         )}
-        <span className="text-[11px] text-[var(--color-fg-mute)]">
+        <span className="text-[12px] text-[var(--color-fg-mute)]">
           {fmt(rev.savedAt)}
         </span>
         <button
@@ -174,7 +174,7 @@ function Version({
               () => {},
             );
           }}
-          className="ml-auto text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+          className="ml-auto text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
         >
           {copied ? "コピーしました" : "コピー"}
         </button>

@@ -59,7 +59,7 @@ export default function MoneyPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; MONEY&nbsp;RECORD
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight mb-1">
@@ -98,9 +98,9 @@ export default function MoneyPage() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
-            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
               資産・収入・固定費・目標を、質問に答えて記録
             </span>
           </button>
@@ -116,7 +116,7 @@ export default function MoneyPage() {
                 key={k.id}
                 type="button"
                 onClick={() => setKind(k.id)}
-                className={`text-[11px] tracking-[0.15em] px-3 py-2 transition ${
+                className={`text-[12px] tracking-[0.15em] px-3 py-2 transition ${
                   kind === k.id
                     ? "bg-[var(--color-ink)] text-white"
                     : "text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
@@ -175,13 +175,13 @@ export default function MoneyPage() {
                 key={m.id}
                 className="flex items-center gap-4 py-4 hairline-bottom group"
               >
-                <span className="text-[9px] tracking-[0.25em] text-[var(--color-fg-faint)] border border-[var(--color-line)] px-1.5 py-0.5 w-10 text-center">
+                <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] border border-[var(--color-line)] px-1.5 py-0.5 w-10 text-center">
                   {KINDS.find((k) => k.id === m.kind)?.label}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-[var(--color-ink)]">{m.label}</div>
                   {m.note && (
-                    <div className="text-[11px] text-[var(--color-fg-mute)] truncate">
+                    <div className="text-[12px] text-[var(--color-fg-mute)] truncate">
                       {m.note}
                     </div>
                   )}
@@ -189,18 +189,18 @@ export default function MoneyPage() {
                 {m.amount != null && (
                   <span className="serif text-base text-[var(--color-ink)] whitespace-nowrap">
                     {m.amount.toLocaleString()}
-                    <span className="text-[10px] text-[var(--color-fg-faint)] ml-0.5">
+                    <span className="text-[12px] text-[var(--color-fg-faint)] ml-0.5">
                       円
                     </span>
                   </span>
                 )}
-                <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+                <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)]">
                   {m.date}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeMoneyEntry(m.id)}
-                  className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
+                  className="text-[12px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
                   aria-label="削除"
                 >
                   ×
@@ -218,7 +218,7 @@ export default function MoneyPage() {
         >
           ← BACK&nbsp;TO&nbsp;DASHBOARD
         </Link>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           SAVED · THIS DEVICE
         </span>
       </div>

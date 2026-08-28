@@ -84,16 +84,16 @@ export default function OnboardingPage() {
       {/* Welcome */}
       {step === "welcome" && (
         <div className="text-center py-16">
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+          <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-6">
             ★ &nbsp; WELCOME&nbsp;TO
           </div>
           <h1 className="serif text-6xl md:text-7xl text-[var(--color-ink)] leading-[1.1] mb-3">
             {APP_NAME_JA}
           </h1>
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
             HOKUSHIN
           </div>
-          <div className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] mb-10">
+          <div className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] mb-10">
             ＝ 北極星
           </div>
           <p className="serif text-lg md:text-xl text-[var(--color-ink)] leading-relaxed mb-3 max-w-xl mx-auto">
@@ -110,12 +110,12 @@ export default function OnboardingPage() {
                 onClick={() => setStep(resumeStep)}
                 className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
               >
-                <span className="text-[var(--color-gold)]">→</span>
+                <span className="text-[var(--color-gold-ink)]">→</span>
                 続きから
               </button>
               <button
                 onClick={start}
-                className="text-[11px] tracking-[0.3em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-line)] hover:border-[var(--color-ink)] pb-0.5"
+                className="text-[12px] tracking-[0.3em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)] transition border-b border-[var(--color-line)] hover:border-[var(--color-ink)] pb-0.5"
               >
                 最初からやり直す
               </button>
@@ -125,16 +125,16 @@ export default function OnboardingPage() {
               onClick={start}
               className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
             >
-              <span className="text-[var(--color-gold)]">★</span>
+              <span className="text-[var(--color-gold-ink)]">★</span>
               はじめる
             </button>
           )}
-          <div className="mt-10 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+          <div className="mt-10 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
             所要時間：約 5 分
           </div>
           <button
             onClick={skipOnboarding}
-            className="block mx-auto mt-6 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-fg-mute)] transition"
+            className="block mx-auto mt-6 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-fg-mute)] transition"
           >
             あとで設定する →
           </button>
@@ -145,7 +145,7 @@ export default function OnboardingPage() {
       {(step === "philosophy" || step === "philosophy_done") && (
         <div className="w-full py-16">
           <StepProgress current={1} total={2} />
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mt-12 mb-4">
+          <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mt-12 mb-4">
             ★ &nbsp; FOUNDATION
           </div>
           <h2 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.15] mb-3">
@@ -158,7 +158,7 @@ export default function OnboardingPage() {
 
           {step === "philosophy_done" && state.pyramid[1]?.content && (
             <div className="bg-[var(--color-paper-soft)] border border-[var(--color-line)] p-6 mb-8">
-              <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+              <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
                 ✓ &nbsp; あなたの人生理念は、こんな形になりました
               </div>
               <div className="serif text-lg text-[var(--color-ink)] leading-relaxed whitespace-pre-wrap mb-5">
@@ -203,7 +203,7 @@ export default function OnboardingPage() {
       {(step === "vision" || step === "vision_done") && (
         <div className="w-full py-16">
           <StepProgress current={2} total={2} />
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mt-12 mb-4">
+          <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mt-12 mb-4">
             ★ &nbsp; VISION
           </div>
           <h2 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.15] mb-3">
@@ -216,7 +216,7 @@ export default function OnboardingPage() {
 
           {step === "vision_done" && state.pyramid[2]?.content && (
             <div className="bg-[var(--color-paper-soft)] border border-[var(--color-line)] p-6 mb-8">
-              <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+              <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
                 ✓ &nbsp; あなたの人生のビジョンは、こんな形になりました
               </div>
               <div className="serif text-lg text-[var(--color-ink)] leading-relaxed whitespace-pre-wrap mb-5">
@@ -257,7 +257,7 @@ export default function OnboardingPage() {
           {/* 参考：人生理念（手がかりとして下に置く） */}
           {state.pyramid[1]?.content && (
             <div className="mt-10 pt-6 hairline-top border-l-2 border-[var(--color-line)] pl-4">
-              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
                 参考 ・ あなたの人生理念
               </div>
               <div className="text-[13px] text-[var(--color-fg-mute)] leading-relaxed whitespace-pre-wrap">
@@ -271,7 +271,7 @@ export default function OnboardingPage() {
       {/* Complete */}
       {step === "complete" && (
         <div className="text-center py-16">
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+          <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-6">
             ★ &nbsp; FOUNDATION&nbsp;SET
           </div>
           <h2 className="serif text-5xl md:text-6xl text-[var(--color-ink)] leading-[1.1] mb-6">
@@ -291,7 +291,7 @@ export default function OnboardingPage() {
               onClick={() => router.push("/fields")}
               className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-8 py-3.5 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
             >
-              <span className="text-[var(--color-gold)]">→</span>
+              <span className="text-[var(--color-gold-ink)]">→</span>
               七つの分野へ
             </button>
             <Link
@@ -303,19 +303,19 @@ export default function OnboardingPage() {
           </div>
 
           <div className="mt-14 pt-8 hairline-top max-w-md mx-auto">
-            <div className="text-[10px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-4">
+            <div className="text-[12px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-4">
               もっと自分を深掘りするなら（あとでもOK）
             </div>
             <div className="flex items-center justify-center gap-5 text-xs tracking-[0.2em]">
-              <Link href="/mandala" className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition">
+              <Link href="/mandala" className="text-[var(--color-ink)] hover:text-[var(--color-gold-ink)] transition">
                 マンダラ
               </Link>
-              <span className="text-[var(--color-line)]">/</span>
-              <Link href="/list-100" className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition">
+              <span className="text-[var(--color-fg-faint)]">/</span>
+              <Link href="/list-100" className="text-[var(--color-ink)] hover:text-[var(--color-gold-ink)] transition">
                 100のリスト
               </Link>
-              <span className="text-[var(--color-line)]">/</span>
-              <Link href="/history" className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition">
+              <span className="text-[var(--color-fg-faint)]">/</span>
+              <Link href="/history" className="text-[var(--color-ink)] hover:text-[var(--color-gold-ink)] transition">
                 100年史
               </Link>
             </div>
@@ -372,9 +372,9 @@ function PhilosophyOrVisionInput({
           onClick={() => setShowGuided(true)}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">質問に答えて見つける</span>
-          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+          <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
             {guidedConfig.ctaSub}
           </span>
         </button>
@@ -382,14 +382,14 @@ function PhilosophyOrVisionInput({
 
       <div className="flex items-center gap-4">
         <div className="flex-1 h-px bg-[var(--color-line)]" />
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           {guidedConfig ? "または" : ""}
         </span>
         <div className="flex-1 h-px bg-[var(--color-line)]" />
       </div>
 
       <div>
-        <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+        <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
           自分で直接書く
         </div>
         <textarea
@@ -416,7 +416,7 @@ function PhilosophyOrVisionInput({
 
 function StepProgress({ current, total }: { current: number; total: number }) {
   return (
-    <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+    <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
       <span>STEP &nbsp; {String(current).padStart(2, "0")} &nbsp;/&nbsp; {String(total).padStart(2, "0")}</span>
       <div className="flex-1 h-px bg-[var(--color-line)] relative">
         <div

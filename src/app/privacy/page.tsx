@@ -13,7 +13,7 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 lg:px-10">
       <section className="pt-20 pb-10 hairline-bottom">
-        <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+        <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-6">
           ★ &nbsp; PRIVACY POLICY
         </div>
         <h1 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.15] font-medium tracking-tight mb-4">
@@ -138,7 +138,7 @@ function Block({
   return (
     <section>
       <div className="flex items-baseline gap-4 mb-3">
-        <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+        <span className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
           {n}
         </span>
         <h2 className="serif text-xl text-[var(--color-ink)]">{title}</h2>

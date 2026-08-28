@@ -30,12 +30,12 @@ export default function NorthStarCard({
     <section className="pt-4 pb-3 hairline-bottom">
       <div className="flex items-baseline justify-between mb-2">
         <div className="flex items-baseline gap-2">
-          <span className="text-[9px] tracking-[0.35em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)]">
             ★ NORTH STAR
           </span>
           <h2 className="serif text-base text-[var(--color-ink)]">私の北極星</h2>
         </div>
-        <span className="text-[9px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)]">
           最重要目標
         </span>
       </div>
@@ -100,7 +100,7 @@ function NorthRow({
     >
       {/* horizon label */}
       <div className="w-11 shrink-0 leading-none">
-        <span className="serif text-sm text-[var(--color-gold)]">{label}</span>
+        <span className="serif text-sm text-[var(--color-gold-ink)]">{label}</span>
         <span className="text-[8px] tracking-[0.1em] text-[var(--color-fg-faint)] ml-1">
           {span}
         </span>
@@ -165,7 +165,7 @@ function NorthRow({
         onChange={(e) =>
           onChangeField(e.target.value === "" ? undefined : Number(e.target.value))
         }
-        className="shrink-0 max-w-[5.5rem] text-[10px] text-[var(--color-fg-mute)] bg-transparent border-b border-[var(--color-line)] py-0.5 focus:outline-none focus:border-[var(--color-ink)]"
+        className="shrink-0 max-w-[5.5rem] text-[12px] text-[var(--color-fg-mute)] bg-transparent border-b border-[var(--color-line)] py-0.5 focus:outline-none focus:border-[var(--color-ink)]"
         title={
           linkedField
             ? `${linkedField.nameJa} の目標を反映中`

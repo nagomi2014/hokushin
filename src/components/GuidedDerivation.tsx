@@ -151,7 +151,7 @@ export function GuidedDerivation({
   if (pendingResume) {
     return (
       <div className="space-y-5">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
           ★ &nbsp; 前回の続きがあります
         </div>
         <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
@@ -183,7 +183,7 @@ export function GuidedDerivation({
   if (phase === "draft") {
     return (
       <div className="space-y-5">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
           ✓ &nbsp; {draftHeader}
         </div>
         {mirrorList.length > 0 && (
@@ -203,7 +203,7 @@ export function GuidedDerivation({
           onChange={(e) => setDraft(e.target.value)}
           className="w-full border border-[var(--color-line)] bg-white px-4 py-3 serif text-sm leading-relaxed text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
         />
-        <div className="text-[11px] text-[var(--color-fg-faint)] leading-relaxed">
+        <div className="text-[12px] text-[var(--color-fg-faint)] leading-relaxed">
           しっくりこなければ、自由に書き換えてOKです。あとからいつでも直せます。
         </div>
         <div className="flex items-center gap-3">
@@ -240,7 +240,7 @@ export function GuidedDerivation({
   return (
     <div className="space-y-5">
       {/* progress */}
-      <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+      <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
           Q {index + 1} / {questions.length}
         </span>
@@ -258,7 +258,7 @@ export function GuidedDerivation({
 
       {/* mirror（2問以上答えたら、見えてきた価値を見せる：理念のみ） */}
       {mirrorList.length > 0 && answers.length >= 2 && (
-        <div className="text-[11px] text-[var(--color-fg-mute)] border-l-2 border-[var(--color-gold)] pl-3">
+        <div className="text-[12px] text-[var(--color-fg-mute)] border-l-2 border-[var(--color-gold)] pl-3">
           ここまでで、あなたは
           <span className="text-[var(--color-ink)]">
             「{mirrorList.join("・")}」
@@ -272,7 +272,7 @@ export function GuidedDerivation({
         {q.prompt}
       </div>
       {q.hint && (
-        <div className="text-[11px] text-[var(--color-fg-faint)]">{q.hint}</div>
+        <div className="text-[12px] text-[var(--color-fg-faint)]">{q.hint}</div>
       )}
 
       {/* 選択肢チップ（複数選択OK・トグル） */}
@@ -291,13 +291,13 @@ export function GuidedDerivation({
                     : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
                 }`}
               >
-                {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
+                {on && <span className="text-[var(--color-gold-ink)] mr-1">✓</span>}
                 {opt.label}
               </button>
             );
           })}
         </div>
-        <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+        <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
           ピンと来たものを複数選んでOK（裏で大事な価値を見つけます）
         </div>
       </div>
@@ -307,7 +307,7 @@ export function GuidedDerivation({
         <div className="pt-1">
           <div className="flex items-center gap-3 mb-2">
             <div className="flex-1 h-px bg-[var(--color-line)]" />
-            <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+            <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
               自分の言葉も足せます
             </span>
             <div className="flex-1 h-px bg-[var(--color-line)]" />
@@ -351,7 +351,7 @@ export function GuidedDerivation({
               finish(answers);
               persist(answers, index, "draft");
             }}
-            className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
+            className="text-[12px] tracking-[0.25em] text-[var(--color-gold-ink)] hover:text-[var(--color-ink)] transition"
           >
             もう十分 ・ つくる →
           </button>

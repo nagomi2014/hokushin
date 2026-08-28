@@ -132,7 +132,7 @@ export function FieldHorizonGuide({
   return (
     <div className="space-y-5">
       {/* progress */}
-      <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+      <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
           {step + 1} / {horizons.length}
         </span>
@@ -165,14 +165,14 @@ export function FieldHorizonGuide({
 
       {/* prompt */}
       <div>
-        <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)] mb-2">
           {h.label}
         </div>
         <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
           {h.prompt}
         </div>
         {h.hint && (
-          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
             {h.hint}
           </div>
         )}
@@ -195,13 +195,13 @@ export function FieldHorizonGuide({
                       : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
                   }`}
                 >
-                  {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
+                  {on && <span className="text-[var(--color-gold-ink)] mr-1">✓</span>}
                   {c}
                 </button>
               );
             })}
           </div>
-          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
             複数選んでOK（下の欄で自由に書き換えもできます）
           </div>
         </div>
@@ -236,7 +236,7 @@ export function FieldHorizonGuide({
         <button
           type="button"
           onClick={() => go(step - 1)}
-          className="text-[11px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+          className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
         >
           ← ひとつ前へ
         </button>
@@ -247,7 +247,7 @@ export function FieldHorizonGuide({
 
 function ContextLine({ label, text }: { label: string; text: string }) {
   return (
-    <div className="border-l-2 border-[var(--color-gold)] pl-3 text-[11px] text-[var(--color-fg-mute)]">
+    <div className="border-l-2 border-[var(--color-gold)] pl-3 text-[12px] text-[var(--color-fg-mute)]">
       <span className="text-[var(--color-fg-faint)] tracking-[0.2em] mr-2">
         {label}
       </span>

@@ -12,7 +12,7 @@ export function ResumeChoice({
 }) {
   return (
     <div className="space-y-5">
-      <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+      <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
         ★ &nbsp; 前回の続きがあります
       </div>
       <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">

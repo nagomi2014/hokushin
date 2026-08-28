@@ -208,7 +208,7 @@ export default function DashboardPage() {
             <h1 className="serif text-base md:text-lg text-[var(--color-ink)] leading-tight font-medium tracking-tight">
               澄み切る、一日を。
             </h1>
-            <p className="text-[var(--color-fg-faint)] mt-0.5 text-[10px] tracking-wider">
+            <p className="text-[var(--color-fg-faint)] mt-0.5 text-[12px] tracking-wider">
               迷わぬ者は、北辰（北極星）を仰ぐ。
             </p>
           </div>
@@ -216,7 +216,7 @@ export default function DashboardPage() {
             <div className="serif text-sm text-[var(--color-ink)] leading-none">
               {formatDateDot(today)}
             </div>
-            <div className="text-[9px] text-[var(--color-fg-mute)] mt-0.5 tracking-widest">
+            <div className="text-[12px] text-[var(--color-fg-mute)] mt-0.5 tracking-widest">
               {WEEKDAYS_EN[today.getDay()]} · DAY {dayOfMonth} / {totalDays}
             </div>
           </div>
@@ -231,7 +231,7 @@ export default function DashboardPage() {
             className="group flex items-center justify-between gap-4 border-2 border-[var(--color-gold)] bg-[var(--color-paper-soft)] px-6 py-4 hover:bg-white transition"
           >
             <div>
-              <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+              <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-1">
                 ★ {moment === "start" ? "月のはじめ" : "月の終わり"}
               </div>
               <div className="serif text-lg text-[var(--color-ink)]">
@@ -240,7 +240,7 @@ export default function DashboardPage() {
                   : "今月のふり返りを書きましょう"}
               </div>
             </div>
-            <span className="text-[var(--color-gold)] text-2xl group-hover:translate-x-1 transition">
+            <span className="text-[var(--color-gold-ink)] text-2xl group-hover:translate-x-1 transition">
               →
             </span>
           </Link>
@@ -258,7 +258,7 @@ export default function DashboardPage() {
       <div className="py-2 hairline-bottom flex justify-end">
         <Link
           href="/fields"
-          className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+          className="text-[12px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
         >
           目標設定をする →
         </Link>
@@ -273,7 +273,7 @@ export default function DashboardPage() {
               href="/monthly"
               className="block bg-[var(--color-ink)] text-white px-5 py-3 mb-4 hover:bg-[var(--color-ink-soft)] transition"
             >
-              <div className="text-[9px] tracking-[0.3em] text-[var(--color-gold)] mb-1">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] mb-1">
                 ★ 今月の目標
               </div>
               <div className="serif text-base leading-relaxed">
@@ -292,15 +292,15 @@ export default function DashboardPage() {
           {/* 本日のタスク（縦の一覧＋日付＋その場で追加/削除） */}
           <div className="flex items-baseline justify-between mb-2">
             <div className="flex items-baseline gap-2">
-              <span className="text-[10px] tracking-[0.3em] text-[var(--color-gold)]">
+              <span className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
                 本日のタスク
               </span>
-              <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)]">
                 {today.getMonth() + 1}/{today.getDate()}（{WEEKDAYS_EN[today.getDay()]}）
               </span>
             </div>
             {todayTasks.length > 0 && (
-              <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
                 {completedToday} / {todayTasks.length} 完了
               </span>
             )}
@@ -323,7 +323,7 @@ export default function DashboardPage() {
                     className={`check-box ${t.completed ? "checked" : ""} shrink-0`}
                     aria-label="完了を切り替える"
                   >
-                    {t.completed && <span className="text-[10px]">✓</span>}
+                    {t.completed && <span className="text-[12px]">✓</span>}
                   </button>
                   <span
                     className={`flex-1 text-sm leading-snug ${
@@ -335,7 +335,7 @@ export default function DashboardPage() {
                     {t.title}
                   </span>
                   {t.fieldId != null && (
-                    <span className="text-[9px] tracking-[0.15em] text-[var(--color-fg-mute)] shrink-0">
+                    <span className="text-[12px] tracking-[0.15em] text-[var(--color-fg-mute)] shrink-0">
                       {String(t.fieldId).padStart(2, "0")}{" "}
                       {FIELDS.find((f) => f.id === t.fieldId)?.nameJaShort}
                     </span>
@@ -386,13 +386,13 @@ export default function DashboardPage() {
       <section className="py-8 hairline-bottom">
         <div className="flex flex-col gap-5">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
+            <span className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)]">
               いま
             </span>
             <span
-              className={`text-[11px] tracking-[0.25em] px-3 py-1 border ${
+              className={`text-[12px] tracking-[0.25em] px-3 py-1 border ${
                 phase === "explore"
-                  ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+                  ? "border-[var(--color-gold)] text-[var(--color-gold-ink)]"
                   : "border-[var(--color-ink)] text-[var(--color-ink)]"
               }`}
             >
@@ -411,7 +411,7 @@ export default function DashboardPage() {
       {/* ===== Pyramid ===== */}
       <section className="py-16 hairline-bottom">
         <div className="text-center mb-8">
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
             全体像 ・ MAP
           </div>
           <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
@@ -457,22 +457,22 @@ export default function DashboardPage() {
                 );
               })}
             </div>
-            <div className="mt-5 max-w-2xl mx-auto flex items-center justify-between text-[9px] tracking-[0.35em] text-[var(--color-fg-faint)] px-1">
+            <div className="mt-5 max-w-2xl mx-auto flex items-center justify-between text-[12px] tracking-[0.35em] text-[var(--color-fg-faint)] px-1">
               <span>BROADER &amp; DEEPER</span>
-              <span className="text-[var(--color-gold)]">
+              <span className="text-[var(--color-gold-ink)]">
                 ↑ NARROWER &amp; HIGHER
               </span>
             </div>
 
             <div className="mt-8 max-w-2xl mx-auto hairline-top pt-5 text-center">
-              <div className="text-[10px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-2">
+              <div className="text-[12px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-2">
                 ピラミッドの頂点「日々の実践」は、ここで現れる
               </div>
               <Link
                 href="/daily"
                 className="inline-flex items-center gap-2 text-xs tracking-[0.3em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5"
               >
-                <span className="text-[var(--color-gold)]">↳</span>
+                <span className="text-[var(--color-gold-ink)]">↳</span>
                 本日の行 へ
               </Link>
             </div>
@@ -480,7 +480,7 @@ export default function DashboardPage() {
 
       {/* ===== ① 知る（探索の道具） ===== */}
       <section className="py-16 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           ① 知る ・ EXPLORE
         </div>
         <h2 className="serif text-3xl text-[var(--color-ink)] mb-2">
@@ -513,7 +513,7 @@ export default function DashboardPage() {
 
       {/* ===== そのほかのツール（ととのえる） ===== */}
       <section className="py-16 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           ととのえる ・ TOOLS
         </div>
         <h2 className="serif text-3xl text-[var(--color-ink)] mb-2">
@@ -548,7 +548,7 @@ export default function DashboardPage() {
       <section className="py-16 hairline-bottom">
         <div className="grid grid-cols-12 gap-8 mb-4">
           <div className="col-span-12 md:col-span-3">
-            <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+            <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
               ② 導き出す ・ DERIVE
             </div>
             <h2 className="serif text-3xl text-[var(--color-ink)] mb-3">
@@ -625,7 +625,7 @@ export default function DashboardPage() {
       {/* ===== ③ 動く（Today + Monthly） ===== */}
       <section className="py-16 hairline-bottom">
         <div className="mb-10">
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-2">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-2">
             ③ 動く ・ ACT
           </div>
           <p className="text-sm text-[var(--color-fg-mute)]">
@@ -675,7 +675,7 @@ export default function DashboardPage() {
                         className={`check-box ${task.completed ? "checked" : ""}`}
                         aria-label="toggle"
                       >
-                        {task.completed && <span className="text-[10px]">✓</span>}
+                        {task.completed && <span className="text-[12px]">✓</span>}
                       </button>
                       <span
                         className={`text-sm flex-1 ${
@@ -687,13 +687,13 @@ export default function DashboardPage() {
                         {task.title}
                       </span>
                       {task.fieldId != null && (
-                        <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-mute)]">
+                        <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-mute)]">
                           {String(task.fieldId).padStart(2, "0")}{" "}
                           {FIELDS.find((f) => f.id === task.fieldId)?.nameJaShort}
                         </span>
                       )}
                       {task.startTime && (
-                        <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+                        <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)]">
                           {task.startTime}
                           {task.endTime ? ` — ${task.endTime}` : " —"}
                         </span>
@@ -726,7 +726,7 @@ export default function DashboardPage() {
                   {ym.month}月の計画
                 </h2>
               </div>
-              <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
                 DAY {dayOfMonth} / {totalDays}
               </span>
             </div>
@@ -745,7 +745,7 @@ export default function DashboardPage() {
             ) : (
               <div className="space-y-6">
                 <div className="hairline-bottom pb-5">
-                  <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+                  <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
                     最重要目標
                   </div>
                   <div className="serif text-xl text-[var(--color-ink)] leading-snug">
@@ -753,7 +753,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="hairline-bottom pb-5">
-                  <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+                  <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
                     行動テーマ
                   </div>
                   <div className="text-sm text-[var(--color-ink)]">
@@ -762,7 +762,7 @@ export default function DashboardPage() {
                 </div>
                 {monthlyPlan.successPoints.length > 0 && (
                   <div className="hairline-bottom pb-5">
-                    <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+                    <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
                       達成のポイント
                     </div>
                     <ul className="text-sm text-[var(--color-ink)] space-y-1.5">
@@ -782,19 +782,19 @@ export default function DashboardPage() {
       {/* ===== Quote ===== */}
       <section className="py-24 text-center">
         <div className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-loose tracking-wider">
-          己の<span className="text-[var(--color-gold)]">北辰</span>を仰ぐ者は、
+          己の<span className="text-[var(--color-gold-ink)]">北辰</span>を仰ぐ者は、
           <br />
           道に迷うことなし。
         </div>
-        <div className="mt-6 text-[10px] tracking-[0.35em] text-[var(--color-fg-faint)]">
+        <div className="mt-6 text-[12px] tracking-[0.35em] text-[var(--color-fg-faint)]">
           ※ 北辰（ほくしん）＝ 北極星。古来、夜空で動かない目印として航海・人生の道標とされてきた。
         </div>
       </section>
 
       {/* ===== Footer ===== */}
-      <footer className="hairline-top py-10 flex items-center justify-between text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+      <footer className="hairline-top py-10 flex items-center justify-between text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
-          <span className="text-[var(--color-gold)]">★</span> &nbsp; HOKUSHIN
+          <span className="text-[var(--color-gold-ink)]">★</span> &nbsp; HOKUSHIN
         </span>
         <span>FIND YOUR NORTH STAR</span>
         <span>© 2026 HOKUSHIN</span>
@@ -829,9 +829,9 @@ function FlowMap({ phase }: { phase: "explore" | "act" }) {
                   : "text-[var(--color-fg-mute)]"
               }`}
             >
-              <span className="text-[var(--color-gold)]">{s.no}</span> {s.ja}
+              <span className="text-[var(--color-gold-ink)]">{s.no}</span> {s.ja}
             </div>
-            <div className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] mt-1">
+            <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mt-1">
               {s.en}
             </div>
           </div>
@@ -864,10 +864,10 @@ function QuickItem({
       <div className="serif text-[var(--color-fg-faint)] text-sm mb-12">
         {label}
       </div>
-      <div className="num-display text-4xl text-[var(--color-ink)] group-hover:text-[var(--color-gold)] transition">
+      <div className="num-display text-4xl text-[var(--color-ink)] group-hover:text-[var(--color-gold-ink)] transition">
         {value}
       </div>
-      <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mt-2">
+      <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mt-2">
         {caption}
       </div>
     </>

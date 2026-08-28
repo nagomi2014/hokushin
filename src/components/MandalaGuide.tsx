@@ -135,13 +135,13 @@ export function MandalaGuide({
   if (phase === "bridge") {
     return (
       <div className="space-y-5">
-        <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)]">
+        <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)]">
           ✓ &nbsp; 8つの観点まで書けました
         </div>
         <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
           それぞれの観点を、さらに8マスに展開しますか？
         </div>
-        <div className="text-[11px] text-[var(--color-fg-faint)]">
+        <div className="text-[12px] text-[var(--color-fg-faint)]">
           観点ごとに「具体的にやること・要素」を質問していきます。あとから足してもOK。
         </div>
         <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export function MandalaGuide({
     const a = queue[qPos];
     return (
       <div className="space-y-5">
-        <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           <span>
             観点 {qPos + 1} / {queue.length}
           </span>
@@ -192,7 +192,7 @@ export function MandalaGuide({
         </div>
 
         <div>
-          <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+          <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)] mb-2">
             {cells[a]}
           </div>
           <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
@@ -201,7 +201,7 @@ export function MandalaGuide({
             具体的にやること・要素は？（最大8つ）
           </div>
           {subAdded > 0 && (
-            <div className="text-[11px] text-[var(--color-gold)] mt-2">
+            <div className="text-[12px] text-[var(--color-gold-ink)] mt-2">
               ✓ {subAdded} 件 追加しました
             </div>
           )}
@@ -246,7 +246,7 @@ export function MandalaGuide({
   // phase === "main"
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+      <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
           {step + 1} / {totalMain}
         </span>
@@ -271,13 +271,13 @@ export function MandalaGuide({
 
       {isCenter ? (
         <div>
-          <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+          <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)] mb-2">
             中央
           </div>
           <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
             マンダラの真ん中に置く、人生で一番大切にしたいテーマは？
           </div>
-          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
             一言で。タップでも、自分の言葉でもOK。
           </div>
           <div className="flex flex-wrap gap-2 mt-3">
@@ -295,7 +295,7 @@ export function MandalaGuide({
         </div>
       ) : (
         <div>
-          <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+          <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)] mb-2">
             {CELL_AREAS[aspectIdx]}
           </div>
           <div className="serif text-lg text-[var(--color-ink)] leading-relaxed">
@@ -303,7 +303,7 @@ export function MandalaGuide({
             <br />
             {CELL_AREAS[aspectIdx]}で大事にしたいことは？
           </div>
-          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
             一言・キーワードでOK。思いつかなければスキップを。
           </div>
         </div>
@@ -344,7 +344,7 @@ export function MandalaGuide({
             setStep((s) => s - 1);
             setText("");
           }}
-          className="text-[11px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+          className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
         >
           ← ひとつ前へ
         </button>

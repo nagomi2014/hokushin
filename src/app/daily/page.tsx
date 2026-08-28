@@ -65,13 +65,13 @@ export default function DailyPage() {
 
       {/* Header */}
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; DAILY&nbsp;PRACTICE
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           本日の行
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           今日この瞬間の一手を、ここで選ぶ。
         </p>
       </section>
@@ -80,7 +80,7 @@ export default function DailyPage() {
       <section className="py-8 hairline-bottom">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
+            <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)] mb-2">
               DATE
             </div>
             <input
@@ -92,7 +92,7 @@ export default function DailyPage() {
           </div>
           <div className="flex items-center gap-6 text-xs">
             <div>
-              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
                 COMPLETED
               </div>
               <div className="serif text-xl text-[var(--color-ink)]">
@@ -101,7 +101,7 @@ export default function DailyPage() {
             </div>
             <div className="w-px h-10 bg-[var(--color-line)]" />
             <div>
-              <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-1">
                 RATE
               </div>
               <div className="serif text-xl text-[var(--color-ink)]">
@@ -115,7 +115,7 @@ export default function DailyPage() {
 
       {/* Add form */}
       <section className="py-8 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           新たに記す
         </div>
         <form onSubmit={handleAdd} className="grid grid-cols-12 gap-3">
@@ -199,7 +199,7 @@ export default function DailyPage() {
                       className={`check-box ${task.completed ? "checked" : ""}`}
                       aria-label="toggle"
                     >
-                      {task.completed && <span className="text-[10px]">✓</span>}
+                      {task.completed && <span className="text-[12px]">✓</span>}
                     </button>
                     <span
                       className={`text-sm flex-1 ${
@@ -211,12 +211,12 @@ export default function DailyPage() {
                       {task.title}
                     </span>
                     {field && (
-                      <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-mute)]">
+                      <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-mute)]">
                         {field.number} {field.nameJaShort}
                       </span>
                     )}
                     {task.startTime && (
-                      <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)] w-24 text-right">
+                      <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)] w-24 text-right">
                         {task.startTime}
                         {task.endTime ? ` — ${task.endTime}` : " —"}
                       </span>
@@ -231,8 +231,8 @@ export default function DailyPage() {
                     </button>
                   </div>
                   {linkedGoal && (
-                    <div className="ml-9 mt-1.5 flex items-start gap-2 text-[11px] text-[var(--color-fg-faint)] leading-relaxed">
-                      <span className="text-[var(--color-gold)] flex-shrink-0">↳</span>
+                    <div className="ml-9 mt-1.5 flex items-start gap-2 text-[12px] text-[var(--color-fg-faint)] leading-relaxed">
+                      <span className="text-[var(--color-gold-ink)] flex-shrink-0">↳</span>
                       <span className="line-clamp-2">{linkedGoal}</span>
                     </div>
                   )}
@@ -240,8 +240,8 @@ export default function DailyPage() {
               );
             })}
           </div>
-          <div className="mt-6 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] text-center">
-            <span className="text-[var(--color-gold)]">↳</span> &nbsp; この一手がつながる目標
+          <div className="mt-6 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] text-center">
+            <span className="text-[var(--color-gold-ink)]">↳</span> &nbsp; この一手がつながる目標
           </div>
           </>
         )}
@@ -311,26 +311,26 @@ function RecurringTasksSection({
         aria-expanded={open}
       >
         <span className="flex items-baseline gap-3">
-          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
             ↻ 繰り返し
           </span>
           <span className="serif text-base text-[var(--color-ink)]">
             毎日・曜日ごとのタスク
           </span>
           {recurringTasks.length > 0 && (
-            <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+            <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)]">
               {recurringTasks.length}件
             </span>
           )}
         </span>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
           {open ? "閉じる −" : "設定する ＋"}
         </span>
       </button>
 
       {open && (
         <div className="mt-5 space-y-4">
-          <p className="text-[11px] text-[var(--color-fg-faint)] leading-relaxed">
+          <p className="text-[12px] text-[var(--color-fg-faint)] leading-relaxed">
             登録すると、その曜日になるたび「本日の行」に自動で入ります（例：平日だけ／毎週水曜だけ）。
           </p>
 
@@ -343,7 +343,7 @@ function RecurringTasksSection({
 
           {/* presets */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] mr-1">
+            <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] mr-1">
               おまかせ：
             </span>
             {presets.map((p) => (
@@ -351,7 +351,7 @@ function RecurringTasksSection({
                 key={p.label}
                 type="button"
                 onClick={() => setDays(p.days)}
-                className="text-[11px] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
+                className="text-[12px] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
               >
                 {p.label}
               </button>
@@ -396,7 +396,7 @@ function RecurringTasksSection({
                   key={r.id}
                   className="flex items-center gap-3 py-2.5 hairline-bottom group"
                 >
-                  <span className="text-[9px] tracking-[0.15em] text-[var(--color-gold)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 whitespace-nowrap">
+                  <span className="text-[12px] tracking-[0.15em] text-[var(--color-gold-ink)] border border-[var(--color-gold)]/40 px-1.5 py-0.5 whitespace-nowrap">
                     {describeSchedule(r)}
                   </span>
                   <span className="text-sm flex-1 text-[var(--color-ink)]">
@@ -405,7 +405,7 @@ function RecurringTasksSection({
                   <button
                     type="button"
                     onClick={() => onRemove(r.id)}
-                    className="text-[10px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
+                    className="text-[12px] text-[var(--color-fg-faint)] opacity-0 group-hover:opacity-100 hover:text-[var(--color-ink)] transition"
                     aria-label="削除"
                   >
                     ×

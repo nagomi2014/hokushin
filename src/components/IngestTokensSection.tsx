@@ -89,7 +89,7 @@ export function IngestTokensSection() {
 
       {/* 発行 */}
       <div className="border border-[var(--color-line)] p-5 mb-6">
-        <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+        <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
           新しいトークンを発行
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -112,13 +112,13 @@ export function IngestTokensSection() {
 
         {newToken && (
           <div className="mt-4 bg-[var(--color-paper-soft)] border border-[var(--color-gold)] p-4">
-            <div className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] mb-2">
+            <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] mb-2">
               ★ 今だけ表示されます ・ 必ずコピーして保管してください
             </div>
             <code className="block break-all text-sm text-[var(--color-ink)] bg-white border border-[var(--color-line)] px-3 py-2 select-all">
               {newToken}
             </code>
-            <p className="mt-2 text-[10px] text-[var(--color-fg-faint)] leading-relaxed">
+            <p className="mt-2 text-[12px] text-[var(--color-fg-faint)] leading-relaxed">
               この画面を離れると二度と表示されません（保存されるのはハッシュのみ）。
             </p>
           </div>
@@ -128,7 +128,7 @@ export function IngestTokensSection() {
       {/* 一覧 */}
       {tokens.length > 0 && (
         <div className="mb-6">
-          <div className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+          <div className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
             発行済みトークン
           </div>
           <div className="hairline-top">
@@ -140,7 +140,7 @@ export function IngestTokensSection() {
                 <span className="text-[var(--color-ink)] flex-1 truncate">
                   {t.label || "（無題）"}
                 </span>
-                <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)] whitespace-nowrap">
+                <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)] whitespace-nowrap">
                   {t.last_used_at
                     ? `最終使用 ${t.last_used_at.slice(0, 10)}`
                     : "未使用"}
@@ -160,7 +160,7 @@ export function IngestTokensSection() {
 
       {/* 使い方 */}
       <details className="text-xs text-[var(--color-fg-mute)]">
-        <summary className="cursor-pointer text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]">
+        <summary className="cursor-pointer text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]">
           送信方法（開発者向け）
         </summary>
         <div className="mt-3 leading-relaxed space-y-2">
@@ -169,7 +169,7 @@ export function IngestTokensSection() {
             POST {endpoint}
           </code>
           <p>例（Markdown を丸ごと送る）：</p>
-          <code className="block whitespace-pre-wrap break-all bg-[var(--color-paper-soft)] border border-[var(--color-line)] px-3 py-2 text-[var(--color-ink)] text-[11px] leading-relaxed">
+          <code className="block whitespace-pre-wrap break-all bg-[var(--color-paper-soft)] border border-[var(--color-line)] px-3 py-2 text-[var(--color-ink)] text-[12px] leading-relaxed">
 {`curl -X POST ${endpoint} \\
   -H "Authorization: Bearer <トークン>" \\
   -H "Content-Type: application/json" \\

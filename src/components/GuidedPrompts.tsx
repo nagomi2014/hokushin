@@ -104,7 +104,7 @@ export function GuidedPrompts({
   return (
     <div className="space-y-5">
       {/* progress */}
-      <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+      <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
         <span>
           {index + 1} / {steps.length}
         </span>
@@ -131,7 +131,7 @@ export function GuidedPrompts({
       {step.context && step.context.length > 0 && (
         <div className="bg-[var(--color-paper-soft)] border-l-2 border-[var(--color-gold)] px-4 py-3 space-y-1">
           {step.context.map((c, i) => (
-            <div key={i} className="text-[11px] leading-relaxed">
+            <div key={i} className="text-[12px] leading-relaxed">
               <span className="text-[var(--color-fg-faint)] tracking-[0.2em] mr-2">
                 {c.label}
               </span>
@@ -147,12 +147,12 @@ export function GuidedPrompts({
           {step.prompt}
         </div>
         {step.hint && (
-          <div className="text-[11px] text-[var(--color-fg-faint)] mt-2">
+          <div className="text-[12px] text-[var(--color-fg-faint)] mt-2">
             {step.hint}
           </div>
         )}
         {addedHere > 0 && (
-          <div className="text-[11px] text-[var(--color-gold)] mt-2">
+          <div className="text-[12px] text-[var(--color-gold-ink)] mt-2">
             ✓ {addedHere} 件 追加しました
           </div>
         )}
@@ -197,7 +197,7 @@ export function GuidedPrompts({
         <button
           type="button"
           onClick={() => go(index - 1)}
-          className="text-[11px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+          className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
         >
           ← ひとつ前へ
         </button>

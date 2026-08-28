@@ -28,14 +28,14 @@ export default function PeriodTasks({
     <section className="py-6 hairline-bottom">
       <div className="flex items-baseline justify-between mb-2">
         <div className="flex items-baseline gap-2">
-          <span className="text-[10px] tracking-[0.3em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
             {title}
           </span>
-          <span className="text-[10px] tracking-[0.2em] text-[var(--color-fg-faint)]">
+          <span className="text-[12px] tracking-[0.2em] text-[var(--color-fg-faint)]">
             {dateLabel}
           </span>
         </div>
-        <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
           {done} / {tasks.length} 完了
         </span>
       </div>
@@ -54,7 +54,7 @@ export default function PeriodTasks({
                 className={`check-box ${checked ? "checked" : ""} shrink-0`}
                 aria-label="完了を切り替える"
               >
-                {checked && <span className="text-[10px]">✓</span>}
+                {checked && <span className="text-[12px]">✓</span>}
               </button>
               <span
                 className={`flex-1 text-sm leading-snug ${
@@ -66,7 +66,7 @@ export default function PeriodTasks({
                 {t.title}
               </span>
               {t.fieldId != null && (
-                <span className="text-[9px] tracking-[0.15em] text-[var(--color-fg-mute)] shrink-0">
+                <span className="text-[12px] tracking-[0.15em] text-[var(--color-fg-mute)] shrink-0">
                   {FIELDS.find((f) => f.id === t.fieldId)?.nameJaShort}
                 </span>
               )}

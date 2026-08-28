@@ -30,13 +30,13 @@ export default function MandalaPage() {
     <div className="max-w-5xl mx-auto px-6 lg:px-10">
 
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; SELF&nbsp;DISCOVERY
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight">
           マンダラチャート
         </h1>
-        <p className="text-[var(--color-fg-faint)] text-[11px] tracking-wider mt-1">
+        <p className="text-[var(--color-fg-faint)] text-[12px] tracking-wider mt-1">
           中央テーマ → 8つの観点 → 64の派生。集めた言葉が目標の材料に。
         </p>
       </section>
@@ -61,9 +61,9 @@ export default function MandalaPage() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold)] mr-2">★</span>
+            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
-            <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+            <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
               中央のテーマ → 8つの観点、を質問に答えて埋める
             </span>
           </button>
@@ -75,13 +75,13 @@ export default function MandalaPage() {
         {expanded ? (
         <>
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+          <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
             81マスを編集
           </span>
           <button
             type="button"
             onClick={() => setExpanded(false)}
-            className="text-[10px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
+            className="text-[12px] tracking-[0.25em] text-[var(--color-fg-mute)] hover:text-[var(--color-ink)]"
           >
             小さく表示 −
           </button>
@@ -155,7 +155,7 @@ export default function MandalaPage() {
           </div>
         </div>
 
-        <div className="mt-5 flex items-center justify-between text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <div className="mt-5 flex items-center justify-between text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           <span>中央テーマ＋8観点＋64派生 ＝ 81マス</span>
           <span>SAVED · THIS DEVICE</span>
         </div>
@@ -167,10 +167,10 @@ export default function MandalaPage() {
             className="block w-full group"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
                 マンダラ全体
               </span>
-              <span className="text-[10px] tracking-[0.25em] text-[var(--color-gold)] group-hover:text-[var(--color-ink)]">
+              <span className="text-[12px] tracking-[0.25em] text-[var(--color-gold-ink)] group-hover:text-[var(--color-ink)]">
                 タップで拡大・編集 →
               </span>
             </div>
@@ -181,12 +181,12 @@ export default function MandalaPage() {
 
       {/* Hints */}
       <section className="py-8 hairline-bottom">
-        <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           書き方のヒント
         </div>
         <ul className="text-sm text-[var(--color-fg-mute)] leading-relaxed space-y-2 max-w-2xl">
-          <li>― 真ん中の<span className="text-[var(--color-gold)]">紺のマス</span>に「人生で大切にしたいこと」を一つ。</li>
-          <li>― そのまわりの<span className="text-[var(--color-gold)]">金のマス</span>が、中央から派生する8つの観点。</li>
+          <li>― 真ん中の<span className="text-[var(--color-gold-ink)]">紺のマス</span>に「人生で大切にしたいこと」を一つ。</li>
+          <li>― そのまわりの<span className="text-[var(--color-gold-ink)]">金のマス</span>が、中央から派生する8つの観点。</li>
           <li>― 外側の8ブロックは、それぞれの観点をさらに8つに展開する場所。</li>
           <li>― 「質問に沿って書く」を使えば、順番に質問されるので白紙で迷いません。</li>
         </ul>
@@ -201,7 +201,7 @@ export default function MandalaPage() {
         </Link>
         <Link
           href="/list-100"
-          className="text-xs tracking-[0.25em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5 hover:text-[var(--color-gold)] hover:border-[var(--color-gold)] transition"
+          className="text-xs tracking-[0.25em] text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5 hover:text-[var(--color-gold-ink)] hover:border-[var(--color-gold)] transition"
         >
           → 次は 100 のリストへ
         </Link>
@@ -275,7 +275,7 @@ function Cell({
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder="中央テーマ"
-          className={`${base} w-full h-full bg-transparent text-white serif text-[11px] md:text-xs px-1 focus:outline-none placeholder:text-white/40`}
+          className={`${base} w-full h-full bg-transparent text-white serif text-[12px] md:text-xs px-1 focus:outline-none placeholder:text-white/40`}
         />
       </div>
     );
@@ -285,7 +285,7 @@ function Cell({
     // 外周ブロックの中心＝観点のミラー（編集は中央ブロックで）
     return (
       <div
-        className={`${base} bg-[var(--color-paper-soft)] text-[var(--color-gold)] serif text-[11px] md:text-xs px-1`}
+        className={`${base} bg-[var(--color-paper-soft)] text-[var(--color-gold-ink)] serif text-[12px] md:text-xs px-1`}
         style={style}
         title="観点（中央で編集）"
       >
@@ -296,7 +296,7 @@ function Cell({
 
   const tint =
     variant === "aspect"
-      ? "bg-[var(--color-paper-soft)] text-[var(--color-gold)] serif"
+      ? "bg-[var(--color-paper-soft)] text-[var(--color-gold-ink)] serif"
       : "bg-white text-[var(--color-ink)]";
 
   return (
@@ -305,7 +305,7 @@ function Cell({
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder="—"
-        className={`${base} w-full h-full bg-transparent text-[11px] md:text-xs px-1 focus:outline-none placeholder:text-[var(--color-fg-faint)]`}
+        className={`${base} w-full h-full bg-transparent text-[12px] md:text-xs px-1 focus:outline-none placeholder:text-[var(--color-fg-faint)]`}
       />
     </div>
   );

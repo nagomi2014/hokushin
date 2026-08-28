@@ -41,13 +41,13 @@ export default function LoginPage() {
     <div className="max-w-md mx-auto px-6 min-h-[calc(100vh-4rem)] flex items-center justify-center">
       <div className="w-full py-16">
         <div className="text-center mb-12">
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-5">
+          <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-5">
             ★ &nbsp; SIGN&nbsp;IN
           </div>
           <h1 className="serif text-5xl text-[var(--color-ink)] leading-[1.1] mb-3">
             {APP_NAME_JA}
           </h1>
-          <div className="text-[10px] tracking-[0.4em] text-[var(--color-fg-faint)]">
+          <div className="text-[12px] tracking-[0.4em] text-[var(--color-fg-faint)]">
             HOKUSHIN
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
         ) : sent ? (
           <div className="text-center">
             <div className="border border-[var(--color-line)] bg-[var(--color-paper-soft)] p-8">
-              <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-4">
+              <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-4">
                 ✓ &nbsp; MAIL&nbsp;SENT
               </div>
               <p className="serif text-lg text-[var(--color-ink)] leading-relaxed mb-3">
@@ -92,7 +92,7 @@ export default function LoginPage() {
             >
               ← 別のメールアドレスで送る
             </button>
-            <p className="mt-4 text-[10px] text-[var(--color-fg-faint)] leading-relaxed">
+            <p className="mt-4 text-[12px] text-[var(--color-fg-faint)] leading-relaxed">
               メールが届かない時は迷惑メールも確認してください（1〜2分かかる場合があります）。
             </p>
           </div>
@@ -104,7 +104,7 @@ export default function LoginPage() {
               パスワードは不要です。
             </p>
             <div>
-              <label className="block text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
+              <label className="block text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-2">
                 EMAIL
               </label>
               <input

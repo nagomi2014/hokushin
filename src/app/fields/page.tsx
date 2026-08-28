@@ -87,7 +87,7 @@ export default function FieldsPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <section className="pt-24 pb-8 text-center">
-          <div className="text-[10px] tracking-[0.5em] text-[var(--color-gold)] mb-6">
+          <div className="text-[12px] tracking-[0.5em] text-[var(--color-gold-ink)] mb-6">
             ★ &nbsp; DONE
           </div>
           <h1 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.15] mb-4">
@@ -112,7 +112,7 @@ export default function FieldsPage() {
           </button>
           <Link
             href="/"
-            className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
+            className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)]"
           >
             DASHBOARD →
           </Link>
@@ -127,7 +127,7 @@ export default function FieldsPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <section className="pt-20 pb-8 hairline-bottom">
-          <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-5">
+          <div className="flex items-center gap-3 text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] mb-5">
             <span>
               分野 {seqIndex + 1} / {activeIds.length}
             </span>
@@ -149,7 +149,7 @@ export default function FieldsPage() {
               閉じる
             </button>
           </div>
-          <div className="text-[10px] tracking-[0.35em] text-[var(--color-gold)] mb-2">
+          <div className="text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)] mb-2">
             {field.nameEn}
           </div>
           <h1 className="serif text-4xl md:text-5xl text-[var(--color-ink)] leading-[1.1] mb-3">
@@ -185,7 +185,7 @@ export default function FieldsPage() {
     <div className="max-w-5xl mx-auto px-6 lg:px-10">
 
       <section className="pt-12 pb-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.45em] text-[var(--color-gold)] mb-2">
+        <div className="text-[12px] tracking-[0.45em] text-[var(--color-gold-ink)] mb-2">
           ★ &nbsp; GOAL&nbsp;SETTING
         </div>
         <h1 className="serif text-2xl md:text-3xl text-[var(--color-ink)] leading-tight font-medium tracking-tight mb-2">
@@ -193,11 +193,11 @@ export default function FieldsPage() {
         </h1>
         <p className="text-[var(--color-fg-mute)] text-sm md:text-base tracking-wider max-w-2xl">
           <span className="text-[var(--color-ink)]">長期</span>
-          <span className="text-[var(--color-gold)] mx-2">→</span>
+          <span className="text-[var(--color-gold-ink)] mx-2">→</span>
           <span className="text-[var(--color-ink)]">中期</span>
-          <span className="text-[var(--color-gold)] mx-2">→</span>
+          <span className="text-[var(--color-gold-ink)] mx-2">→</span>
           <span className="text-[var(--color-ink)]">短期（今年末）</span>
-          <span className="text-[var(--color-gold)] mx-2">→</span>
+          <span className="text-[var(--color-gold-ink)] mx-2">→</span>
           <span className="text-[var(--color-ink)]">今日のタスク</span>
           へ、年ごとに降ろしていく。
         </p>
@@ -219,13 +219,13 @@ export default function FieldsPage() {
           onClick={startSeq}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold)] mr-2">★</span>
+          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
             {activeIds.length > 0
               ? `質問に沿って、${activeIds.length}つの分野を順に立てる`
               : "まず、取り組む分野を選ぶ"}
           </span>
-          <span className="block text-[10px] tracking-[0.25em] text-white/60 mt-1">
+          <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
             一つの分野ずつ、質問に答えるだけ。途中で閉じても続きから
           </span>
         </button>
@@ -233,7 +233,7 @@ export default function FieldsPage() {
 
       {/* 目標の区切り設定（毎年 12/31 〆） */}
       <section className="py-6 hairline-bottom">
-        <div className="text-[10px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-3">
+        <div className="text-[12px] tracking-[0.35em] text-[var(--color-fg-faint)] mb-3">
           目標の区切り（毎年 12 / 31 〆）
         </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-xs text-[var(--color-ink)]">
@@ -243,7 +243,7 @@ export default function FieldsPage() {
               （{new Date().getFullYear()}）
             </span>
           </span>
-          <span className="text-[var(--color-line)]">/</span>
+          <span className="text-[var(--color-fg-faint)]">/</span>
           <span className="flex items-center gap-2">
             中期 ＝
             <Stepper
@@ -255,7 +255,7 @@ export default function FieldsPage() {
               （{new Date().getFullYear() + horizonSpan.mid}）
             </span>
           </span>
-          <span className="text-[var(--color-line)]">/</span>
+          <span className="text-[var(--color-fg-faint)]">/</span>
           <span className="flex items-center gap-2">
             長期 ＝
             <Stepper
@@ -305,7 +305,7 @@ export default function FieldsPage() {
                   <h2 className="serif text-2xl text-[var(--color-ink)]">
                     {field.nameJa}
                   </h2>
-                  <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+                  <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
                     {field.nameEn}
                   </span>
                 </div>
@@ -313,7 +313,7 @@ export default function FieldsPage() {
                   <button
                     type="button"
                     onClick={() => setCoachFieldId(field.id)}
-                    className="text-[10px] tracking-[0.3em] text-[var(--color-gold)] hover:text-[var(--color-ink)] transition"
+                    className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] hover:text-[var(--color-ink)] transition"
                   >
                     ★ 質問で目標を作る
                   </button>
@@ -397,7 +397,7 @@ export default function FieldsPage() {
                     style={{ width: `${goal?.progress ?? 0}%` }}
                   />
                 </div>
-                <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+                <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
                   {goal?.updatedAt
                     ? `UPDATED · ${goal.updatedAt.slice(0, 10)}`
                     : "—"}
@@ -424,7 +424,7 @@ export default function FieldsPage() {
         >
           ← BACK&nbsp;TO&nbsp;DASHBOARD
         </Link>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           AUTO-SAVED · LOCAL
         </span>
       </div>
@@ -439,7 +439,7 @@ export default function FieldsPage() {
           <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
             <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
               <div>
-                <div className="text-[9px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
+                <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-1">
                   ★ &nbsp; 質問で目標を作る
                 </div>
                 <div className="serif text-base text-[var(--color-ink)]">
@@ -508,7 +508,7 @@ function NextSteps() {
   ];
   return (
     <section className="mt-12 pt-10 hairline-top">
-      <div className="text-[10px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+      <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
         ③ 動く ・ NEXT
       </div>
       <h2 className="serif text-3xl text-[var(--color-ink)] mb-2">
@@ -527,16 +527,16 @@ function NextSteps() {
             className="bg-white p-6 hover:bg-[var(--color-paper-soft)] transition group"
           >
             <div className="flex items-baseline justify-between mb-3">
-              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold)] transition">
+              <span className="serif text-2xl text-[var(--color-fg-faint)] group-hover:text-[var(--color-gold-ink)] transition">
                 {s.no}
               </span>
-              <span className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+              <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
                 {s.en}
               </span>
             </div>
             <div className="serif text-lg text-[var(--color-ink)] mb-2">
               {s.title}
-              <span className="text-[var(--color-gold)] ml-2 text-sm">→</span>
+              <span className="text-[var(--color-gold-ink)] ml-2 text-sm">→</span>
             </div>
             <p className="text-[12px] text-[var(--color-fg-mute)] leading-relaxed">
               {s.desc}
@@ -578,17 +578,17 @@ function FieldChooser({
         aria-expanded={open}
       >
         <span className="flex items-baseline gap-3">
-          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
             FOCUS
           </span>
           <span className="serif text-lg text-[var(--color-ink)]">
             取り組む分野を選ぶ
           </span>
-          <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+          <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
             {activeIds.length > 0 ? `${activeIds.length}つ` : "未選択"}
           </span>
         </span>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
           {open ? "閉じる −" : "選び直す ＋"}
         </span>
       </button>
@@ -615,7 +615,7 @@ function FieldChooser({
                       : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
                   }`}
                 >
-                  {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
+                  {on && <span className="text-[var(--color-gold-ink)] mr-1">✓</span>}
                   {f.nameJa}
                 </button>
               );
@@ -624,7 +624,7 @@ function FieldChooser({
 
           {/* おまかせプリセット */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] mr-1">
+            <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] mr-1">
               おまかせ：
             </span>
             {presets.map((p) => (
@@ -632,7 +632,7 @@ function FieldChooser({
                 key={p.label}
                 type="button"
                 onClick={() => onPreset(p.ids)}
-                className="text-[11px] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
+                className="text-[12px] border border-[var(--color-line)] text-[var(--color-fg-mute)] px-2.5 py-1 hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
               >
                 {p.label}
               </button>
@@ -676,14 +676,14 @@ function ExplorationMaterial({
         aria-expanded={open}
       >
         <span className="flex items-baseline gap-3">
-          <span className="text-[10px] tracking-[0.4em] text-[var(--color-gold)]">
+          <span className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)]">
             ① 知る → ② 導き出す
           </span>
           <span className="serif text-lg text-[var(--color-ink)]">
             探索の材料
           </span>
         </span>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-mute)] group-hover:text-[var(--color-ink)]">
           {open ? "閉じる −" : "開く ＋"}
         </span>
       </button>
@@ -697,7 +697,7 @@ function ExplorationMaterial({
           {!hasAny ? (
             <div className="hairline-top hairline-bottom py-8 text-center text-sm text-[var(--color-fg-faint)]">
               まだ探索の材料がありません。
-              <span className="block mt-3 flex items-center justify-center gap-4 text-[10px] tracking-[0.25em]">
+              <span className="block mt-3 flex items-center justify-center gap-4 text-[12px] tracking-[0.25em]">
                 <Link href="/pyramid" className="text-[var(--color-ink)] border-b border-[var(--color-ink)] pb-0.5">
                   ピラミッド →
                 </Link>
@@ -735,7 +735,7 @@ function ExplorationMaterial({
                 {mandalaCenter || mandalaCells.length > 0 ? (
                   <div className="text-sm text-[var(--color-ink)]">
                     {mandalaCenter && (
-                      <div className="serif mb-2 text-[var(--color-gold)]">
+                      <div className="serif mb-2 text-[var(--color-gold-ink)]">
                         {mandalaCenter}
                       </div>
                     )}
@@ -744,7 +744,7 @@ function ExplorationMaterial({
                         {mandalaCells.slice(0, 8).map((c, i) => (
                           <span
                             key={i}
-                            className="text-[11px] px-2 py-0.5 border border-[var(--color-line)] text-[var(--color-fg-mute)]"
+                            className="text-[12px] px-2 py-0.5 border border-[var(--color-line)] text-[var(--color-fg-mute)]"
                           >
                             {c}
                           </span>
@@ -762,14 +762,14 @@ function ExplorationMaterial({
                   <ul className="text-sm text-[var(--color-ink)] space-y-1">
                     {wishes.slice(0, 5).map((w) => (
                       <li key={w.id} className="flex items-baseline gap-2">
-                        <span className="text-[var(--color-gold)] text-[10px]">
+                        <span className="text-[var(--color-gold-ink)] text-[12px]">
                           ・
                         </span>
                         <span className="truncate">{w.text}</span>
                       </li>
                     ))}
                     {wishes.length > 5 && (
-                      <li className="text-[10px] text-[var(--color-fg-faint)] pl-4">
+                      <li className="text-[12px] text-[var(--color-fg-faint)] pl-4">
                         …他 {wishes.length - 5} 件
                       </li>
                     )}
@@ -803,7 +803,7 @@ function MaterialCard({
         <span className="serif text-sm text-[var(--color-ink)]">{title}</span>
         <Link
           href={href}
-          className="text-[9px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
+          className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)] hover:text-[var(--color-ink)] transition"
         >
           {en} →
         </Link>
@@ -817,7 +817,7 @@ function EmptyHint({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-[11px] text-[var(--color-fg-faint)] italic hover:text-[var(--color-ink)] transition"
+      className="text-[12px] text-[var(--color-fg-faint)] italic hover:text-[var(--color-ink)] transition"
     >
       {label} →
     </Link>
@@ -877,7 +877,7 @@ function FieldTermInput({
     <div className="relative">
       <div className="flex items-baseline justify-between mb-2">
         <span className="serif text-sm text-[var(--color-ink)]">{label}</span>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           {caption}
         </span>
       </div>
@@ -885,9 +885,9 @@ function FieldTermInput({
         <button
           type="button"
           onClick={onToggleDashboard}
-          className={`mb-2 inline-flex items-center gap-1 text-[10px] tracking-[0.15em] px-2 py-1 border transition ${
+          className={`mb-2 inline-flex items-center gap-1 text-[12px] tracking-[0.15em] px-2 py-1 border transition ${
             dashboardActive
-              ? "border-[var(--color-gold)] text-[var(--color-gold)]"
+              ? "border-[var(--color-gold)] text-[var(--color-gold-ink)]"
               : "border-[var(--color-line)] text-[var(--color-fg-faint)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
           }`}
           title="ダッシュボードの「私の北極星」に表示する"
@@ -903,7 +903,7 @@ function FieldTermInput({
         className="w-full border border-[var(--color-line)] bg-white px-3 py-2 text-sm leading-relaxed text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)] transition resize-y"
       />
       {arrow && (
-        <div className="hidden md:flex absolute top-1/2 -right-3 -translate-y-1/2 text-[var(--color-gold)] text-lg z-10 pointer-events-none">
+        <div className="hidden md:flex absolute top-1/2 -right-3 -translate-y-1/2 text-[var(--color-gold-ink)] text-lg z-10 pointer-events-none">
           →
         </div>
       )}
@@ -916,18 +916,18 @@ function TodayTasksColumn({ tasks }: { tasks: DailyTask[] }) {
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
-        <span className="serif text-sm text-[var(--color-gold)]">今日のタスク</span>
-        <span className="text-[10px] tracking-[0.3em] text-[var(--color-fg-faint)]">
+        <span className="serif text-sm text-[var(--color-gold-ink)]">今日のタスク</span>
+        <span className="text-[12px] tracking-[0.3em] text-[var(--color-fg-faint)]">
           NOW
         </span>
       </div>
       <div className="border border-[var(--color-line)] bg-[var(--color-paper-soft)] px-3 py-2 min-h-[7.5rem] text-sm">
         {tasks.length === 0 ? (
-          <div className="text-[11px] text-[var(--color-fg-faint)] italic">
+          <div className="text-[12px] text-[var(--color-fg-faint)] italic">
             この分野のタスクはまだありません。
             <Link
               href="/daily"
-              className="block mt-2 text-[10px] tracking-[0.25em] text-[var(--color-ink)] not-italic border-b border-[var(--color-ink)] pb-0.5 inline-block"
+              className="block mt-2 text-[12px] tracking-[0.25em] text-[var(--color-ink)] not-italic border-b border-[var(--color-ink)] pb-0.5 inline-block"
             >
               ＋ 追加する
             </Link>
@@ -944,25 +944,25 @@ function TodayTasksColumn({ tasks }: { tasks: DailyTask[] }) {
                       : "text-[var(--color-ink)]"
                   }`}
                 >
-                  <span className="text-[var(--color-gold)] text-[10px]">
+                  <span className="text-[var(--color-gold-ink)] text-[12px]">
                     {t.completed ? "✓" : "□"}
                   </span>
                   <span className="truncate">{t.title}</span>
                 </li>
               ))}
               {tasks.length > 4 && (
-                <li className="text-[10px] text-[var(--color-fg-faint)] pl-4">
+                <li className="text-[12px] text-[var(--color-fg-faint)] pl-4">
                   …他 {tasks.length - 4} 件
                 </li>
               )}
             </ul>
-            <div className="flex items-center justify-between text-[10px] tracking-[0.25em] text-[var(--color-fg-faint)] hairline-top pt-1.5">
+            <div className="flex items-center justify-between text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)] hairline-top pt-1.5">
               <span>
                 {done} / {tasks.length}
               </span>
               <Link
                 href="/daily"
-                className="text-[var(--color-ink)] hover:text-[var(--color-gold)] transition"
+                className="text-[var(--color-ink)] hover:text-[var(--color-gold-ink)] transition"
               >
                 → 本日の行
               </Link>

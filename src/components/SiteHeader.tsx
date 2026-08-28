@@ -66,7 +66,7 @@ export function SiteHeader() {
     href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
   return (
-    <header className="hairline-bottom sticky top-0 bg-white/95 backdrop-blur-sm z-40">
+    <header className="hairline-bottom sticky top-0 bg-white z-40">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           <span className="serif text-2xl text-[var(--color-ink)] leading-none">
@@ -74,10 +74,10 @@ export function SiteHeader() {
           </span>
           <span className="w-px h-5 bg-[var(--color-line)]" />
           <div className="flex flex-col leading-tight">
-            <span className="text-[10px] tracking-[0.35em] text-[var(--color-fg-mute)] font-medium">
+            <span className="text-[12px] tracking-[0.35em] text-[var(--color-fg-mute)] font-medium">
               {APP_NAME.toUpperCase()}
             </span>
-            <span className="text-[9px] tracking-[0.25em] text-[var(--color-fg-faint)]">
+            <span className="text-[12px] tracking-[0.25em] text-[var(--color-fg-faint)]">
               ＝ {APP_MEANING_JA}
             </span>
           </div>
@@ -103,7 +103,7 @@ export function SiteHeader() {
           {supabaseEnabled && !userEmail && (
             <Link
               href="/login"
-              className="hidden sm:inline-block text-[10px] tracking-[0.3em] px-2.5 py-1 border border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
+              className="hidden sm:inline-block text-[12px] tracking-[0.3em] px-2.5 py-1 border border-[var(--color-line)] text-[var(--color-fg-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition"
               title="ログイン"
             >
               LOGIN
@@ -170,7 +170,7 @@ export function SiteHeader() {
                 return (
                   <Fragment key={item.href}>
                     {showHeader && (
-                      <li className="pt-4 pb-1 text-[10px] tracking-[0.35em] text-[var(--color-gold)]">
+                      <li className="pt-4 pb-1 text-[12px] tracking-[0.35em] text-[var(--color-gold-ink)]">
                         {GROUP_LABEL[item.group]}
                       </li>
                     )}
@@ -183,16 +183,16 @@ export function SiteHeader() {
                         <span
                           className={`serif text-lg ${
                             active
-                              ? "text-[var(--color-gold)]"
+                              ? "text-[var(--color-gold-ink)]"
                               : "text-[var(--color-ink)]"
                           }`}
                         >
                           {item.labelJa}
                         </span>
                         <span
-                          className={`text-[10px] tracking-[0.3em] ${
+                          className={`text-[12px] tracking-[0.3em] ${
                             active
-                              ? "text-[var(--color-gold)]"
+                              ? "text-[var(--color-gold-ink)]"
                               : "text-[var(--color-fg-faint)]"
                           }`}
                         >
