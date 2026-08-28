@@ -110,7 +110,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep(resumeStep)}
                 className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
               >
-                <span className="text-[var(--color-gold-ink)]">→</span>
+                <span className="text-[var(--color-gold)]">→</span>
                 続きから
               </button>
               <button
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
               onClick={start}
               className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-10 py-4 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
             >
-              <span className="text-[var(--color-gold-ink)]">★</span>
+              <span className="text-[var(--color-gold)]">★</span>
               はじめる
             </button>
           )}
@@ -291,7 +291,7 @@ export default function OnboardingPage() {
               onClick={() => router.push("/fields")}
               className="inline-flex items-center gap-3 bg-[var(--color-ink)] text-white px-8 py-3.5 text-sm tracking-[0.3em] hover:bg-[var(--color-ink-soft)] transition"
             >
-              <span className="text-[var(--color-gold-ink)]">→</span>
+              <span className="text-[var(--color-gold)]">→</span>
               七つの分野へ
             </button>
             <Link
@@ -372,7 +372,7 @@ function PhilosophyOrVisionInput({
           onClick={() => setShowGuided(true)}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
+          <span className="text-[var(--color-gold)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">質問に答えて見つける</span>
           <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
             {guidedConfig.ctaSub}

@@ -169,7 +169,7 @@ export default function PyramidPage() {
           <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
             <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
               <div>
-                <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-1">
+                <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
                   ★ &nbsp; 質問で見つける
                 </div>
                 <div className="serif text-base text-[var(--color-ink)]">

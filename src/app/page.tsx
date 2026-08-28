@@ -273,7 +273,7 @@ export default function DashboardPage() {
               href="/monthly"
               className="block bg-[var(--color-ink)] text-white px-5 py-3 mb-4 hover:bg-[var(--color-ink-soft)] transition"
             >
-              <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)] mb-1">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold)] mb-1">
                 ★ 今月の目標
               </div>
               <div className="serif text-base leading-relaxed">

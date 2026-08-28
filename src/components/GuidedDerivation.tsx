@@ -291,7 +291,7 @@ export function GuidedDerivation({
                     : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
                 }`}
               >
-                {on && <span className="text-[var(--color-gold-ink)] mr-1">✓</span>}
+                {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
                 {opt.label}
               </button>
             );

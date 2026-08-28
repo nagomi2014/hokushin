@@ -186,7 +186,7 @@ export default function PrimePage() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
+            <span className="text-[var(--color-gold)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">
               {fieldsWithStates.length > 0
                 ? "分野の状態から、一手を引き出す"

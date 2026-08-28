@@ -98,7 +98,7 @@ export default function MoneyPage() {
             onClick={() => setGuideOpen(true)}
             className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
           >
-            <span className="text-[var(--color-gold-ink)] mr-2">★</span>
+            <span className="text-[var(--color-gold)] mr-2">★</span>
             <span className="text-sm tracking-[0.15em]">質問に沿って書く</span>
             <span className="block text-[12px] tracking-[0.25em] text-white/60 mt-1">
               資産・収入・固定費・目標を、質問に答えて記録

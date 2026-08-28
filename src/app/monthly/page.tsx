@@ -218,7 +218,7 @@ export default function MonthlyPage() {
           }}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 mt-6 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
+          <span className="text-[var(--color-gold)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
             新しい月のはじまりです。今月の目標を立てましょう
           </span>
@@ -242,7 +242,7 @@ export default function MonthlyPage() {
           }}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 mt-6 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
+          <span className="text-[var(--color-gold)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
             今月もおつかれさまでした。ふり返りを書きましょう
           </span>
@@ -257,7 +257,7 @@ export default function MonthlyPage() {
         {primaryText ? (
           <div className="bg-[var(--color-ink)] text-white px-5 py-4">
             <div className="flex items-center justify-between gap-3 mb-1">
-              <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
+              <div className="text-[12px] tracking-[0.3em] text-[var(--color-gold)]">
                 ★ THIS MONTH
               </div>
               <button

@@ -14,7 +14,7 @@
   --color-paper-soft: #FAFAF7;
   --color-fg: #1A1A1A;
   --color-fg-mute: #6B6B6B;
-  --color-fg-faint: #6E6E6E;  /* 白・#FAFAF7・#F1F1ED の上で 4.5 を越える上限（旧 #9A9A9A は2.48で読めない） */
+  --color-fg-faint: #6B6B6B;  /* 旧 #9A9A9A は比2.48で読めなかった。床(4.5)を越える濃さにしたら mute と同値になったので、灰は1段に統合 */
 
   /* Fonts (Next.js next/font injects these CSS variables via <html> className) */
   --font-serif: var(--font-noto-serif-jp), "Yu Mincho", "Hiragino Mincho ProN", serif;

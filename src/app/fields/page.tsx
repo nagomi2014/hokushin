@@ -219,7 +219,7 @@ export default function FieldsPage() {
           onClick={startSeq}
           className="block w-full text-left bg-[var(--color-ink)] text-white px-6 py-4 hover:bg-[var(--color-ink-soft)] transition"
         >
-          <span className="text-[var(--color-gold-ink)] mr-2">★</span>
+          <span className="text-[var(--color-gold)] mr-2">★</span>
           <span className="text-sm tracking-[0.15em]">
             {activeIds.length > 0
               ? `質問に沿って、${activeIds.length}つの分野を順に立てる`
@@ -439,7 +439,7 @@ export default function FieldsPage() {
           <aside className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl flex flex-col">
             <div className="hairline-bottom px-6 py-4 flex items-center justify-between">
               <div>
-                <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-1">
+                <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold)] mb-1">
                   ★ &nbsp; 質問で目標を作る
                 </div>
                 <div className="serif text-base text-[var(--color-ink)]">
@@ -615,7 +615,7 @@ function FieldChooser({
                       : "border-[var(--color-line)] text-[var(--color-ink)] hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-soft)]"
                   }`}
                 >
-                  {on && <span className="text-[var(--color-gold-ink)] mr-1">✓</span>}
+                  {on && <span className="text-[var(--color-gold)] mr-1">✓</span>}
                   {f.nameJa}
                 </button>
               );

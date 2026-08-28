@@ -144,7 +144,7 @@ export default function JournalPage() {
             日報を保存
           </button>
           {savedMsg && (
-            <span className="text-[12px] tracking-[0.3em] text-[var(--color-gold-ink)]">
+            <span className="text-[12px] tracking-[0.3em] text-[var(--color-gold)]">
               ✓ {savedMsg}
             </span>
           )}
