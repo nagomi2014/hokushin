@@ -190,7 +190,7 @@ export default function SettingsPage() {
 
       {/* Legal */}
       <section className="py-12 hairline-bottom">
-        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold)] mb-3">
+        <div className="text-[12px] tracking-[0.4em] text-[var(--color-gold-ink)] mb-3">
           04 ・ 規約
         </div>
         <Link
